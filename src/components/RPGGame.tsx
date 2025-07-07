@@ -6,6 +6,7 @@ import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
 import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
+import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import { useToast } from '@/hooks/use-toast';
 
@@ -56,6 +57,7 @@ const RPGGame = () => {
     maxMana: 50,
     experience: 0,
     level: 1,
+    coins: 50,
     inventory: initialItems,
     equipment: {
       head: null,
@@ -63,6 +65,10 @@ const RPGGame = () => {
       legs: null,
       weapon: null,
       shield: null
+    },
+    questProgress: {
+      visitedMerchant: false,
+      usedFountain: false
     }
   });
 
@@ -86,7 +92,26 @@ const RPGGame = () => {
           slot: 'weapon',
           stats: { damage: 12 },
           description: 'Прочный железный меч',
-          icon: '⚔️'
+          icon: '⚔️',
+          price: 25
+        },
+        {
+          id: 'steel-armor',
+          name: 'Стальная броня',
+          type: 'armor',
+          slot: 'chest',
+          stats: { armor: 8 },
+          description: 'Прочная стальная броня',
+          icon: '🛡️',
+          price: 40
+        },
+        {
+          id: 'mana-potion',
+          name: 'Зелье маны',
+          type: 'consumable',
+          description: 'Восстанавливает 30 единиц маны',
+          icon: '🔮',
+          price: 10
         }
       ]
     },
@@ -108,7 +133,7 @@ const RPGGame = () => {
           status: 'available',
           objectives: [
             { description: 'Поговори с торговцем', completed: false },
-            { description: 'Исследуй деревню', completed: false }
+            { description: 'Используй фонтан исцеления', completed: false }
           ],
           rewards: {
             experience: 50,
@@ -178,7 +203,44 @@ const RPGGame = () => {
 
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);
-  }, []);
+    
+    // Mark merchant as visited for quest progress
+    if (npc.type === 'merchant') {
+      setPlayer(prev => ({
+        ...prev,
+        questProgress: {
+          ...prev.questProgress,
+          visitedMerchant: true
+        }
+      }));
+      
+      // Check if quest should be completed
+      if (player.questProgress.usedFountain) {
+        const activeQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
+        if (activeQuest) {
+          const updatedQuest = {
+            ...activeQuest,
+            status: 'completed' as const,
+            objectives: activeQuest.objectives.map(obj => ({ ...obj, completed: true }))
+          };
+          setQuests(prev => [...prev.filter(q => q.id !== activeQuest.id), updatedQuest]);
+          
+          // Give rewards
+          setPlayer(prev => ({
+            ...prev,
+            experience: prev.experience + activeQuest.rewards.experience,
+            inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
+          }));
+          
+          toast({
+            title: 'Квест выполнен!',
+            description: `${activeQuest.title} завершён! +${activeQuest.rewards.experience} опыта`,
+            duration: 4000,
+          });
+        }
+      }
+    }
+  }, [player.questProgress, quests, toast]);
 
   const handleEquipItem = useCallback((item: Item) => {
     if (!item.slot) return;
@@ -250,6 +312,88 @@ const RPGGame = () => {
     });
   }, [player.equipment, toast]);
 
+  const handleBuyItem = useCallback((item: Item) => {
+    if (!item.price || player.coins < item.price) {
+      toast({
+        title: 'Недостаточно монет',
+        description: `Нужно ${item.price} монет, у вас ${player.coins}`,
+        duration: 2000,
+      });
+      return;
+    }
+
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins - item.price!,
+      inventory: [...prev.inventory, item]
+    }));
+
+    toast({
+      title: 'Покупка совершена!',
+      description: `${item.name} добавлен в инвентарь`,
+      duration: 2000,
+    });
+  }, [player.coins, toast]);
+
+  const handleTrade = useCallback(() => {
+    setActiveMenu('trade');
+    setSelectedNPC(null);
+  }, []);
+
+  const handleFountainUse = useCallback(() => {
+    if (player.coins < 5) {
+      toast({
+        title: 'Недостаточно монет',
+        description: 'Нужно 5 монет для использования фонтана',
+        duration: 2000,
+      });
+      return;
+    }
+
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins - 5,
+      health: prev.maxHealth,
+      mana: prev.maxMana,
+      questProgress: {
+        ...prev.questProgress,
+        usedFountain: true
+      }
+    }));
+
+    toast({
+      title: 'Фонтан использован!',
+      description: 'Здоровье и мана восстановлены',
+      duration: 2000,
+    });
+
+    // Check if quest should be completed
+    if (player.questProgress.visitedMerchant) {
+      const activeQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
+      if (activeQuest) {
+        const updatedQuest = {
+          ...activeQuest,
+          status: 'completed' as const,
+          objectives: activeQuest.objectives.map(obj => ({ ...obj, completed: true }))
+        };
+        setQuests(prev => [...prev.filter(q => q.id !== activeQuest.id), updatedQuest]);
+        
+        // Give rewards
+        setPlayer(prev => ({
+          ...prev,
+          experience: prev.experience + activeQuest.rewards.experience,
+          inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
+        }));
+        
+        toast({
+          title: 'Квест выполнен!',
+          description: `${activeQuest.title} завершён! +${activeQuest.rewards.experience} опыта`,
+          duration: 4000,
+        });
+      }
+    }
+  }, [player.coins, player.questProgress, quests, toast]);
+
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       <PlayerStats player={player} />
@@ -259,6 +403,7 @@ const RPGGame = () => {
         npcs={npcs}
         onPlayerMove={handlePlayerMove}
         onNPCInteract={handleNPCInteract}
+        onFountainUse={handleFountainUse}
       />
 
       <VirtualJoystick
@@ -294,6 +439,7 @@ const RPGGame = () => {
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
           onAcceptQuest={handleAcceptQuest}
+          onTrade={handleTrade}
         />
       )}
 
@@ -311,6 +457,15 @@ const RPGGame = () => {
         <QuestMenu
           quests={quests}
           onClose={() => setActiveMenu('none')}
+        />
+      )}
+
+      {activeMenu === 'trade' && (
+        <TradeMenu
+          player={player}
+          merchant={npcs.find(npc => npc.type === 'merchant')!}
+          onClose={() => setActiveMenu('none')}
+          onBuyItem={handleBuyItem}
         />
       )}
     </div>

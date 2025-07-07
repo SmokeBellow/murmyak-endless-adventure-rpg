@@ -9,8 +9,13 @@ export interface Player {
   maxMana: number;
   experience: number;
   level: number;
+  coins: number;
   inventory: Item[];
   equipment: Equipment;
+  questProgress: {
+    visitedMerchant: boolean;
+    usedFountain: boolean;
+  };
 }
 
 export interface Item {
@@ -26,6 +31,7 @@ export interface Item {
   };
   description: string;
   icon: string;
+  price?: number;
 }
 
 export interface Equipment {
@@ -62,4 +68,4 @@ export interface Quest {
 }
 
 export type GameScreen = 'intro' | 'game';
-export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests';
+export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade';

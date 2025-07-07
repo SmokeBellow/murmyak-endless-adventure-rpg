@@ -6,9 +6,10 @@ interface GameMapProps {
   npcs: NPC[];
   onPlayerMove: (newPosition: { x: number; y: number }) => void;
   onNPCInteract: (npc: NPC) => void;
+  onFountainUse: () => void;
 }
 
-const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) => {
+const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: GameMapProps) => {
   const mapWidth = 2000;
   const mapHeight = 2000;
 
@@ -16,6 +17,13 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
     const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
+    
+    // Check if clicking on fountain
+    const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+    if (fountainDistance < 30) {
+      onFountainUse();
+      return;
+    }
     
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
@@ -28,7 +36,7 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
     } else {
       onPlayerMove({ x, y });
     }
-  }, [player.position, npcs, onPlayerMove, onNPCInteract]);
+  }, [player.position, npcs, onPlayerMove, onNPCInteract, onFountainUse]);
 
   // Calculate camera offset to center on player
   const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
@@ -113,6 +121,23 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
             height: 60,
           }}
         />
+
+        {/* Fountain */}
+        <div
+          className="absolute bg-blue-400/80 border-2 border-blue-600 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+          style={{
+            left: 380,
+            top: 380,
+            width: 40,
+            height: 40,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onFountainUse();
+          }}
+        >
+          ⛲
+        </div>
       </div>
     </div>
   );

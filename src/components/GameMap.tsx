@@ -23,9 +23,9 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
     const screenX = event.clientX - rect.left;
     const screenY = event.clientY - rect.top;
     
-    // Calculate world position accounting for camera offset
-    const worldX = screenX - cameraOffsetX;
-    const worldY = screenY - cameraOffsetY;
+    // Calculate world position: screen coordinates + player position - screen center
+    const worldX = screenX + player.position.x - (rect.width / 2);
+    const worldY = screenY + player.position.y - (rect.height / 2);
     
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
@@ -41,7 +41,7 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
       const constrainedY = Math.max(50, Math.min(mapHeight - 50, worldY));
       onPlayerMove({ x: constrainedX, y: constrainedY });
     }
-  }, [cameraOffsetX, cameraOffsetY, npcs, onPlayerMove, onNPCInteract, mapWidth, mapHeight]);
+  }, [player.position, npcs, onPlayerMove, onNPCInteract, mapWidth, mapHeight]);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

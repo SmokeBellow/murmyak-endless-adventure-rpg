@@ -212,7 +212,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     <>
       {/* Coal Mine - moved here from village */}
       <div
-        className="absolute bg-gray-800/80 border-2 border-gray-600 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        className="absolute bg-gray-900/90 border-2 border-gray-700 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-orange-200 font-bold shadow-lg shadow-black/50"
         style={{
           left: 370,
           top: 370,
@@ -232,7 +232,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Return Portal */}
       <div
-        className="absolute bg-purple-600/80 border-2 border-purple-400 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        className="absolute bg-purple-700/90 border-2 border-purple-500 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-purple-200 font-bold shadow-lg shadow-black/60"
         style={{
           left: 180,
           top: 180,
@@ -250,17 +250,47 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         🌀
       </div>
 
-      {/* Mine rocks and environment */}
+      {/* Mine rocks and environment - more detailed and dark */}
       <div
-        className="absolute bg-gray-700/60 border-2 border-gray-500 rounded-lg"
+        className="absolute bg-gray-800/80 border-2 border-gray-700 rounded-lg shadow-inner"
         style={{ left: 300, top: 300, width: 80, height: 40 }}
-      >
-      </div>
+      />
       <div
-        className="absolute bg-gray-600/60 border-2 border-gray-400 rounded-lg"
+        className="absolute bg-gray-700/80 border-2 border-gray-600 rounded-lg shadow-inner"
         style={{ left: 500, top: 350, width: 60, height: 30 }}
-      >
-      </div>
+      />
+      <div
+        className="absolute bg-gray-900/70 border-2 border-gray-800 rounded-lg shadow-inner"
+        style={{ left: 250, top: 450, width: 40, height: 25 }}
+      />
+      <div
+        className="absolute bg-stone-800/60 border border-stone-700 rounded"
+        style={{ left: 450, top: 500, width: 30, height: 20 }}
+      />
+      <div
+        className="absolute bg-slate-800/70 border border-slate-700 rounded-lg"
+        style={{ left: 350, top: 550, width: 70, height: 35 }}
+      />
+      <div
+        className="absolute bg-gray-900/80 border border-gray-800 rounded"
+        style={{ left: 580, top: 480, width: 25, height: 15 }}
+      />
+      
+      {/* Dark cave entrances */}
+      <div
+        className="absolute bg-black/90 border-2 border-gray-900 rounded-full shadow-2xl"
+        style={{ left: 150, top: 400, width: 50, height: 50 }}
+      />
+      <div
+        className="absolute bg-black/90 border-2 border-gray-900 rounded-full shadow-2xl"
+        style={{ left: 600, top: 250, width: 40, height: 40 }}
+      />
+      
+      {/* Scattered coal pieces */}
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 320, top: 380 }} />
+      <div className="absolute w-2 h-2 bg-black/70 rounded-full" style={{ left: 380, top: 420 }} />
+      <div className="absolute w-2 h-2 bg-gray-900/80 rounded-full" style={{ left: 450, top: 360 }} />
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 520, top: 390 }} />
     </>
   );
 
@@ -274,23 +304,30 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           linear-gradient(45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%),
           linear-gradient(-45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%)
         `,
-        backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px'
+        backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px',
+        backgroundColor: 'rgba(139, 186, 139, 0.1)'
       };
     } else {
       return {
         backgroundImage: `
-          radial-gradient(circle at 400px 400px, rgba(50, 50, 50, 0.3) 0%, transparent 200px),
-          radial-gradient(circle at 600px 200px, rgba(80, 80, 80, 0.2) 0%, transparent 150px),
-          linear-gradient(45deg, rgba(60, 60, 60, 0.1) 25%, transparent 25%),
-          linear-gradient(-45deg, rgba(60, 60, 60, 0.1) 25%, transparent 25%)
+          radial-gradient(circle at 400px 400px, rgba(20, 20, 20, 0.8) 0%, rgba(40, 40, 40, 0.4) 200px),
+          radial-gradient(circle at 600px 200px, rgba(30, 30, 35, 0.6) 0%, rgba(50, 50, 55, 0.3) 150px),
+          radial-gradient(circle at 200px 600px, rgba(25, 25, 30, 0.7) 0%, rgba(45, 45, 50, 0.2) 180px),
+          linear-gradient(45deg, rgba(10, 10, 15, 0.3) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(15, 15, 20, 0.3) 25%, transparent 25%),
+          linear-gradient(135deg, rgba(5, 5, 10, 0.2) 0%, rgba(25, 25, 30, 0.1) 100%)
         `,
-        backgroundSize: '300px 300px, 250px 250px, 40px 40px, 40px 40px'
+        backgroundSize: '300px 300px, 250px 250px, 280px 280px, 40px 40px, 40px 40px, 800px 800px',
+        backgroundColor: 'rgba(15, 15, 20, 0.9)',
+        filter: 'brightness(0.6) contrast(1.2)'
       };
     }
   };
 
   return (
-    <div className="flex-1 overflow-hidden bg-village-bg relative cursor-crosshair">
+    <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
+      currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
+    }`}>
       <div 
         className="absolute w-full h-full"
         style={{

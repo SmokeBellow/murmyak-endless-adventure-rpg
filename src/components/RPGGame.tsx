@@ -12,6 +12,7 @@ import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
 import QuestRewardModal from './QuestRewardModal';
+import LoadingScreen from './LoadingScreen';
 
 const RPGGame = () => {
   const { toast } = useToast();
@@ -21,6 +22,7 @@ const RPGGame = () => {
   const [showCoalMining, setShowCoalMining] = useState(false);
   const [questReward, setQuestReward] = useState<Quest | null>(null);
   const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   // Initial game items
   const initialItems: Item[] = [
@@ -509,21 +511,26 @@ const RPGGame = () => {
   }, []);
 
   const handlePortalUse = useCallback(() => {
-    if (currentLocation === 'village') {
-      setCurrentLocation('abandoned-mines');
-      setPlayer(prev => ({
-        ...prev,
-        position: { x: 200, y: 200 },
-        targetPosition: { x: 200, y: 200 }
-      }));
-    } else {
-      setCurrentLocation('village');
-      setPlayer(prev => ({
-        ...prev,
-        position: { x: 600, y: 400 },
-        targetPosition: { x: 600, y: 400 }
-      }));
-    }
+    setIsLoadingLocation(true);
+    
+    setTimeout(() => {
+      if (currentLocation === 'village') {
+        setCurrentLocation('abandoned-mines');
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: 200, y: 200 },
+          targetPosition: { x: 200, y: 200 }
+        }));
+      } else {
+        setCurrentLocation('village');
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: 600, y: 400 },
+          targetPosition: { x: 600, y: 400 }
+        }));
+      }
+      setIsLoadingLocation(false);
+    }, 1500);
   }, [currentLocation]);
 
   const handleMineCoal = useCallback(() => {
@@ -719,6 +726,13 @@ const RPGGame = () => {
         <QuestRewardModal
           quest={questReward}
           onClose={() => setQuestReward(null)}
+        />
+      )}
+
+      {/* Loading Screen */}
+      {isLoadingLocation && (
+        <LoadingScreen 
+          message={currentLocation === 'village' ? 'Переход в заброшенные шахты...' : 'Возвращение в деревню...'}
         />
       )}
     </div>

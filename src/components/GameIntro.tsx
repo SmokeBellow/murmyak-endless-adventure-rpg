@@ -8,13 +8,15 @@ const GameIntro = ({ onComplete }: GameIntroProps) => {
   const [currentScreen, setCurrentScreen] = useState<'developer' | 'title' | 'complete'>('developer');
 
   useEffect(() => {
+    // Developer screen for 3 seconds
     const timer1 = setTimeout(() => {
       setCurrentScreen('title');
     }, 3000);
 
+    // Title screen for 3 seconds (total 6 seconds)
     const timer2 = setTimeout(() => {
       setCurrentScreen('complete');
-      onComplete();
+      setTimeout(() => onComplete(), 100); // Small delay to ensure state update
     }, 6000);
 
     return () => {

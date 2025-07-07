@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Player, NPC } from '@/types/gameTypes';
+import { Player, NPC, LocationType } from '@/types/gameTypes';
 
 interface GameMapProps {
   player: Player;
@@ -7,9 +7,11 @@ interface GameMapProps {
   onNPCInteract: (npc: NPC) => void;
   onFountainUse: () => void;
   onCoalMineInteract: () => void;
+  currentLocation: LocationType;
+  onPortalUse: () => void;
 }
 
-const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInteract }: GameMapProps) => {
+const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
   const mapWidth = 2000;
   const mapHeight = 2000;
 
@@ -42,34 +44,54 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
     const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
     
-    // Check if clicking on fountain
-    const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-    const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
-    if (fountainDistance < 30 && playerToFountainDistance < 80) {
-      onFountainUse();
-      return;
+    if (currentLocation === 'village') {
+      // Check if clicking on fountain
+      const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+      if (fountainDistance < 30 && playerToFountainDistance < 80) {
+        onFountainUse();
+        return;
+      }
+      
+      // Check if clicking on portal
+      const portalDistance = Math.sqrt(Math.pow(700 - x, 2) + Math.pow(300 - y, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(700 - player.position.x, 2) + Math.pow(300 - player.position.y, 2));
+      if (portalDistance < 40 && playerToPortalDistance < 80) {
+        onPortalUse();
+        return;
+      }
+    } else if (currentLocation === 'abandoned-mines') {
+      // Check if clicking on coal mine in abandoned mines
+      const coalMineDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      const playerToCoalMineDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+      if (coalMineDistance < 40 && playerToCoalMineDistance < 80) {
+        onCoalMineInteract();
+        return;
+      }
+      
+      // Check if clicking on return portal
+      const portalDistance = Math.sqrt(Math.pow(200 - x, 2) + Math.pow(200 - y, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+      if (portalDistance < 40 && playerToPortalDistance < 80) {
+        onPortalUse();
+        return;
+      }
     }
     
-    // Check if clicking on coal mine
-    const coalMineDistance = Math.sqrt(Math.pow(800 - x, 2) + Math.pow(200 - y, 2));
-    const playerToCoalMineDistance = Math.sqrt(Math.pow(800 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
-    if (coalMineDistance < 40 && playerToCoalMineDistance < 80) {
-      onCoalMineInteract();
-      return;
-    }
-    
-    // Check if clicking on NPC
-    const clickedNPC = npcs.find(npc => {
-      const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
-      const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
-      return distance < 30 && playerToNPCDistance < 80;
-    });
-    
-    if (clickedNPC) {
-      onNPCInteract(clickedNPC);
+    // Check if clicking on NPC (only in village)
+    if (currentLocation === 'village') {
+      const clickedNPC = npcs.find(npc => {
+        const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
+        const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
+        return distance < 30 && playerToNPCDistance < 80;
+      });
+      
+      if (clickedNPC) {
+        onNPCInteract(clickedNPC);
+      }
     }
     // Removed player movement on click
-  }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract]);
+  }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
 
   // Calculate camera offset to center on player
   const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
@@ -89,6 +111,184 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return 'bg-green-500/20';
   };
 
+  const renderVillage = () => (
+    <>
+      {/* NPCs - only in village */}
+      {npcs.map(npc => (
+        <div
+          key={npc.id}
+          className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-10 border-2 border-foreground/20 ${
+            npc.type === 'merchant' ? 'bg-accent' : npc.type === 'blacksmith' ? 'bg-orange-500' : 'bg-secondary'
+          }`}
+          style={{
+            left: npc.position.x - 16,
+            top: npc.position.y - 16,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
+            if (playerToNPCDistance < 80) {
+              onNPCInteract(npc);
+            }
+          }}
+        />
+      ))}
+
+      {/* Village buildings */}
+      <div
+        className="absolute bg-stone/80 border-2 border-border rounded-lg"
+        style={{
+          left: 450,
+          top: 450,
+          width: 100,
+          height: 100,
+        }}
+      />
+      <div
+        className="absolute bg-stone/80 border-2 border-border rounded-lg"
+        style={{
+          left: 350,
+          top: 500,
+          width: 80,
+          height: 60,
+        }}
+      />
+      {/* Blacksmith forge */}
+      <div
+        className="absolute bg-orange-800/80 border-2 border-orange-600 rounded-lg flex items-center justify-center text-white font-bold"
+        style={{
+          left: 300,
+          top: 460,
+          width: 60,
+          height: 50,
+        }}
+      >
+        🔨
+      </div>
+
+      {/* Fountain */}
+      <div
+        className="absolute bg-blue-400/80 border-2 border-blue-600 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        style={{
+          left: 380,
+          top: 380,
+          width: 40,
+          height: 40,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+          if (playerToFountainDistance < 80) {
+            onFountainUse();
+          }
+        }}
+      >
+        ⛲
+      </div>
+
+      {/* Portal to Abandoned Mines */}
+      <div
+        className="absolute bg-purple-600/80 border-2 border-purple-400 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        style={{
+          left: 680,
+          top: 280,
+          width: 40,
+          height: 40,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          const playerToPortalDistance = Math.sqrt(Math.pow(700 - player.position.x, 2) + Math.pow(300 - player.position.y, 2));
+          if (playerToPortalDistance < 80) {
+            onPortalUse();
+          }
+        }}
+      >
+        🌀
+      </div>
+    </>
+  );
+
+  const renderAbandonedMines = () => (
+    <>
+      {/* Coal Mine - moved here from village */}
+      <div
+        className="absolute bg-gray-800/80 border-2 border-gray-600 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        style={{
+          left: 370,
+          top: 370,
+          width: 60,
+          height: 60,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          const playerToCoalMineDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+          if (playerToCoalMineDistance < 80) {
+            onCoalMineInteract();
+          }
+        }}
+      >
+        ⛏️
+      </div>
+
+      {/* Return Portal */}
+      <div
+        className="absolute bg-purple-600/80 border-2 border-purple-400 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+        style={{
+          left: 180,
+          top: 180,
+          width: 40,
+          height: 40,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+          if (playerToPortalDistance < 80) {
+            onPortalUse();
+          }
+        }}
+      >
+        🌀
+      </div>
+
+      {/* Mine rocks and environment */}
+      <div
+        className="absolute bg-gray-700/60 border-2 border-gray-500 rounded-lg"
+        style={{ left: 300, top: 300, width: 80, height: 40 }}
+      >
+      </div>
+      <div
+        className="absolute bg-gray-600/60 border-2 border-gray-400 rounded-lg"
+        style={{ left: 500, top: 350, width: 60, height: 30 }}
+      >
+      </div>
+    </>
+  );
+
+  const getBackgroundStyle = () => {
+    if (currentLocation === 'village') {
+      return {
+        backgroundImage: `
+          radial-gradient(circle at 500px 500px, rgba(139, 69, 19, 0.1) 0%, transparent 200px),
+          radial-gradient(circle at 300px 800px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
+          radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
+          linear-gradient(45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%)
+        `,
+        backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px'
+      };
+    } else {
+      return {
+        backgroundImage: `
+          radial-gradient(circle at 400px 400px, rgba(50, 50, 50, 0.3) 0%, transparent 200px),
+          radial-gradient(circle at 600px 200px, rgba(80, 80, 80, 0.2) 0%, transparent 150px),
+          linear-gradient(45deg, rgba(60, 60, 60, 0.1) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(60, 60, 60, 0.1) 25%, transparent 25%)
+        `,
+        backgroundSize: '300px 300px, 250px 250px, 40px 40px, 40px 40px'
+      };
+    }
+  };
+
   return (
     <div className="flex-1 overflow-hidden bg-village-bg relative cursor-crosshair">
       <div 
@@ -97,14 +297,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px)`,
           width: mapWidth,
           height: mapHeight,
-          backgroundImage: `
-            radial-gradient(circle at 500px 500px, rgba(139, 69, 19, 0.1) 0%, transparent 200px),
-            radial-gradient(circle at 300px 800px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
-            radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
-            linear-gradient(45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%),
-            linear-gradient(-45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%)
-          `,
-          backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px'
+          ...getBackgroundStyle()
         }}
         onClick={handleMapClick}
       >
@@ -117,98 +310,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           }}
         />
 
-        {/* NPCs */}
-        {npcs.map(npc => (
-          <div
-            key={npc.id}
-            className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-10 border-2 border-foreground/20 ${
-              npc.type === 'merchant' ? 'bg-accent' : npc.type === 'blacksmith' ? 'bg-orange-500' : 'bg-secondary'
-            }`}
-            style={{
-              left: npc.position.x - 16,
-              top: npc.position.y - 16,
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
-              if (playerToNPCDistance < 80) {
-                onNPCInteract(npc);
-              }
-            }}
-          />
-        ))}
-
-        {/* Village buildings */}
-        <div
-          className="absolute bg-stone/80 border-2 border-border rounded-lg"
-          style={{
-            left: 450,
-            top: 450,
-            width: 100,
-            height: 100,
-          }}
-        />
-        <div
-          className="absolute bg-stone/80 border-2 border-border rounded-lg"
-          style={{
-            left: 350,
-            top: 500,
-            width: 80,
-            height: 60,
-          }}
-        />
-        {/* Blacksmith forge */}
-        <div
-          className="absolute bg-orange-800/80 border-2 border-orange-600 rounded-lg flex items-center justify-center text-white font-bold"
-          style={{
-            left: 300,
-            top: 460,
-            width: 60,
-            height: 50,
-          }}
-        >
-          🔨
-        </div>
-
-        {/* Fountain */}
-        <div
-          className="absolute bg-blue-400/80 border-2 border-blue-600 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
-          style={{
-            left: 380,
-            top: 380,
-            width: 40,
-            height: 40,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
-            if (playerToFountainDistance < 80) {
-              onFountainUse();
-            }
-          }}
-        >
-          ⛲
-        </div>
-
-        {/* Coal Mine */}
-        <div
-          className="absolute bg-gray-800/80 border-2 border-gray-600 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
-          style={{
-            left: 770,
-            top: 170,
-            width: 60,
-            height: 60,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            const playerToCoalMineDistance = Math.sqrt(Math.pow(800 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
-            if (playerToCoalMineDistance < 80) {
-              onCoalMineInteract();
-            }
-          }}
-        >
-          ⛏️
-        </div>
+        {/* Render location-specific content */}
+        {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
       </div>
     </div>
   );

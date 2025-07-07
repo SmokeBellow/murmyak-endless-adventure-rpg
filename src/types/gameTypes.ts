@@ -72,3 +72,4 @@ export interface Quest {
 
 export type GameScreen = 'intro' | 'game';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';
+export type LocationType = 'village' | 'abandoned-mines';

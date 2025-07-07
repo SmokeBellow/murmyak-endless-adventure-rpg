@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType } from '@/types/gameTypes';
+import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { X } from 'lucide-react';
@@ -20,6 +20,7 @@ const RPGGame = () => {
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showCoalMining, setShowCoalMining] = useState(false);
   const [questReward, setQuestReward] = useState<Quest | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
 
   // Initial game items
   const initialItems: Item[] = [
@@ -507,6 +508,24 @@ const RPGGame = () => {
     setShowCoalMining(true);
   }, []);
 
+  const handlePortalUse = useCallback(() => {
+    if (currentLocation === 'village') {
+      setCurrentLocation('abandoned-mines');
+      setPlayer(prev => ({
+        ...prev,
+        position: { x: 200, y: 200 },
+        targetPosition: { x: 200, y: 200 }
+      }));
+    } else {
+      setCurrentLocation('village');
+      setPlayer(prev => ({
+        ...prev,
+        position: { x: 600, y: 400 },
+        targetPosition: { x: 600, y: 400 }
+      }));
+    }
+  }, [currentLocation]);
+
   const handleMineCoal = useCallback(() => {
     const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
     const hasCoal = player.inventory.some(item => item.id === 'coal');
@@ -551,6 +570,8 @@ const RPGGame = () => {
         onNPCInteract={handleNPCInteract}
         onFountainUse={handleFountainUse}
         onCoalMineInteract={handleCoalMineInteract}
+        currentLocation={currentLocation}
+        onPortalUse={handlePortalUse}
       />
 
       <VirtualJoystick

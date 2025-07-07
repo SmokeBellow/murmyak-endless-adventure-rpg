@@ -394,9 +394,9 @@ const RPGGame = () => {
       const elderNPC = npcs.find(n => n.id === 'elder');
       if (elderNPC) {
         const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
-        if (nextQuest) {
+        if (nextQuest && !quests.some(q => q.id === 'find-blacksmith')) {
           const unlockedQuest = { ...nextQuest, status: 'available' as const };
-          setQuests(prev => [...prev.filter(q => q.id !== nextQuest.id), unlockedQuest]);
+          setQuests(prev => [...prev, unlockedQuest]);
         }
       }
     } else if (quest.id === 'find-blacksmith') {

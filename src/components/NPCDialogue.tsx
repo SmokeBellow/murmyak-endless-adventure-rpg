@@ -15,12 +15,16 @@ interface NPCDialogueProps {
 }
 
 const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [] }: NPCDialogueProps) => {
+  console.log('NPCDialogue - NPC:', npc.id, 'completedQuestIds:', completedQuestIds);
+  
   // Special logic for elder NPC
   let availableQuests = [];
   
   if (npc.id === 'elder') {
     const firstQuestTaken = activeQuests.some(q => q.id === 'first-quest') || 
                            completedQuestIds.includes('first-quest');
+    
+    console.log('Elder NPC - firstQuestTaken:', firstQuestTaken);
     
     if (!firstQuestTaken) {
       // Show first quest if not taken
@@ -33,7 +37,8 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
     // Normal logic for other NPCs
     availableQuests = npc.quests?.filter(quest => 
       quest.status === 'available' && 
-      !activeQuests.some(aq => aq.id === quest.id)
+      !activeQuests.some(aq => aq.id === quest.id) &&
+      !completedQuestIds.includes(quest.id)
     ) || [];
   }
   

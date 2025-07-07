@@ -10,8 +10,9 @@ interface QuestRewardModalProps {
 }
 
 const QuestRewardModal = ({ quest, onClose }: QuestRewardModalProps) => {
+  console.log('QuestRewardModal rendered for quest:', quest.id);
   return (
-    <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
         <CardHeader className="text-center border-b border-primary/20">
           <div className="flex justify-center mb-4">

@@ -410,13 +410,19 @@ const RPGGame = () => {
   }, []);
 
   const handleCompleteQuest = useCallback((quest: Quest) => {
+    console.log('Completing quest:', quest.id);
+    
     // Complete the quest
     const completedQuest = {
       ...quest,
       status: 'completed' as const
     };
     setQuests(prev => [...prev.filter(q => q.id !== quest.id), completedQuest]);
-    setCompletedQuestIds(prev => [...prev, quest.id]);
+    setCompletedQuestIds(prev => {
+      const newIds = [...prev, quest.id];
+      console.log('Updated completed quest IDs:', newIds);
+      return newIds;
+    });
     
     // Give rewards
     setPlayer(prev => ({
@@ -427,6 +433,7 @@ const RPGGame = () => {
     }));
     
     // Show quest reward modal
+    console.log('Setting quest reward modal for quest:', quest.id);
     setQuestReward(quest);
     
     // Handle quest chain unlocking

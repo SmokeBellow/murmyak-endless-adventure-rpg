@@ -269,7 +269,57 @@ const RPGGame = () => {
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);
     
-    // Check if completing quests at the right NPC
+    // Mark merchant as visited for quest progress
+    if (npc.type === 'merchant') {
+      setPlayer(prev => ({
+        ...prev,
+        questProgress: {
+          ...prev.questProgress,
+          visitedMerchant: true
+        }
+      }));
+      
+      // Update first quest objective
+      const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
+      if (firstQuest) {
+        const updatedObjectives = firstQuest.objectives.map(obj => 
+          obj.description === 'Поговори с торговцем' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
+      }
+    }
+    
+    // Handle blacksmith interaction for find-blacksmith quest
+    if (npc.type === 'blacksmith') {
+      const findBlacksmithQuest = quests.find(q => q.id === 'find-blacksmith' && q.status === 'active');
+      if (findBlacksmithQuest) {
+        const updatedObjectives = findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }));
+        const updatedQuest = { ...findBlacksmithQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== findBlacksmithQuest.id), updatedQuest]);
+      }
+      
+      // Handle coal quest completion
+      const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
+      const hasCoal = player.inventory.some(item => item.id === 'coal');
+      
+      if (coalQuest && hasCoal) {
+        // Remove coal from inventory
+        setPlayer(prev => ({
+          ...prev,
+          inventory: prev.inventory.filter(item => item.id !== 'coal')
+        }));
+        
+        // Update quest objective
+        const updatedObjectives = coalQuest.objectives.map(obj => 
+          obj.description === 'Вернись к кузнецу с углем' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
+      }
+    }
+    
+    // Complete quests ONLY at the NPC who gave them
     const activeQuestsForNPC = quests.filter(q => q.status === 'active' && q.giver === npc.id);
     
     activeQuestsForNPC.forEach(quest => {
@@ -322,57 +372,7 @@ const RPGGame = () => {
         }
       }
     });
-    
-    // Mark merchant as visited for quest progress
-    if (npc.type === 'merchant') {
-      setPlayer(prev => ({
-        ...prev,
-        questProgress: {
-          ...prev.questProgress,
-          visitedMerchant: true
-        }
-      }));
-      
-      // Update first quest objective
-      const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
-      if (firstQuest) {
-        const updatedObjectives = firstQuest.objectives.map(obj => 
-          obj.description === 'Поговори с торговцем' ? { ...obj, completed: true } : obj
-        );
-        const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
-        setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
-      }
-    }
-    
-    // Handle blacksmith interaction for find-blacksmith quest
-    if (npc.type === 'blacksmith') {
-      const findBlacksmithQuest = quests.find(q => q.id === 'find-blacksmith' && q.status === 'active');
-      if (findBlacksmithQuest) {
-        const updatedObjectives = findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }));
-        const updatedQuest = { ...findBlacksmithQuest, objectives: updatedObjectives };
-        setQuests(prev => [...prev.filter(q => q.id !== findBlacksmithQuest.id), updatedQuest]);
-      }
-      
-      // Handle coal quest completion
-      const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
-      const hasCoal = player.inventory.some(item => item.id === 'coal');
-      
-      if (coalQuest && hasCoal) {
-        // Remove coal from inventory
-        setPlayer(prev => ({
-          ...prev,
-          inventory: prev.inventory.filter(item => item.id !== 'coal')
-        }));
-        
-        // Update quest objective
-        const updatedObjectives = coalQuest.objectives.map(obj => 
-          obj.description === 'Вернись к кузнецу с углем' ? { ...obj, completed: true } : obj
-        );
-        const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
-        setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
-      }
-    }
-  }, [quests, toast, npcs, setPlayer]);
+  }, [quests, toast, npcs, setPlayer, player.inventory]);
 
   const handleEquipItem = useCallback((item: Item) => {
     if (!item.slot) return;

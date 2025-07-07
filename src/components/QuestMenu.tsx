@@ -80,7 +80,7 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-3xl max-h-[90vh] flex flex-col">
+      <Card className="w-full h-full flex flex-col">
         <CardHeader className="border-b border-border flex-shrink-0 sticky top-0 bg-card z-10">
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary">Журнал Квестов</CardTitle>

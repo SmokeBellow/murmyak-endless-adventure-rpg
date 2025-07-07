@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
-import GameIntro from './GameIntro';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
@@ -12,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const RPGGame = () => {
   const { toast } = useToast();
-  const [gameScreen, setGameScreen] = useState<GameScreen>('intro');
+  const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
 
@@ -266,10 +265,6 @@ const RPGGame = () => {
       duration: 2000,
     });
   }, [player.equipment, toast]);
-
-  if (gameScreen === 'intro') {
-    return <GameIntro onComplete={() => setGameScreen('game')} />;
-  }
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">

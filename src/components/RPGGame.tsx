@@ -325,55 +325,7 @@ const RPGGame = () => {
       }
     }
     
-    // Complete quests ONLY at the NPC who gave them
-    const activeQuestsForNPC = quests.filter(q => q.status === 'active' && q.giver === npc.id);
-    
-    activeQuestsForNPC.forEach(quest => {
-      // Check if all objectives are completed
-      const allObjectivesCompleted = quest.objectives.every(obj => obj.completed);
-      
-      if (allObjectivesCompleted) {
-        // Complete the quest
-        const completedQuest = {
-          ...quest,
-          status: 'completed' as const
-        };
-        setQuests(prev => [...prev.filter(q => q.id !== quest.id), completedQuest]);
-        
-        // Give rewards
-        setPlayer(prev => ({
-          ...prev,
-          experience: prev.experience + quest.rewards.experience,
-          coins: prev.coins + (quest.rewards.coins || 0),
-          inventory: [...prev.inventory, ...(quest.rewards.items || [])]
-        }));
-        
-        // Quest completed silently
-        
-        // Handle quest chain unlocking
-        if (quest.id === 'first-quest') {
-          // Unlock find-blacksmith quest
-          const elderNPC = npcs.find(n => n.id === 'elder');
-          if (elderNPC) {
-            const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
-            if (nextQuest) {
-              const unlockedQuest = { ...nextQuest, status: 'available' as const };
-              setQuests(prev => [...prev.filter(q => q.id !== nextQuest.id), unlockedQuest]);
-            }
-          }
-        } else if (quest.id === 'find-blacksmith') {
-          // Unlock coal quest
-          const blacksmithNPC = npcs.find(n => n.id === 'blacksmith');
-          if (blacksmithNPC) {
-            const coalQuest = blacksmithNPC.quests?.find(q => q.id === 'find-coal');
-            if (coalQuest) {
-              const unlockedQuest = { ...coalQuest, status: 'available' as const };
-              setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), unlockedQuest]);
-            }
-          }
-        }
-      }
-    });
+    // Note: Quests are now completed manually through the dialogue system
   }, [quests, npcs, setPlayer, player.inventory]);
 
   const handleEquipItem = useCallback((item: Item) => {

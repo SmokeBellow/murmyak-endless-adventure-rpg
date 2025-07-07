@@ -8,12 +8,35 @@ interface VirtualJoystickProps {
 const VirtualJoystick = ({ onMove, disabled }: VirtualJoystickProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [knobPosition, setKnobPosition] = useState({ x: 0, y: 0 });
+  const [currentDirection, setCurrentDirection] = useState<{ x: number; y: number } | null>(null);
   const joystickRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
   
   const joystickRadius = 60;
   const knobRadius = 20;
-  const deadZone = 15;
+  const deadZone = 10;
+
+  // Continuous movement loop
+  useEffect(() => {
+    let animationFrame: number;
+    
+    const updateMovement = () => {
+      if (currentDirection) {
+        onMove(currentDirection);
+      }
+      animationFrame = requestAnimationFrame(updateMovement);
+    };
+    
+    if (currentDirection) {
+      animationFrame = requestAnimationFrame(updateMovement);
+    }
+    
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [currentDirection, onMove]);
 
   const handleStart = useCallback((clientX: number, clientY: number) => {
     if (disabled) return;
@@ -49,15 +72,16 @@ const VirtualJoystick = ({ onMove, disabled }: VirtualJoystickProps) => {
     if (limitedDistance > deadZone) {
       const normalizedX = newX / maxDistance;
       const normalizedY = newY / maxDistance;
-      onMove({ x: normalizedX, y: normalizedY });
+      setCurrentDirection({ x: normalizedX, y: normalizedY });
     } else {
-      onMove(null);
+      setCurrentDirection(null);
     }
-  }, [isDragging, disabled, onMove, joystickRadius, knobRadius, deadZone]);
+  }, [isDragging, disabled, joystickRadius, knobRadius, deadZone]);
 
   const handleEnd = useCallback(() => {
     setIsDragging(false);
     setKnobPosition({ x: 0, y: 0 });
+    setCurrentDirection(null);
     onMove(null);
   }, [onMove]);
 
@@ -129,7 +153,7 @@ const VirtualJoystick = ({ onMove, disabled }: VirtualJoystickProps) => {
         {/* Knob */}
         <div
           ref={knobRef}
-          className="absolute bg-primary rounded-full shadow-glow cursor-pointer transition-all"
+          className="absolute bg-primary rounded-full shadow-glow cursor-pointer"
           style={{
             width: knobRadius * 2,
             height: knobRadius * 2,

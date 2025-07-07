@@ -154,24 +154,27 @@ const RPGGame = () => {
       return;
     }
 
-    const moveSpeed = 2;
-    const { x, y } = player.position;
+    const moveSpeed = 4;
     
-    // Calculate new position
-    let newX = x + (direction.x * moveSpeed);
-    let newY = y + (direction.y * moveSpeed);
-    
-    // Boundary constraints
-    newX = Math.max(50, Math.min(1950, newX));
-    newY = Math.max(50, Math.min(1950, newY));
-    
-    setPlayer(prev => ({
-      ...prev,
-      position: { x: newX, y: newY },
-      targetPosition: { x: newX, y: newY },
-      isMoving: true
-    }));
-  }, [player.position]);
+    setPlayer(prev => {
+      const { x, y } = prev.position;
+      
+      // Calculate new position
+      let newX = x + (direction.x * moveSpeed);
+      let newY = y + (direction.y * moveSpeed);
+      
+      // Boundary constraints
+      newX = Math.max(50, Math.min(1950, newX));
+      newY = Math.max(50, Math.min(1950, newY));
+      
+      return {
+        ...prev,
+        position: { x: newX, y: newY },
+        targetPosition: { x: newX, y: newY },
+        isMoving: true
+      };
+    });
+  }, []);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);
@@ -217,29 +220,10 @@ const RPGGame = () => {
     });
   }, [toast]);
 
-  // Smooth movement animation
+  // Player movement animation at 60fps
   useEffect(() => {
     const animationFrame = () => {
-      setPlayer(prev => {
-        const { position, targetPosition } = prev;
-        const dx = targetPosition.x - position.x;
-        const dy = targetPosition.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 0.01) {
-          return { ...prev, isMoving: false };
-        }
-        
-        const speed = 0.1;
-        const newX = position.x + (dx * speed);
-        const newY = position.y + (dy * speed);
-        
-        return {
-          ...prev,
-          position: { x: newX, y: newY },
-          isMoving: distance > 0.01
-        };
-      });
+      // This animation is now only for click-to-move, joystick uses direct movement
     };
 
     const interval = setInterval(animationFrame, 16); // ~60fps

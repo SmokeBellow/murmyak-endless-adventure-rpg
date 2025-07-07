@@ -9,99 +9,110 @@ interface GameMapProps {
 }
 
 const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) => {
-  const mapSize = 20;
-  const tileSize = 32;
+  const mapWidth = 2000;
+  const mapHeight = 2000;
 
-  const handleTileClick = useCallback((x: number, y: number) => {
-    const distance = Math.abs(x - player.position.x) + Math.abs(y - player.position.y);
-    if (distance <= 1) {
-      const npcAtPosition = npcs.find(npc => npc.position.x === x && npc.position.y === y);
-      if (npcAtPosition) {
-        onNPCInteract(npcAtPosition);
-      } else {
-        onPlayerMove({ x, y });
-      }
+  const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
+    const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
+    
+    // Check if clicking on NPC
+    const clickedNPC = npcs.find(npc => {
+      const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
+      return distance < 30;
+    });
+    
+    if (clickedNPC) {
+      onNPCInteract(clickedNPC);
+    } else {
+      onPlayerMove({ x, y });
     }
   }, [player.position, npcs, onPlayerMove, onNPCInteract]);
 
-  const getTileContent = (x: number, y: number) => {
-    // Player position (rounded for tile matching)
-    const playerTileX = Math.round(player.position.x);
-    const playerTileY = Math.round(player.position.y);
-    
-    if (playerTileX === x && playerTileY === y) {
-      return (
-        <div 
-          className="w-6 h-6 bg-primary rounded-full shadow-glow transition-all duration-200"
-          style={{
-            transform: `translate(${(player.position.x - playerTileX) * tileSize}px, ${(player.position.y - playerTileY) * tileSize}px)`
-          }}
-        />
-      );
-    }
-    
-    const npc = npcs.find(npc => npc.position.x === x && npc.position.y === y);
-    if (npc) {
-      return (
-        <div className={`w-6 h-6 rounded-full shadow-md ${
-          npc.type === 'merchant' ? 'bg-accent' : 'bg-secondary'
-        } border-2 border-foreground/20 hover:scale-110 transition-transform cursor-pointer`} />
-      );
-    }
+  // Calculate camera offset to center on player
+  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
+  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
 
-    // Village tiles
-    if ((x >= 8 && x <= 12) && (y >= 8 && y <= 12)) {
-      return <div className="w-full h-full bg-stone border border-border/30" />;
+  // Generate background pattern
+  const getBackgroundTile = (x: number, y: number) => {
+    // Village area
+    if (x >= 400 && x <= 600 && y >= 400 && y <= 600) {
+      return 'bg-stone/50';
     }
-    
-    // Water around village
-    if (x < 3 || x > 16 || y < 3 || y > 16) {
-      return <div className="w-full h-full bg-water" />;
+    // Water areas
+    if (x < 100 || x > mapWidth - 100 || y < 100 || y > mapHeight - 100) {
+      return 'bg-blue-500/30';
     }
-
     // Forest/grass
-    return <div className="w-full h-full bg-village-bg border border-border/10" />;
+    return 'bg-green-500/20';
   };
 
-  // Calculate camera offset to center on player
-  const cameraOffsetX = -(player.position.x * tileSize) + (window.innerWidth / 2);
-  const cameraOffsetY = -(player.position.y * tileSize) + (window.innerHeight / 2);
-
   return (
-    <div className="flex-1 overflow-hidden bg-village-bg relative">
+    <div className="flex-1 overflow-hidden bg-village-bg relative cursor-crosshair">
       <div 
-        className="absolute transition-transform duration-200 ease-out"
+        className="absolute w-full h-full"
         style={{
           transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px)`,
-          left: '50%',
-          top: '50%',
-          marginLeft: -(mapSize * tileSize) / 2,
-          marginTop: -(mapSize * tileSize) / 2,
+          width: mapWidth,
+          height: mapHeight,
+          backgroundImage: `
+            radial-gradient(circle at 500px 500px, rgba(139, 69, 19, 0.1) 0%, transparent 200px),
+            radial-gradient(circle at 300px 800px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
+            radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
+            linear-gradient(45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%)
+          `,
+          backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px'
         }}
+        onClick={handleMapClick}
       >
-        <div 
-          className="grid gap-0 border-2 border-border rounded-lg overflow-hidden shadow-medieval"
-          style={{ 
-            gridTemplateColumns: `repeat(${mapSize}, ${tileSize}px)`,
-            gridTemplateRows: `repeat(${mapSize}, ${tileSize}px)`
+        {/* Player */}
+        <div
+          className="absolute w-8 h-8 bg-primary rounded-full shadow-glow transition-all duration-100 border-2 border-primary-foreground z-20"
+          style={{
+            left: player.position.x - 16,
+            top: player.position.y - 16,
           }}
-        >
-          {Array.from({ length: mapSize * mapSize }, (_, index) => {
-            const x = index % mapSize;
-            const y = Math.floor(index / mapSize);
-            
-            return (
-              <div
-                key={`${x}-${y}`}
-                className="flex items-center justify-center cursor-pointer hover:brightness-110 transition-all"
-                style={{ width: tileSize, height: tileSize }}
-                onClick={() => handleTileClick(x, y)}
-              >
-                {getTileContent(x, y)}
-              </div>
-            );
-          })}
-        </div>
+        />
+
+        {/* NPCs */}
+        {npcs.map(npc => (
+          <div
+            key={npc.id}
+            className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-10 border-2 border-foreground/20 ${
+              npc.type === 'merchant' ? 'bg-accent' : 'bg-secondary'
+            }`}
+            style={{
+              left: npc.position.x - 16,
+              top: npc.position.y - 16,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onNPCInteract(npc);
+            }}
+          />
+        ))}
+
+        {/* Village buildings */}
+        <div
+          className="absolute bg-stone/80 border-2 border-border rounded-lg"
+          style={{
+            left: 450,
+            top: 450,
+            width: 100,
+            height: 100,
+          }}
+        />
+        <div
+          className="absolute bg-stone/80 border-2 border-border rounded-lg"
+          style={{
+            left: 350,
+            top: 500,
+            width: 80,
+            height: 60,
+          }}
+        />
       </div>
     </div>
   );

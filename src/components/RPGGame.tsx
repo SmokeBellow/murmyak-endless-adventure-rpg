@@ -48,8 +48,8 @@ const RPGGame = () => {
   // Player state
   const [player, setPlayer] = useState<Player>({
     name: 'Герой',
-    position: { x: 10, y: 10 },
-    targetPosition: { x: 10, y: 10 },
+    position: { x: 500, y: 500 },
+    targetPosition: { x: 500, y: 500 },
     isMoving: false,
     health: 100,
     maxHealth: 100,
@@ -72,7 +72,7 @@ const RPGGame = () => {
     {
       id: 'merchant',
       name: 'Торговец Марк',
-      position: { x: 9, y: 8 },
+      position: { x: 470, y: 430 },
       type: 'merchant',
       dialogue: [
         'Добро пожаловать в мою лавку!',
@@ -94,7 +94,7 @@ const RPGGame = () => {
     {
       id: 'elder',
       name: 'Староста Эдвин',
-      position: { x: 11, y: 8 },
+      position: { x: 530, y: 430 },
       type: 'elder',
       dialogue: [
         'Приветствую тебя, молодой искатель приключений!',
@@ -155,7 +155,7 @@ const RPGGame = () => {
       return;
     }
 
-    const moveSpeed = 0.03;
+    const moveSpeed = 2;
     const { x, y } = player.position;
     
     // Calculate new position
@@ -163,8 +163,8 @@ const RPGGame = () => {
     let newY = y + (direction.y * moveSpeed);
     
     // Boundary constraints
-    newX = Math.max(0.5, Math.min(19.5, newX));
-    newY = Math.max(0.5, Math.min(19.5, newY));
+    newX = Math.max(50, Math.min(1950, newX));
+    newY = Math.max(50, Math.min(1950, newY));
     
     setPlayer(prev => ({
       ...prev,

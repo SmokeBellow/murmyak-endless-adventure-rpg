@@ -15,7 +15,6 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
       <div className="flex flex-col space-y-2">
         {/* Health Bar */}
         <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-foreground min-w-[80px]">Здоровье:</span>
           <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-health transition-all duration-300 ease-out rounded-full"
@@ -29,7 +28,6 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
 
         {/* Mana Bar */}
         <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-foreground min-w-[80px]">Мана:</span>
           <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-mana transition-all duration-300 ease-out rounded-full"
@@ -43,7 +41,6 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
 
         {/* Experience Bar */}
         <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-foreground min-w-[80px]">Опыт:</span>
           <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-experience transition-all duration-300 ease-out rounded-full shadow-glow"

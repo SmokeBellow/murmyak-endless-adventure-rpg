@@ -12,12 +12,15 @@ interface NPCDialogueProps {
 }
 
 const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade }: NPCDialogueProps) => {
-  const availableQuests = npc.quests?.filter(quest => quest.status === 'available') || [];
+  const availableQuests = npc.quests?.filter(quest => 
+    quest.status === 'available' || 
+    (quest.status === 'completed' && quest.repeatable)
+  ) || [];
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="border-b border-border">
+      <Card className="w-full max-w-md max-h-[90vh] flex flex-col">
+        <CardHeader className="border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary">{npc.name}</CardTitle>
             <Button variant="outline" size="sm" onClick={onClose}>
@@ -26,7 +29,7 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade }: NPCDialogueProps)
           </div>
         </CardHeader>
         
-        <CardContent className="p-6">
+        <CardContent className="p-6 flex-1 overflow-y-auto">
           <div className="space-y-4">
             {/* NPC Dialogue */}
             <div className="bg-muted/50 p-4 rounded-lg">

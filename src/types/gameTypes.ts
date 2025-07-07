@@ -57,6 +57,8 @@ export interface Quest {
   title: string;
   description: string;
   status: 'available' | 'active' | 'completed' | 'locked';
+  repeatable?: boolean;
+  giver: string; // NPC id who gives this quest
   objectives: {
     description: string;
     completed: boolean;

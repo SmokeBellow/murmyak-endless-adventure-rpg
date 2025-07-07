@@ -8,6 +8,7 @@ import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
 import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
+import CoalMining from './CoalMining';
 import { useToast } from '@/hooks/use-toast';
 
 const RPGGame = () => {
@@ -15,6 +16,7 @@ const RPGGame = () => {
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
+  const [showCoalMining, setShowCoalMining] = useState(false);
 
   // Initial game items
   const initialItems: Item[] = [
@@ -48,8 +50,8 @@ const RPGGame = () => {
   // Player state
   const [player, setPlayer] = useState<Player>({
     name: 'Герой',
-    position: { x: 500, y: 500 },
-    targetPosition: { x: 500, y: 500 },
+    position: { x: 600, y: 400 }, // Safe position away from buildings
+    targetPosition: { x: 600, y: 400 },
     isMoving: false,
     health: 100,
     maxHealth: 100,
@@ -131,6 +133,7 @@ const RPGGame = () => {
           title: 'Знакомство с деревней',
           description: 'Познакомься с жителями деревни и изучи окрестности.',
           status: 'available',
+          giver: 'elder',
           objectives: [
             { description: 'Поговори с торговцем', completed: false },
             { description: 'Используй фонтан исцеления', completed: false }
@@ -145,6 +148,7 @@ const RPGGame = () => {
           title: 'Найти кузнеца',
           description: 'В деревне есть кузнец, который может помочь тебе. Найди его!',
           status: 'locked',
+          giver: 'elder',
           objectives: [
             { description: 'Найди и поговори с кузнецом', completed: false }
           ],
@@ -168,10 +172,12 @@ const RPGGame = () => {
         {
           id: 'find-coal',
           title: 'Поиск угля',
-          description: 'Кузнецу нужен уголь для работы. Найди его в лесу.',
+          description: 'Кузнецу нужен уголь для работы. Найди его в лесу за деревней.',
           status: 'locked',
+          giver: 'blacksmith',
           objectives: [
-            { description: 'Найди уголь в лесу', completed: false }
+            { description: 'Найди уголь в лесу', completed: false },
+            { description: 'Вернись к кузнецу с углем', completed: false }
           ],
           rewards: {
             experience: 75,
@@ -263,6 +269,60 @@ const RPGGame = () => {
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);
     
+    // Check if completing quests at the right NPC
+    const activeQuestsForNPC = quests.filter(q => q.status === 'active' && q.giver === npc.id);
+    
+    activeQuestsForNPC.forEach(quest => {
+      // Check if all objectives are completed
+      const allObjectivesCompleted = quest.objectives.every(obj => obj.completed);
+      
+      if (allObjectivesCompleted) {
+        // Complete the quest
+        const completedQuest = {
+          ...quest,
+          status: 'completed' as const
+        };
+        setQuests(prev => [...prev.filter(q => q.id !== quest.id), completedQuest]);
+        
+        // Give rewards
+        setPlayer(prev => ({
+          ...prev,
+          experience: prev.experience + quest.rewards.experience,
+          coins: prev.coins + (quest.rewards.coins || 0),
+          inventory: [...prev.inventory, ...(quest.rewards.items || [])]
+        }));
+        
+        toast({
+          title: 'Квест выполнен!',
+          description: `${quest.title} завершён! +${quest.rewards.experience} опыта`,
+          duration: 4000,
+        });
+        
+        // Handle quest chain unlocking
+        if (quest.id === 'first-quest') {
+          // Unlock find-blacksmith quest
+          const elderNPC = npcs.find(n => n.id === 'elder');
+          if (elderNPC) {
+            const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
+            if (nextQuest) {
+              const unlockedQuest = { ...nextQuest, status: 'available' as const };
+              setQuests(prev => [...prev.filter(q => q.id !== nextQuest.id), unlockedQuest]);
+            }
+          }
+        } else if (quest.id === 'find-blacksmith') {
+          // Unlock coal quest
+          const blacksmithNPC = npcs.find(n => n.id === 'blacksmith');
+          if (blacksmithNPC) {
+            const coalQuest = blacksmithNPC.quests?.find(q => q.id === 'find-coal');
+            if (coalQuest) {
+              const unlockedQuest = { ...coalQuest, status: 'available' as const };
+              setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), unlockedQuest]);
+            }
+          }
+        }
+      }
+    });
+    
     // Mark merchant as visited for quest progress
     if (npc.type === 'merchant') {
       setPlayer(prev => ({
@@ -273,71 +333,46 @@ const RPGGame = () => {
         }
       }));
       
-      // Check if quest should be completed
-      if (player.questProgress.usedFountain) {
-        const activeQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
-        if (activeQuest) {
-          const updatedQuest = {
-            ...activeQuest,
-            status: 'completed' as const,
-            objectives: activeQuest.objectives.map(obj => ({ ...obj, completed: true }))
-          };
-          setQuests(prev => [...prev.filter(q => q.id !== activeQuest.id), updatedQuest]);
-          
-          // Give rewards
-          setPlayer(prev => ({
-            ...prev,
-            experience: prev.experience + activeQuest.rewards.experience,
-            coins: prev.coins + (activeQuest.rewards.coins || 0),
-            inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
-          }));
-          
-          toast({
-            title: 'Квест выполнен!',
-            description: `${activeQuest.title} завершён! +${activeQuest.rewards.experience} опыта`,
-            duration: 4000,
-          });
-        }
+      // Update first quest objective
+      const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
+      if (firstQuest) {
+        const updatedObjectives = firstQuest.objectives.map(obj => 
+          obj.description === 'Поговори с торговцем' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
       }
     }
     
-    // Handle blacksmith interaction - unlock coal quest if find-blacksmith is completed
+    // Handle blacksmith interaction for find-blacksmith quest
     if (npc.type === 'blacksmith') {
       const findBlacksmithQuest = quests.find(q => q.id === 'find-blacksmith' && q.status === 'active');
       if (findBlacksmithQuest) {
-        // Complete find-blacksmith quest
-        const completedQuest = {
-          ...findBlacksmithQuest,
-          status: 'completed' as const,
-          objectives: findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }))
-        };
-        setQuests(prev => [...prev.filter(q => q.id !== findBlacksmithQuest.id), completedQuest]);
-        
-        // Give rewards
+        const updatedObjectives = findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }));
+        const updatedQuest = { ...findBlacksmithQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== findBlacksmithQuest.id), updatedQuest]);
+      }
+      
+      // Handle coal quest completion
+      const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
+      const hasCoal = player.inventory.some(item => item.id === 'coal');
+      
+      if (coalQuest && hasCoal) {
+        // Remove coal from inventory
         setPlayer(prev => ({
           ...prev,
-          experience: prev.experience + findBlacksmithQuest.rewards.experience,
-          coins: prev.coins + (findBlacksmithQuest.rewards.coins || 0)
+          inventory: prev.inventory.filter(item => item.id !== 'coal')
         }));
         
-        // Unlock coal quest
-        const blacksmithNPC = npcs.find(n => n.id === 'blacksmith');
-        if (blacksmithNPC) {
-          const coalQuest = blacksmithNPC.quests?.find(q => q.id === 'find-coal');
-          if (coalQuest) {
-            const unlockedQuest = { ...coalQuest, status: 'available' as const };
-            setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), unlockedQuest]);
-          }
-        }
-        
-        toast({
-          title: 'Квест выполнен!',
-          description: `${findBlacksmithQuest.title} завершён! Кузнец готов дать вам новое задание.`,
-          duration: 4000,
-        });
+        // Update quest objective
+        const updatedObjectives = coalQuest.objectives.map(obj => 
+          obj.description === 'Вернись к кузнецу с углем' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
       }
     }
-  }, [player.questProgress, quests, toast, npcs]);
+  }, [quests, toast, npcs, setPlayer]);
 
   const handleEquipItem = useCallback((item: Item) => {
     if (!item.slot) return;
@@ -477,33 +512,62 @@ const RPGGame = () => {
       duration: 2000,
     });
 
-    // Check if quest should be completed
-    if (player.questProgress.visitedMerchant) {
-      const activeQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
-      if (activeQuest) {
-        const updatedQuest = {
-          ...activeQuest,
-          status: 'completed' as const,
-          objectives: activeQuest.objectives.map(obj => ({ ...obj, completed: true }))
-        };
-        setQuests(prev => [...prev.filter(q => q.id !== activeQuest.id), updatedQuest]);
-        
-        // Give rewards
-        setPlayer(prev => ({
-          ...prev,
-          experience: prev.experience + activeQuest.rewards.experience,
-          coins: prev.coins + (activeQuest.rewards.coins || 0),
-          inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
-        }));
-        
-        toast({
-          title: 'Квест выполнен!',
-          description: `${activeQuest.title} завершён! +${activeQuest.rewards.experience} опыта`,
-          duration: 4000,
-        });
-      }
+    // Update first quest objective
+    const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
+    if (firstQuest) {
+      const updatedObjectives = firstQuest.objectives.map(obj => 
+        obj.description === 'Используй фонтан исцеления' ? { ...obj, completed: true } : obj
+      );
+      const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
+      setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
     }
-  }, [player.coins, player.questProgress, quests, toast]);
+  }, [player.coins, quests, toast]);
+
+  const handleCoalMineInteract = useCallback(() => {
+    setShowCoalMining(true);
+  }, []);
+
+  const handleMineCoal = useCallback(() => {
+    const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
+    const hasCoal = player.inventory.some(item => item.id === 'coal');
+    
+    if (coalQuest && !hasCoal) {
+      // Add coal to inventory
+      const coal = {
+        id: 'coal',
+        name: 'Уголь',
+        type: 'misc' as const,
+        description: 'Высококачественный уголь для кузнечных работ',
+        icon: '🪨'
+      };
+      
+      setPlayer(prev => ({
+        ...prev,
+        inventory: [...prev.inventory, coal]
+      }));
+      
+      // Update quest objective
+      const updatedObjectives = coalQuest.objectives.map(obj => 
+        obj.description === 'Найди уголь в лесу' ? { ...obj, completed: true } : obj
+      );
+      const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
+      setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
+      
+      toast({
+        title: 'Уголь добыт!',
+        description: 'Вы добыли уголь. Отнесите его кузнецу.',
+        duration: 3000,
+      });
+      
+      setShowCoalMining(false);
+    } else {
+      toast({
+        title: 'Не можете добыть уголь',
+        description: 'У вас нет соответствующего квеста или уголь уже добыт.',
+        duration: 2000,
+      });
+    }
+  }, [quests, player.inventory, toast]);
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
@@ -512,9 +576,9 @@ const RPGGame = () => {
       <GameMap 
         player={player}
         npcs={npcs}
-        onPlayerMove={handlePlayerMove}
         onNPCInteract={handleNPCInteract}
         onFountainUse={handleFountainUse}
+        onCoalMineInteract={handleCoalMineInteract}
       />
 
       <VirtualJoystick
@@ -577,6 +641,15 @@ const RPGGame = () => {
           merchant={npcs.find(npc => npc.type === 'merchant')!}
           onClose={() => setActiveMenu('none')}
           onBuyItem={handleBuyItem}
+        />
+      )}
+
+      {/* Coal Mining */}
+      {showCoalMining && (
+        <CoalMining
+          onClose={() => setShowCoalMining(false)}
+          onMineCoal={handleMineCoal}
+          canMine={quests.some(q => q.id === 'find-coal' && q.status === 'active') && !player.inventory.some(item => item.id === 'coal')}
         />
       )}
     </div>

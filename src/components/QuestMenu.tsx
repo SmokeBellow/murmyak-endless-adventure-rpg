@@ -78,8 +78,8 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden">
-        <CardHeader className="border-b border-border">
+      <Card className="w-full max-w-3xl max-h-[90vh] flex flex-col">
+        <CardHeader className="border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary">Журнал Квестов</CardTitle>
             <Button variant="outline" size="sm" onClick={onClose}>
@@ -88,7 +88,7 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
           </div>
         </CardHeader>
         
-        <CardContent className="p-6 overflow-auto">
+        <CardContent className="p-6 flex-1 overflow-y-auto">
           <div className="space-y-6">
             {/* Active Quests */}
             {activeQuests.length > 0 && (

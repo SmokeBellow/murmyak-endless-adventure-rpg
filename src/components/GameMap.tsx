@@ -4,12 +4,12 @@ import { Player, NPC } from '@/types/gameTypes';
 interface GameMapProps {
   player: Player;
   npcs: NPC[];
-  onPlayerMove: (newPosition: { x: number; y: number }) => void;
   onNPCInteract: (npc: NPC) => void;
   onFountainUse: () => void;
+  onCoalMineInteract: () => void;
 }
 
-const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: GameMapProps) => {
+const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInteract }: GameMapProps) => {
   const mapWidth = 2000;
   const mapHeight = 2000;
 
@@ -49,6 +49,13 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
       return;
     }
     
+    // Check if clicking on coal mine
+    const coalMineDistance = Math.sqrt(Math.pow(800 - x, 2) + Math.pow(200 - y, 2));
+    if (coalMineDistance < 40) {
+      onCoalMineInteract();
+      return;
+    }
+    
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
       const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
@@ -57,10 +64,9 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
     
     if (clickedNPC) {
       onNPCInteract(clickedNPC);
-    } else if (!isColliding(x, y)) {
-      onPlayerMove({ x, y });
     }
-  }, [player.position, npcs, onPlayerMove, onNPCInteract, onFountainUse, isColliding]);
+    // Removed player movement on click
+  }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract]);
 
   // Calculate camera offset to center on player
   const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
@@ -173,6 +179,23 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
           }}
         >
           ⛲
+        </div>
+
+        {/* Coal Mine */}
+        <div
+          className="absolute bg-gray-800/80 border-2 border-gray-600 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-white font-bold shadow-lg"
+          style={{
+            left: 770,
+            top: 170,
+            width: 60,
+            height: 60,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onCoalMineInteract();
+          }}
+        >
+          ⛏️
         </div>
       </div>
     </div>

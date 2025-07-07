@@ -589,6 +589,7 @@ const RPGGame = () => {
           activeQuests={quests.filter(q => q.status === 'active')}
           onCompleteQuest={handleCompleteQuest}
           completedQuestIds={completedQuestIds}
+          allQuests={quests}
         />
       )}
 

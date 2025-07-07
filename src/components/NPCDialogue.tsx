@@ -12,9 +12,10 @@ interface NPCDialogueProps {
   activeQuests?: Quest[];
   onCompleteQuest?: (quest: Quest) => void;
   completedQuestIds?: string[];
+  allQuests?: Quest[]; // Add all available quests
 }
 
-const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [] }: NPCDialogueProps) => {
+const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [], allQuests = [] }: NPCDialogueProps) => {
   console.log('NPCDialogue - NPC:', npc.id, 'completedQuestIds:', completedQuestIds);
   
   // Special logic for elder NPC
@@ -30,16 +31,26 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
       // Show first quest if not taken
       availableQuests = npc.quests?.filter(quest => quest.id === 'first-quest' && quest.status === 'available') || [];
     } else {
-      // Show second quest if first is taken/completed
-      availableQuests = npc.quests?.filter(quest => quest.id === 'find-blacksmith' && quest.status === 'available') || [];
+      // Show second quest from allQuests if first is taken/completed
+      const findBlacksmithQuest = allQuests.find(quest => quest.id === 'find-blacksmith' && quest.status === 'available');
+      availableQuests = findBlacksmithQuest ? [findBlacksmithQuest] : [];
     }
   } else {
-    // Normal logic for other NPCs
-    availableQuests = npc.quests?.filter(quest => 
+    // Normal logic for other NPCs - check both npc.quests and allQuests for this NPC
+    const npcQuests = npc.quests?.filter(quest => 
       quest.status === 'available' && 
       !activeQuests.some(aq => aq.id === quest.id) &&
       !completedQuestIds.includes(quest.id)
     ) || [];
+    
+    const globalQuests = allQuests.filter(quest => 
+      quest.giver === npc.id &&
+      quest.status === 'available' && 
+      !activeQuests.some(aq => aq.id === quest.id) &&
+      !completedQuestIds.includes(quest.id)
+    );
+    
+    availableQuests = [...npcQuests, ...globalQuests];
   }
   
   // Show active quests that can be completed with this NPC

@@ -25,8 +25,19 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
   }, [player.position, npcs, onPlayerMove, onNPCInteract]);
 
   const getTileContent = (x: number, y: number) => {
-    if (player.position.x === x && player.position.y === y) {
-      return <div className="w-6 h-6 bg-primary rounded-full shadow-glow animate-pulse" />;
+    // Player position (rounded for tile matching)
+    const playerTileX = Math.round(player.position.x);
+    const playerTileY = Math.round(player.position.y);
+    
+    if (playerTileX === x && playerTileY === y) {
+      return (
+        <div 
+          className="w-6 h-6 bg-primary rounded-full shadow-glow transition-all duration-200"
+          style={{
+            transform: `translate(${(player.position.x - playerTileX) * tileSize}px, ${(player.position.y - playerTileY) * tileSize}px)`
+          }}
+        />
+      );
     }
     
     const npc = npcs.find(npc => npc.position.x === x && npc.position.y === y);
@@ -52,9 +63,22 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
     return <div className="w-full h-full bg-village-bg border border-border/10" />;
   };
 
+  // Calculate camera offset to center on player
+  const cameraOffsetX = -(player.position.x * tileSize) + (window.innerWidth / 2);
+  const cameraOffsetY = -(player.position.y * tileSize) + (window.innerHeight / 2);
+
   return (
-    <div className="flex-1 overflow-auto p-4 bg-village-bg">
-      <div className="flex items-center justify-center min-h-full">
+    <div className="flex-1 overflow-hidden bg-village-bg relative">
+      <div 
+        className="absolute transition-transform duration-200 ease-out"
+        style={{
+          transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px)`,
+          left: '50%',
+          top: '50%',
+          marginLeft: -(mapSize * tileSize) / 2,
+          marginTop: -(mapSize * tileSize) / 2,
+        }}
+      >
         <div 
           className="grid gap-0 border-2 border-border rounded-lg overflow-hidden shadow-medieval"
           style={{ 

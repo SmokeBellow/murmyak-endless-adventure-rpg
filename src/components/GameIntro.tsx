@@ -8,17 +8,13 @@ const GameIntro = ({ onComplete }: GameIntroProps) => {
   const [currentScreen, setCurrentScreen] = useState<'developer' | 'title' | 'complete'>('developer');
 
   useEffect(() => {
-    console.log('GameIntro useEffect started');
-    
     // Developer screen for 3 seconds
     const timer1 = setTimeout(() => {
-      console.log('Switching to title screen');
       setCurrentScreen('title');
     }, 3000);
 
-    // Title screen for 3 seconds (total 6 seconds)
+    // Title screen for 3 seconds (starts after developer screen)
     const timer2 = setTimeout(() => {
-      console.log('Completing intro, calling onComplete');
       setCurrentScreen('complete');
       onComplete();
     }, 6000);

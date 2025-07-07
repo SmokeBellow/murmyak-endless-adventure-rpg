@@ -1,6 +1,8 @@
 export interface Player {
   name: string;
   position: { x: number; y: number };
+  targetPosition: { x: number; y: number };
+  isMoving: boolean;
   health: number;
   maxHealth: number;
   mana: number;

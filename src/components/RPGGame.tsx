@@ -7,7 +7,7 @@ import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
 import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
-import MobileControls from './MobileControls';
+import VirtualJoystick from './VirtualJoystick';
 import { useToast } from '@/hooks/use-toast';
 
 const RPGGame = () => {
@@ -49,6 +49,8 @@ const RPGGame = () => {
   const [player, setPlayer] = useState<Player>({
     name: 'Герой',
     position: { x: 10, y: 10 },
+    targetPosition: { x: 10, y: 10 },
+    isMoving: false,
     health: 100,
     maxHealth: 100,
     mana: 50,
@@ -142,9 +144,35 @@ const RPGGame = () => {
   const handlePlayerMove = useCallback((newPosition: { x: number; y: number }) => {
     setPlayer(prev => ({
       ...prev,
-      position: newPosition
+      position: newPosition,
+      targetPosition: newPosition
     }));
   }, []);
+
+  const handleJoystickMove = useCallback((direction: { x: number; y: number } | null) => {
+    if (!direction) {
+      setPlayer(prev => ({ ...prev, isMoving: false }));
+      return;
+    }
+
+    const moveSpeed = 0.03;
+    const { x, y } = player.position;
+    
+    // Calculate new position
+    let newX = x + (direction.x * moveSpeed);
+    let newY = y + (direction.y * moveSpeed);
+    
+    // Boundary constraints
+    newX = Math.max(0.5, Math.min(19.5, newX));
+    newY = Math.max(0.5, Math.min(19.5, newY));
+    
+    setPlayer(prev => ({
+      ...prev,
+      position: { x: newX, y: newY },
+      targetPosition: { x: newX, y: newY },
+      isMoving: true
+    }));
+  }, [player.position]);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);
@@ -190,30 +218,34 @@ const RPGGame = () => {
     });
   }, [toast]);
 
-  const handleMobileMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
-    const { x, y } = player.position;
-    let newX = x;
-    let newY = y;
-    
-    switch (direction) {
-      case 'up':
-        newY = Math.max(0, y - 1);
-        break;
-      case 'down':
-        newY = Math.min(19, y + 1);
-        break;
-      case 'left':
-        newX = Math.max(0, x - 1);
-        break;
-      case 'right':
-        newX = Math.min(19, x + 1);
-        break;
-    }
-    
-    if (newX !== x || newY !== y) {
-      handlePlayerMove({ x: newX, y: newY });
-    }
-  }, [player.position, handlePlayerMove]);
+  // Smooth movement animation
+  useEffect(() => {
+    const animationFrame = () => {
+      setPlayer(prev => {
+        const { position, targetPosition } = prev;
+        const dx = targetPosition.x - position.x;
+        const dy = targetPosition.y - position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 0.01) {
+          return { ...prev, isMoving: false };
+        }
+        
+        const speed = 0.1;
+        const newX = position.x + (dx * speed);
+        const newY = position.y + (dy * speed);
+        
+        return {
+          ...prev,
+          position: { x: newX, y: newY },
+          isMoving: distance > 0.01
+        };
+      });
+    };
+
+    const interval = setInterval(animationFrame, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, []);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];
@@ -250,9 +282,8 @@ const RPGGame = () => {
         onNPCInteract={handleNPCInteract}
       />
 
-      <MobileControls
-        player={player}
-        onMove={handleMobileMove}
+      <VirtualJoystick
+        onMove={handleJoystickMove}
         disabled={activeMenu !== 'none' || selectedNPC !== null}
       />
 

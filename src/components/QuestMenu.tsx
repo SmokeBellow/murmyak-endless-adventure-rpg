@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Quest } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface QuestMenuProps {
   quests: Quest[];
@@ -10,6 +11,8 @@ interface QuestMenuProps {
 }
 
 const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
+  const [showActiveQuests, setShowActiveQuests] = useState(true);
+  const [showCompletedQuests, setShowCompletedQuests] = useState(false);
   const getStatusBadge = (status: Quest['status']) => {
     switch (status) {
       case 'available':
@@ -92,12 +95,20 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
             {/* Active Quests */}
             {activeQuests.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-3">
-                  Активные квесты ({activeQuests.length})
-                </h3>
-                <div className="space-y-3">
-                  {activeQuests.map(renderQuest)}
+                <div 
+                  className="flex items-center justify-between cursor-pointer mb-3"
+                  onClick={() => setShowActiveQuests(!showActiveQuests)}
+                >
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Активные квесты ({activeQuests.length})
+                  </h3>
+                  {showActiveQuests ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </div>
+                {showActiveQuests && (
+                  <div className="space-y-3">
+                    {activeQuests.map(renderQuest)}
+                  </div>
+                )}
               </div>
             )}
 
@@ -105,12 +116,20 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
             {/* Completed Quests */}
             {completedQuests.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-3">
-                  Завершённые квесты ({completedQuests.length})
-                </h3>
-                <div className="space-y-3">
-                  {completedQuests.map(renderQuest)}
+                <div 
+                  className="flex items-center justify-between cursor-pointer mb-3"
+                  onClick={() => setShowCompletedQuests(!showCompletedQuests)}
+                >
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Завершённые квесты ({completedQuests.length})
+                  </h3>
+                  {showCompletedQuests ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </div>
+                {showCompletedQuests && (
+                  <div className="space-y-3">
+                    {completedQuests.map(renderQuest)}
+                  </div>
+                )}
               </div>
             )}
 

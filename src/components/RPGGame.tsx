@@ -157,7 +157,7 @@ const RPGGame = () => {
             { description: 'Найди и поговори с кузнецом', completed: false }
           ],
           rewards: {
-            experience: 25
+            experience: 10
           }
         }
       ]

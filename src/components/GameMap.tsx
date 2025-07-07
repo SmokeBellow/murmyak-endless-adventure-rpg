@@ -44,14 +44,16 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     
     // Check if clicking on fountain
     const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-    if (fountainDistance < 30) {
+    const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+    if (fountainDistance < 30 && playerToFountainDistance < 80) {
       onFountainUse();
       return;
     }
     
     // Check if clicking on coal mine
     const coalMineDistance = Math.sqrt(Math.pow(800 - x, 2) + Math.pow(200 - y, 2));
-    if (coalMineDistance < 40) {
+    const playerToCoalMineDistance = Math.sqrt(Math.pow(800 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+    if (coalMineDistance < 40 && playerToCoalMineDistance < 80) {
       onCoalMineInteract();
       return;
     }
@@ -59,7 +61,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
       const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
-      return distance < 30;
+      const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
+      return distance < 30 && playerToNPCDistance < 80;
     });
     
     if (clickedNPC) {
@@ -127,7 +130,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             }}
             onClick={(e) => {
               e.stopPropagation();
-              onNPCInteract(npc);
+              const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
+              if (playerToNPCDistance < 80) {
+                onNPCInteract(npc);
+              }
             }}
           />
         ))}
@@ -175,7 +181,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           }}
           onClick={(e) => {
             e.stopPropagation();
-            onFountainUse();
+            const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+            if (playerToFountainDistance < 80) {
+              onFountainUse();
+            }
           }}
         >
           ⛲
@@ -192,7 +201,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           }}
           onClick={(e) => {
             e.stopPropagation();
-            onCoalMineInteract();
+            const playerToCoalMineDistance = Math.sqrt(Math.pow(800 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+            if (playerToCoalMineDistance < 80) {
+              onCoalMineInteract();
+            }
           }}
         >
           ⛏️

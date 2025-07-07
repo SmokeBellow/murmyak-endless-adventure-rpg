@@ -12,27 +12,36 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
   const mapWidth = 2000;
   const mapHeight = 2000;
 
+  // Calculate camera offset to center on player
+  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
+  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
+
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
-    const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
+    
+    // Convert screen coordinates to world coordinates
+    const screenX = event.clientX - rect.left;
+    const screenY = event.clientY - rect.top;
+    
+    // Calculate world position accounting for camera offset
+    const worldX = screenX - cameraOffsetX;
+    const worldY = screenY - cameraOffsetY;
     
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
-      const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
+      const distance = Math.sqrt(Math.pow(npc.position.x - worldX, 2) + Math.pow(npc.position.y - worldY, 2));
       return distance < 30;
     });
     
     if (clickedNPC) {
       onNPCInteract(clickedNPC);
     } else {
-      onPlayerMove({ x, y });
+      // Constrain movement within map bounds
+      const constrainedX = Math.max(50, Math.min(mapWidth - 50, worldX));
+      const constrainedY = Math.max(50, Math.min(mapHeight - 50, worldY));
+      onPlayerMove({ x: constrainedX, y: constrainedY });
     }
-  }, [player.position, npcs, onPlayerMove, onNPCInteract]);
-
-  // Calculate camera offset to center on player
-  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
-  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
+  }, [cameraOffsetX, cameraOffsetY, npcs, onPlayerMove, onNPCInteract, mapWidth, mapHeight]);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

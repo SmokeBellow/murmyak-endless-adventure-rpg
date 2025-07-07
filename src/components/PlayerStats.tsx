@@ -54,6 +54,15 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
             Ур. {player.level}
           </span>
         </div>
+
+        {/* Gold */}
+        <div className="flex items-center space-x-3">
+          <span className="text-sm font-medium text-foreground min-w-[80px]">Золото:</span>
+          <div className="flex-1"></div>
+          <span className="text-sm font-medium text-yellow-500 min-w-[60px] text-right flex items-center gap-1">
+            🪙 {player.gold}
+          </span>
+        </div>
       </div>
     </div>
   );

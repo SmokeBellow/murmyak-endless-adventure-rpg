@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
@@ -11,6 +12,7 @@ import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
 
 const RPGGame = () => {
+  const { toast } = useToast();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
@@ -132,6 +134,7 @@ const RPGGame = () => {
           description: 'Познакомься с жителями деревни и изучи окрестности.',
           status: 'available',
           giver: 'elder',
+          repeatable: false,
           objectives: [
             { description: 'Поговори с торговцем', completed: false },
             { description: 'Используй фонтан исцеления', completed: false }
@@ -147,6 +150,7 @@ const RPGGame = () => {
           description: 'В деревне есть кузнец, который может помочь тебе. Найди его!',
           status: 'locked',
           giver: 'elder',
+          repeatable: false,
           objectives: [
             { description: 'Найди и поговори с кузнецом', completed: false }
           ],
@@ -173,6 +177,7 @@ const RPGGame = () => {
           description: 'Кузнецу нужен уголь для работы. Найди его в лесу за деревней.',
           status: 'locked',
           giver: 'blacksmith',
+          repeatable: false,
           objectives: [
             { description: 'Найди уголь в лесу', completed: false },
             { description: 'Вернись к кузнецу с углем', completed: false }
@@ -492,6 +497,11 @@ const RPGGame = () => {
 
   const handleFountainUse = useCallback(() => {
     if (player.coins < 5) {
+      toast({
+        title: "Недостаточно монет",
+        description: "Нужно 5 монет для использования фонтана",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -506,7 +516,10 @@ const RPGGame = () => {
       }
     }));
 
-    // Fountain used silently
+    toast({
+      title: "Фонтан исцеления",
+      description: "Здоровье и мана полностью восстановлены!",
+    });
 
     // Update first quest objective
     const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
@@ -517,7 +530,7 @@ const RPGGame = () => {
       const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
       setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
     }
-  }, [player.coins, quests]);
+  }, [player.coins, quests, toast]);
 
   const handleCoalMineInteract = useCallback(() => {
     setShowCoalMining(true);

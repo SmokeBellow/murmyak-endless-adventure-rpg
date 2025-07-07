@@ -73,7 +73,6 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
   );
 
   const activeQuests = quests.filter(q => q.status === 'active');
-  const availableQuests = quests.filter(q => q.status === 'available');
   const completedQuests = quests.filter(q => q.status === 'completed');
 
   return (
@@ -102,17 +101,6 @@ const QuestMenu = ({ quests, onClose }: QuestMenuProps) => {
               </div>
             )}
 
-            {/* Available Quests */}
-            {availableQuests.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-foreground mb-3">
-                  Доступные квесты ({availableQuests.length})
-                </h3>
-                <div className="space-y-3">
-                  {availableQuests.map(renderQuest)}
-                </div>
-              </div>
-            )}
 
             {/* Completed Quests */}
             {completedQuests.length > 0 && (

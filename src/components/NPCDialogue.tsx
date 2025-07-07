@@ -14,7 +14,7 @@ interface NPCDialogueProps {
 }
 
 const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest }: NPCDialogueProps) => {
-  // Only show available quests that haven't been taken yet
+  // Only show available quests that haven't been taken yet and not completed (one-time quests)
   const availableQuests = npc.quests?.filter(quest => 
     quest.status === 'available' && 
     !activeQuests.some(aq => aq.id === quest.id)

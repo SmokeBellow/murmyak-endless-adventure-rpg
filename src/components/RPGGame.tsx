@@ -9,10 +9,8 @@ import NPCDialogue from './NPCDialogue';
 import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
-import { useToast } from '@/hooks/use-toast';
 
 const RPGGame = () => {
-  const { toast } = useToast();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
@@ -342,11 +340,7 @@ const RPGGame = () => {
           inventory: [...prev.inventory, ...(quest.rewards.items || [])]
         }));
         
-        toast({
-          title: 'Квест выполнен!',
-          description: `${quest.title} завершён! +${quest.rewards.experience} опыта`,
-          duration: 4000,
-        });
+        // Quest completed silently
         
         // Handle quest chain unlocking
         if (quest.id === 'first-quest') {
@@ -372,7 +366,7 @@ const RPGGame = () => {
         }
       }
     });
-  }, [quests, toast, npcs, setPlayer, player.inventory]);
+  }, [quests, npcs, setPlayer, player.inventory]);
 
   const handleEquipItem = useCallback((item: Item) => {
     if (!item.slot) return;
@@ -395,20 +389,38 @@ const RPGGame = () => {
       };
     });
 
-    toast({
-      title: 'Предмет экипирован',
-      description: `${item.name} теперь экипирован`,
-      duration: 2000,
-    });
-  }, [toast]);
+    // Item equipped silently
+  }, []);
 
   const handleAcceptQuest = useCallback((quest: Quest) => {
     const updatedQuest = { ...quest, status: 'active' as const };
     setQuests(prev => [...prev.filter(q => q.id !== quest.id), updatedQuest]);
     
-    // Unlock next quest if completing first quest
+    setSelectedNPC(null);
+    
+    // Quest accepted silently
+  }, []);
+
+  const handleCompleteQuest = useCallback((quest: Quest) => {
+    // Complete the quest
+    const completedQuest = {
+      ...quest,
+      status: 'completed' as const
+    };
+    setQuests(prev => [...prev.filter(q => q.id !== quest.id), completedQuest]);
+    
+    // Give rewards
+    setPlayer(prev => ({
+      ...prev,
+      experience: prev.experience + quest.rewards.experience,
+      coins: prev.coins + (quest.rewards.coins || 0),
+      inventory: [...prev.inventory, ...(quest.rewards.items || [])]
+    }));
+    
+    // Handle quest chain unlocking
     if (quest.id === 'first-quest') {
-      const elderNPC = npcs.find(npc => npc.id === 'elder');
+      // Unlock find-blacksmith quest
+      const elderNPC = npcs.find(n => n.id === 'elder');
       if (elderNPC) {
         const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
         if (nextQuest) {
@@ -416,16 +428,22 @@ const RPGGame = () => {
           setQuests(prev => [...prev.filter(q => q.id !== nextQuest.id), unlockedQuest]);
         }
       }
+    } else if (quest.id === 'find-blacksmith') {
+      // Unlock coal quest
+      const blacksmithNPC = npcs.find(n => n.id === 'blacksmith');
+      if (blacksmithNPC) {
+        const coalQuest = blacksmithNPC.quests?.find(q => q.id === 'find-coal');
+        if (coalQuest) {
+          const unlockedQuest = { ...coalQuest, status: 'available' as const };
+          setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), unlockedQuest]);
+        }
+      }
     }
     
     setSelectedNPC(null);
     
-    toast({
-      title: 'Квест принят!',
-      description: `${quest.title} добавлен в журнал квестов`,
-      duration: 3000,
-    });
-  }, [toast, npcs]);
+    // Quest completed silently
+  }, [npcs]);
 
   // Player movement animation at 60fps
   useEffect(() => {
@@ -450,20 +468,11 @@ const RPGGame = () => {
       inventory: [...prev.inventory, equippedItem]
     }));
 
-    toast({
-      title: 'Предмет снят',
-      description: `${equippedItem.name} убран в инвентарь`,
-      duration: 2000,
-    });
-  }, [player.equipment, toast]);
+    // Item unequipped silently
+  }, [player.equipment]);
 
   const handleBuyItem = useCallback((item: Item) => {
     if (!item.price || player.coins < item.price) {
-      toast({
-        title: 'Недостаточно монет',
-        description: `Нужно ${item.price} монет, у вас ${player.coins}`,
-        duration: 2000,
-      });
       return;
     }
 
@@ -473,12 +482,8 @@ const RPGGame = () => {
       inventory: [...prev.inventory, item]
     }));
 
-    toast({
-      title: 'Покупка совершена!',
-      description: `${item.name} добавлен в инвентарь`,
-      duration: 2000,
-    });
-  }, [player.coins, toast]);
+    // Item purchased silently
+  }, [player.coins]);
 
   const handleTrade = useCallback(() => {
     setActiveMenu('trade');
@@ -487,11 +492,6 @@ const RPGGame = () => {
 
   const handleFountainUse = useCallback(() => {
     if (player.coins < 5) {
-      toast({
-        title: 'Недостаточно монет',
-        description: 'Нужно 5 монет для использования фонтана',
-        duration: 2000,
-      });
       return;
     }
 
@@ -506,11 +506,7 @@ const RPGGame = () => {
       }
     }));
 
-    toast({
-      title: 'Фонтан использован!',
-      description: 'Здоровье и мана восстановлены',
-      duration: 2000,
-    });
+    // Fountain used silently
 
     // Update first quest objective
     const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
@@ -521,7 +517,7 @@ const RPGGame = () => {
       const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
       setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
     }
-  }, [player.coins, quests, toast]);
+  }, [player.coins, quests]);
 
   const handleCoalMineInteract = useCallback(() => {
     setShowCoalMining(true);
@@ -553,21 +549,13 @@ const RPGGame = () => {
       const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
       setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
       
-      toast({
-        title: 'Уголь добыт!',
-        description: 'Вы добыли уголь. Отнесите его кузнецу.',
-        duration: 3000,
-      });
+      // Coal mined silently
       
       setShowCoalMining(false);
     } else {
-      toast({
-        title: 'Не можете добыть уголь',
-        description: 'У вас нет соответствующего квеста или уголь уже добыт.',
-        duration: 2000,
-      });
+      // Cannot mine coal silently
     }
-  }, [quests, player.inventory, toast]);
+  }, [quests, player.inventory]);
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
@@ -615,6 +603,8 @@ const RPGGame = () => {
           onClose={() => setSelectedNPC(null)}
           onAcceptQuest={handleAcceptQuest}
           onTrade={handleTrade}
+          activeQuests={quests.filter(q => q.status === 'active')}
+          onCompleteQuest={handleCompleteQuest}
         />
       )}
 

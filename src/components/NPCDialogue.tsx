@@ -9,13 +9,22 @@ interface NPCDialogueProps {
   onClose: () => void;
   onAcceptQuest?: (quest: Quest) => void;
   onTrade?: () => void;
+  activeQuests?: Quest[];
+  onCompleteQuest?: (quest: Quest) => void;
 }
 
-const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade }: NPCDialogueProps) => {
+const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest }: NPCDialogueProps) => {
+  // Only show available quests that haven't been taken yet
   const availableQuests = npc.quests?.filter(quest => 
-    quest.status === 'available' || 
-    (quest.status === 'completed' && quest.repeatable)
+    quest.status === 'available' && 
+    !activeQuests.some(aq => aq.id === quest.id)
   ) || [];
+  
+  // Show active quests that can be completed with this NPC
+  const completableQuests = activeQuests.filter(quest => 
+    quest.giver === npc.id && 
+    quest.objectives.every(obj => obj.completed)
+  );
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -38,6 +47,38 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade }: NPCDialogueProps)
               </p>
             </div>
 
+            {/* Completable Quests */}
+            {completableQuests.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="font-semibold text-foreground">Завершить квесты:</h3>
+                {completableQuests.map(quest => (
+                  <Card key={quest.id} className="bg-primary/10 border-primary/20">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium text-foreground">{quest.title}</h4>
+                        <Badge variant="default">Готов</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Все задачи выполнены!
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-primary font-medium">
+                          +{quest.rewards.experience} опыта
+                          {quest.rewards.coins && `, +${quest.rewards.coins} монет`}
+                        </span>
+                        <Button
+                          size="sm"
+                          onClick={() => onCompleteQuest?.(quest)}
+                        >
+                          Завершить квест
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
             {/* Available Quests */}
             {availableQuests.length > 0 && (
               <div className="space-y-3">
@@ -55,6 +96,7 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade }: NPCDialogueProps)
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-experience font-medium">
                           +{quest.rewards.experience} опыта
+                          {quest.rewards.coins && `, +${quest.rewards.coins} монет`}
                         </span>
                         <Button
                           size="sm"

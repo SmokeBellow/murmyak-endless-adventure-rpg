@@ -6,7 +6,7 @@ import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
 import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
-import TradeMenu from './TradeMenu';
+import VirtualJoystick from './VirtualJoystick';
 import { useToast } from '@/hooks/use-toast';
 
 const RPGGame = () => {
@@ -14,7 +14,6 @@ const RPGGame = () => {
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
-  const [isTrading, setIsTrading] = useState(false);
 
   // Initial game items
   const initialItems: Item[] = [
@@ -57,7 +56,6 @@ const RPGGame = () => {
     maxMana: 50,
     experience: 0,
     level: 1,
-    gold: 100,
     inventory: initialItems,
     equipment: {
       head: null,
@@ -145,101 +143,37 @@ const RPGGame = () => {
   const handlePlayerMove = useCallback((newPosition: { x: number; y: number }) => {
     setPlayer(prev => ({
       ...prev,
-      targetPosition: newPosition,
-      isMoving: true
+      position: newPosition,
+      targetPosition: newPosition
     }));
   }, []);
 
-  // Smooth movement animation
-  useEffect(() => {
-    const animationFrame = () => {
-      setPlayer(prev => {
-        const { position, targetPosition } = prev;
-        const dx = targetPosition.x - position.x;
-        const dy = targetPosition.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 2) {
-          return { 
-            ...prev, 
-            position: targetPosition,
-            isMoving: false 
-          };
-        }
-        
-        const speed = 5;
-        const moveX = (dx / distance) * speed;
-        const moveY = (dy / distance) * speed;
-        
-        return {
-          ...prev,
-          position: { 
-            x: position.x + moveX, 
-            y: position.y + moveY 
-          },
-          isMoving: true
-        };
-      });
-    };
-
-    const interval = setInterval(animationFrame, 16); // ~60fps
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleTrade = useCallback(() => {
-    setIsTrading(true);
-  }, []);
-
-  const handleBuyItem = useCallback((item: Item) => {
-    const price = getItemPrice(item);
-    
-    if (player.gold < price) {
-      toast({
-        title: 'Недостаточно денег',
-        description: `Нужно ${price} золота для покупки ${item.name}`,
-        duration: 2000,
-      });
+  const handleJoystickMove = useCallback((direction: { x: number; y: number } | null) => {
+    if (!direction) {
+      setPlayer(prev => ({ ...prev, isMoving: false }));
       return;
     }
 
-    setPlayer(prev => ({
-      ...prev,
-      gold: prev.gold - price,
-      inventory: [...prev.inventory, item]
-    }));
-
-    toast({
-      title: 'Предмет куплен!',
-      description: `${item.name} добавлен в инвентарь`,
-      duration: 2000,
+    const moveSpeed = 4;
+    
+    setPlayer(prev => {
+      const { x, y } = prev.position;
+      
+      // Calculate new position
+      let newX = x + (direction.x * moveSpeed);
+      let newY = y + (direction.y * moveSpeed);
+      
+      // Boundary constraints
+      newX = Math.max(50, Math.min(1950, newX));
+      newY = Math.max(50, Math.min(1950, newY));
+      
+      return {
+        ...prev,
+        position: { x: newX, y: newY },
+        targetPosition: { x: newX, y: newY },
+        isMoving: true
+      };
     });
-  }, [player.gold, toast]);
-
-  const handleSellItem = useCallback((item: Item) => {
-    const price = getItemPrice(item, true);
-    
-    setPlayer(prev => ({
-      ...prev,
-      gold: prev.gold + price,
-      inventory: prev.inventory.filter(invItem => invItem.id !== item.id)
-    }));
-
-    toast({
-      title: 'Предмет продан!',
-      description: `${item.name} продан за ${price} золота`,
-      duration: 2000,
-    });
-  }, [toast]);
-
-  const getItemPrice = useCallback((item: Item, isSelling: boolean = false) => {
-    let basePrice = 10;
-    
-    if (item.stats?.damage) basePrice += item.stats.damage * 5;
-    if (item.stats?.armor) basePrice += item.stats.armor * 3;
-    if (item.stats?.health) basePrice += item.stats.health * 2;
-    if (item.stats?.mana) basePrice += item.stats.mana * 2;
-    
-    return isSelling ? Math.floor(basePrice * 0.5) : basePrice;
   }, []);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
@@ -286,6 +220,16 @@ const RPGGame = () => {
     });
   }, [toast]);
 
+  // Player movement animation at 60fps
+  useEffect(() => {
+    const animationFrame = () => {
+      // This animation is now only for click-to-move, joystick uses direct movement
+    };
+
+    const interval = setInterval(animationFrame, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, []);
+
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];
     if (!equippedItem) return;
@@ -317,6 +261,11 @@ const RPGGame = () => {
         onNPCInteract={handleNPCInteract}
       />
 
+      <VirtualJoystick
+        onMove={handleJoystickMove}
+        disabled={activeMenu !== 'none' || selectedNPC !== null}
+      />
+
       {/* Game Controls */}
       <div className="fixed bottom-4 left-4 right-4 z-40">
         <div className="flex justify-center space-x-2">
@@ -340,26 +289,11 @@ const RPGGame = () => {
       </div>
 
       {/* NPC Dialogue */}
-      {selectedNPC && !isTrading && (
+      {selectedNPC && (
         <NPCDialogue
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
           onAcceptQuest={handleAcceptQuest}
-          onTrade={handleTrade}
-        />
-      )}
-
-      {/* Trade Menu */}
-      {selectedNPC && isTrading && (
-        <TradeMenu
-          player={player}
-          npc={selectedNPC}
-          onClose={() => {
-            setIsTrading(false);
-            setSelectedNPC(null);
-          }}
-          onBuyItem={handleBuyItem}
-          onSellItem={handleSellItem}
         />
       )}
 

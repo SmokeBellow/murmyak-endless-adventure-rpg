@@ -9,7 +9,6 @@ export interface Player {
   maxMana: number;
   experience: number;
   level: number;
-  gold: number;
   inventory: Item[];
   equipment: Equipment;
 }

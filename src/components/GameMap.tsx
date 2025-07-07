@@ -12,36 +12,27 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract }: GameMapProps) =>
   const mapWidth = 2000;
   const mapHeight = 2000;
 
-  // Calculate camera offset to center on player
-  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
-  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
-
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    
-    // Convert screen coordinates to world coordinates
-    const screenX = event.clientX - rect.left;
-    const screenY = event.clientY - rect.top;
-    
-    // Calculate world position: screen coordinates + player position - screen center
-    const worldX = screenX + player.position.x - (rect.width / 2);
-    const worldY = screenY + player.position.y - (rect.height / 2);
+    const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
+    const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
     
     // Check if clicking on NPC
     const clickedNPC = npcs.find(npc => {
-      const distance = Math.sqrt(Math.pow(npc.position.x - worldX, 2) + Math.pow(npc.position.y - worldY, 2));
+      const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
       return distance < 30;
     });
     
     if (clickedNPC) {
       onNPCInteract(clickedNPC);
     } else {
-      // Constrain movement within map bounds
-      const constrainedX = Math.max(50, Math.min(mapWidth - 50, worldX));
-      const constrainedY = Math.max(50, Math.min(mapHeight - 50, worldY));
-      onPlayerMove({ x: constrainedX, y: constrainedY });
+      onPlayerMove({ x, y });
     }
-  }, [player.position, npcs, onPlayerMove, onNPCInteract, mapWidth, mapHeight]);
+  }, [player.position, npcs, onPlayerMove, onNPCInteract]);
+
+  // Calculate camera offset to center on player
+  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
+  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

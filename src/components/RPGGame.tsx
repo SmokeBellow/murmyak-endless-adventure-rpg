@@ -151,7 +151,7 @@ const RPGGame = () => {
           title: 'Найти кузнеца',
           description: 'В деревне есть кузнец, который может помочь тебе. Найди его!',
           status: 'locked',
-          giver: 'elder',
+          giver: 'blacksmith',
           repeatable: false,
           objectives: [
             { description: 'Найди и поговори с кузнецом', completed: false }

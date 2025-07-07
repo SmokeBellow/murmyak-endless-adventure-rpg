@@ -74,8 +74,8 @@ const InventoryMenu = ({ player, onClose, onEquipItem, onUnequipItem }: Inventor
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        <CardHeader className="border-b border-border">
+      <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <CardHeader className="border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary">Инвентарь и Экипировка</CardTitle>
             <Button variant="outline" size="sm" onClick={onClose}>
@@ -84,7 +84,7 @@ const InventoryMenu = ({ player, onClose, onEquipItem, onUnequipItem }: Inventor
           </div>
         </CardHeader>
         
-        <CardContent className="p-6 overflow-auto">
+        <CardContent className="p-6 flex-1 overflow-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Equipment Section */}
             <div>
@@ -107,7 +107,7 @@ const InventoryMenu = ({ player, onClose, onEquipItem, onUnequipItem }: Inventor
               <h3 className="text-lg font-semibold text-foreground mb-4">
                 Инвентарь ({player.inventory.length} предметов)
               </h3>
-              <div className="space-y-2 max-h-96 overflow-auto">
+              <div className="space-y-2 max-h-80 overflow-y-auto">
                 {player.inventory.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">Инвентарь пуст</p>
                 ) : (

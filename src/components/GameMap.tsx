@@ -13,6 +13,30 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
   const mapWidth = 2000;
   const mapHeight = 2000;
 
+  // Collision detection
+  const isColliding = useCallback((x: number, y: number) => {
+    // Building collisions
+    const buildings = [
+      { x: 450, y: 450, width: 100, height: 100 }, // Main building
+      { x: 350, y: 500, width: 80, height: 60 },   // Second building
+      { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
+    ];
+    
+    // Fountain collision
+    const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+    if (fountainDistance < 25) return true;
+    
+    // Check building collisions
+    for (const building of buildings) {
+      if (x >= building.x && x <= building.x + building.width &&
+          y >= building.y && y <= building.y + building.height) {
+        return true;
+      }
+    }
+    
+    return false;
+  }, []);
+
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
@@ -33,10 +57,10 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
     
     if (clickedNPC) {
       onNPCInteract(clickedNPC);
-    } else {
+    } else if (!isColliding(x, y)) {
       onPlayerMove({ x, y });
     }
-  }, [player.position, npcs, onPlayerMove, onNPCInteract, onFountainUse]);
+  }, [player.position, npcs, onPlayerMove, onNPCInteract, onFountainUse, isColliding]);
 
   // Calculate camera offset to center on player
   const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
@@ -89,7 +113,7 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
           <div
             key={npc.id}
             className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-10 border-2 border-foreground/20 ${
-              npc.type === 'merchant' ? 'bg-accent' : 'bg-secondary'
+              npc.type === 'merchant' ? 'bg-accent' : npc.type === 'blacksmith' ? 'bg-orange-500' : 'bg-secondary'
             }`}
             style={{
               left: npc.position.x - 16,
@@ -121,6 +145,18 @@ const GameMap = ({ player, npcs, onPlayerMove, onNPCInteract, onFountainUse }: G
             height: 60,
           }}
         />
+        {/* Blacksmith forge */}
+        <div
+          className="absolute bg-orange-800/80 border-2 border-orange-600 rounded-lg flex items-center justify-center text-white font-bold"
+          style={{
+            left: 300,
+            top: 460,
+            width: 60,
+            height: 50,
+          }}
+        >
+          🔨
+        </div>
 
         {/* Fountain */}
         <div

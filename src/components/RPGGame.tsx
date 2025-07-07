@@ -137,12 +137,52 @@ const RPGGame = () => {
           ],
           rewards: {
             experience: 50,
+            coins: 20
+          }
+        },
+        {
+          id: 'find-blacksmith',
+          title: 'Найти кузнеца',
+          description: 'В деревне есть кузнец, который может помочь тебе. Найди его!',
+          status: 'locked',
+          objectives: [
+            { description: 'Найди и поговори с кузнецом', completed: false }
+          ],
+          rewards: {
+            experience: 25
+          }
+        }
+      ]
+    },
+    {
+      id: 'blacksmith',
+      name: 'Кузнец Гром',
+      position: { x: 320, y: 480 },
+      type: 'blacksmith',
+      dialogue: [
+        'Добро пожаловать в мою кузницу!',
+        'Мне нужны материалы для работы.',
+        'Принеси мне уголь, и я выкую тебе отличное оружие!'
+      ],
+      quests: [
+        {
+          id: 'find-coal',
+          title: 'Поиск угля',
+          description: 'Кузнецу нужен уголь для работы. Найди его в лесу.',
+          status: 'locked',
+          objectives: [
+            { description: 'Найди уголь в лесу', completed: false }
+          ],
+          rewards: {
+            experience: 75,
             items: [{
-              id: 'village-ring',
-              name: 'Кольцо деревни',
-              type: 'misc',
-              description: 'Памятный подарок от жителей деревни',
-              icon: '💍'
+              id: 'forged-iron-sword',
+              name: 'Кованый железный меч',
+              type: 'weapon',
+              slot: 'weapon',
+              stats: { damage: 18 },
+              description: 'Превосходный меч, выкованный мастером',
+              icon: '⚔️'
             }]
           }
         }
@@ -192,6 +232,25 @@ const RPGGame = () => {
       newX = Math.max(50, Math.min(1950, newX));
       newY = Math.max(50, Math.min(1950, newY));
       
+      // Check collision for joystick movement
+      const buildings = [
+        { x: 450, y: 450, width: 100, height: 100 },
+        { x: 350, y: 500, width: 80, height: 60 },
+        { x: 300, y: 460, width: 60, height: 50 },
+      ];
+      
+      const fountainDistance = Math.sqrt(Math.pow(400 - newX, 2) + Math.pow(400 - newY, 2));
+      if (fountainDistance < 25) {
+        return prev; // Don't move if would collide with fountain
+      }
+      
+      for (const building of buildings) {
+        if (newX >= building.x && newX <= building.x + building.width &&
+            newY >= building.y && newY <= building.y + building.height) {
+          return prev; // Don't move if would collide with building
+        }
+      }
+      
       return {
         ...prev,
         position: { x: newX, y: newY },
@@ -229,6 +288,7 @@ const RPGGame = () => {
           setPlayer(prev => ({
             ...prev,
             experience: prev.experience + activeQuest.rewards.experience,
+            coins: prev.coins + (activeQuest.rewards.coins || 0),
             inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
           }));
           
@@ -240,7 +300,44 @@ const RPGGame = () => {
         }
       }
     }
-  }, [player.questProgress, quests, toast]);
+    
+    // Handle blacksmith interaction - unlock coal quest if find-blacksmith is completed
+    if (npc.type === 'blacksmith') {
+      const findBlacksmithQuest = quests.find(q => q.id === 'find-blacksmith' && q.status === 'active');
+      if (findBlacksmithQuest) {
+        // Complete find-blacksmith quest
+        const completedQuest = {
+          ...findBlacksmithQuest,
+          status: 'completed' as const,
+          objectives: findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }))
+        };
+        setQuests(prev => [...prev.filter(q => q.id !== findBlacksmithQuest.id), completedQuest]);
+        
+        // Give rewards
+        setPlayer(prev => ({
+          ...prev,
+          experience: prev.experience + findBlacksmithQuest.rewards.experience,
+          coins: prev.coins + (findBlacksmithQuest.rewards.coins || 0)
+        }));
+        
+        // Unlock coal quest
+        const blacksmithNPC = npcs.find(n => n.id === 'blacksmith');
+        if (blacksmithNPC) {
+          const coalQuest = blacksmithNPC.quests?.find(q => q.id === 'find-coal');
+          if (coalQuest) {
+            const unlockedQuest = { ...coalQuest, status: 'available' as const };
+            setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), unlockedQuest]);
+          }
+        }
+        
+        toast({
+          title: 'Квест выполнен!',
+          description: `${findBlacksmithQuest.title} завершён! Кузнец готов дать вам новое задание.`,
+          duration: 4000,
+        });
+      }
+    }
+  }, [player.questProgress, quests, toast, npcs]);
 
   const handleEquipItem = useCallback((item: Item) => {
     if (!item.slot) return;
@@ -273,6 +370,19 @@ const RPGGame = () => {
   const handleAcceptQuest = useCallback((quest: Quest) => {
     const updatedQuest = { ...quest, status: 'active' as const };
     setQuests(prev => [...prev.filter(q => q.id !== quest.id), updatedQuest]);
+    
+    // Unlock next quest if completing first quest
+    if (quest.id === 'first-quest') {
+      const elderNPC = npcs.find(npc => npc.id === 'elder');
+      if (elderNPC) {
+        const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
+        if (nextQuest) {
+          const unlockedQuest = { ...nextQuest, status: 'available' as const };
+          setQuests(prev => [...prev.filter(q => q.id !== nextQuest.id), unlockedQuest]);
+        }
+      }
+    }
+    
     setSelectedNPC(null);
     
     toast({
@@ -280,7 +390,7 @@ const RPGGame = () => {
       description: `${quest.title} добавлен в журнал квестов`,
       duration: 3000,
     });
-  }, [toast]);
+  }, [toast, npcs]);
 
   // Player movement animation at 60fps
   useEffect(() => {
@@ -382,6 +492,7 @@ const RPGGame = () => {
         setPlayer(prev => ({
           ...prev,
           experience: prev.experience + activeQuest.rewards.experience,
+          coins: prev.coins + (activeQuest.rewards.coins || 0),
           inventory: [...prev.inventory, ...(activeQuest.rewards.items || [])]
         }));
         

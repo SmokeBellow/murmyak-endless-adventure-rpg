@@ -46,7 +46,7 @@ export interface NPC {
   id: string;
   name: string;
   position: { x: number; y: number };
-  type: 'merchant' | 'elder';
+  type: 'merchant' | 'elder' | 'blacksmith';
   dialogue: string[];
   quests?: Quest[];
   shop?: Item[];
@@ -56,13 +56,14 @@ export interface Quest {
   id: string;
   title: string;
   description: string;
-  status: 'available' | 'active' | 'completed';
+  status: 'available' | 'active' | 'completed' | 'locked';
   objectives: {
     description: string;
     completed: boolean;
   }[];
   rewards: {
     experience: number;
+    coins?: number;
     items?: Item[];
   };
 }

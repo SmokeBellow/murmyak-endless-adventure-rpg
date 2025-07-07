@@ -20,7 +20,7 @@ const TradeMenu = ({ player, merchant, onClose, onBuyItem }: TradeMenuProps) => 
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md max-h-[80vh] overflow-y-auto">
+      <Card className="w-full max-w-md max-h-[90vh] flex flex-col">
         <CardHeader className="border-b border-border">
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary">🛒 Торговля с {merchant.name}</CardTitle>
@@ -34,7 +34,7 @@ const TradeMenu = ({ player, merchant, onClose, onBuyItem }: TradeMenuProps) => 
           </div>
         </CardHeader>
         
-        <CardContent className="p-6">
+        <CardContent className="p-6 flex-1 overflow-y-auto">
           <div className="space-y-4">
             {shopItems.length === 0 ? (
               <p className="text-center text-muted-foreground">Товары закончились</p>

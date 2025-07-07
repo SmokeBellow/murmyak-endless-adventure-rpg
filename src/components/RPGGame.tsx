@@ -10,6 +10,7 @@ import NPCDialogue from './NPCDialogue';
 import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
+import QuestRewardModal from './QuestRewardModal';
 
 const RPGGame = () => {
   const { toast } = useToast();
@@ -17,6 +18,7 @@ const RPGGame = () => {
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showCoalMining, setShowCoalMining] = useState(false);
+  const [questReward, setQuestReward] = useState<Quest | null>(null);
 
   // Initial game items
   const initialItems: Item[] = [
@@ -200,6 +202,7 @@ const RPGGame = () => {
   ]);
 
   const [quests, setQuests] = useState<Quest[]>([]);
+  const [completedQuestIds, setCompletedQuestIds] = useState<string[]>([]);
 
   // Regeneration effect
   useEffect(() => {
@@ -413,6 +416,7 @@ const RPGGame = () => {
       status: 'completed' as const
     };
     setQuests(prev => [...prev.filter(q => q.id !== quest.id), completedQuest]);
+    setCompletedQuestIds(prev => [...prev, quest.id]);
     
     // Give rewards
     setPlayer(prev => ({
@@ -421,6 +425,9 @@ const RPGGame = () => {
       coins: prev.coins + (quest.rewards.coins || 0),
       inventory: [...prev.inventory, ...(quest.rewards.items || [])]
     }));
+    
+    // Show quest reward modal
+    setQuestReward(quest);
     
     // Handle quest chain unlocking
     if (quest.id === 'first-quest') {
@@ -446,8 +453,6 @@ const RPGGame = () => {
     }
     
     setSelectedNPC(null);
-    
-    // Quest completed silently
   }, [npcs]);
 
   // Player movement animation at 60fps
@@ -618,6 +623,7 @@ const RPGGame = () => {
           onTrade={handleTrade}
           activeQuests={quests.filter(q => q.status === 'active')}
           onCompleteQuest={handleCompleteQuest}
+          completedQuestIds={completedQuestIds}
         />
       )}
 
@@ -653,6 +659,14 @@ const RPGGame = () => {
           onClose={() => setShowCoalMining(false)}
           onMineCoal={handleMineCoal}
           canMine={quests.some(q => q.id === 'find-coal' && q.status === 'active') && !player.inventory.some(item => item.id === 'coal')}
+        />
+      )}
+
+      {/* Quest Reward Modal */}
+      {questReward && (
+        <QuestRewardModal
+          quest={questReward}
+          onClose={() => setQuestReward(null)}
         />
       )}
     </div>

@@ -11,14 +11,31 @@ interface NPCDialogueProps {
   onTrade?: () => void;
   activeQuests?: Quest[];
   onCompleteQuest?: (quest: Quest) => void;
+  completedQuestIds?: string[];
 }
 
-const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest }: NPCDialogueProps) => {
-  // Only show available quests that haven't been taken yet and not completed (one-time quests)
-  const availableQuests = npc.quests?.filter(quest => 
-    quest.status === 'available' && 
-    !activeQuests.some(aq => aq.id === quest.id)
-  ) || [];
+const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [] }: NPCDialogueProps) => {
+  // Special logic for elder NPC
+  let availableQuests = [];
+  
+  if (npc.id === 'elder') {
+    const firstQuestTaken = activeQuests.some(q => q.id === 'first-quest') || 
+                           completedQuestIds.includes('first-quest');
+    
+    if (!firstQuestTaken) {
+      // Show first quest if not taken
+      availableQuests = npc.quests?.filter(quest => quest.id === 'first-quest' && quest.status === 'available') || [];
+    } else {
+      // Show second quest if first is taken/completed
+      availableQuests = npc.quests?.filter(quest => quest.id === 'find-blacksmith' && quest.status === 'available') || [];
+    }
+  } else {
+    // Normal logic for other NPCs
+    availableQuests = npc.quests?.filter(quest => 
+      quest.status === 'available' && 
+      !activeQuests.some(aq => aq.id === quest.id)
+    ) || [];
+  }
   
   // Show active quests that can be completed with this NPC
   const completableQuests = activeQuests.filter(quest => 

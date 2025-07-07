@@ -390,12 +390,18 @@ const RPGGame = () => {
     
     // Handle quest chain unlocking
     if (quest.id === 'first-quest') {
+      console.log('Attempting to unlock find-blacksmith quest');
       // Unlock find-blacksmith quest
       const elderNPC = npcs.find(n => n.id === 'elder');
+      console.log('Elder NPC found:', elderNPC ? 'yes' : 'no');
       if (elderNPC) {
         const nextQuest = elderNPC.quests?.find(q => q.id === 'find-blacksmith');
-        if (nextQuest && !quests.some(q => q.id === 'find-blacksmith')) {
+        console.log('Next quest found:', nextQuest ? 'yes' : 'no');
+        const questExists = quests.some(q => q.id === 'find-blacksmith');
+        console.log('Quest already exists in quests array:', questExists);
+        if (nextQuest && !questExists) {
           const unlockedQuest = { ...nextQuest, status: 'available' as const };
+          console.log('Adding find-blacksmith quest to quests array');
           setQuests(prev => [...prev, unlockedQuest]);
         }
       }

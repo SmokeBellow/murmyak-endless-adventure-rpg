@@ -13,9 +13,8 @@ const GameIntro = ({ onComplete }: GameIntroProps) => {
       setCurrentScreen('title');
     }, 3000);
 
-    // Title screen for 3 seconds (starts after developer screen)
+    // Title screen appears after developer screen, then after 3 more seconds go to game
     const timer2 = setTimeout(() => {
-      setCurrentScreen('complete');
       onComplete();
     }, 6000);
 

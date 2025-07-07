@@ -578,7 +578,7 @@ const RPGGame = () => {
       {/* Sidebar Menu */}
       {activeMenu === 'sidebar' && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex">
-          <div className="w-1/2 h-full bg-card border-r border-border shadow-lg flex flex-col">
+          <div className="w-2/3 h-full bg-card border-r border-border shadow-lg flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="text-lg font-semibold text-foreground">Меню</h2>
@@ -596,17 +596,27 @@ const RPGGame = () => {
             <div className="flex-1 p-4 space-y-3">
               <Button
                 variant="secondary"
-                className="w-full justify-start text-left h-12"
+                className="w-full justify-start text-left h-14 text-sm"
                 onClick={() => {
                   setActiveMenu('inventory');
                 }}
               >
                 <span className="text-lg mr-3">🎒</span>
-                Инвентарь и Экипировка
+                Инвентарь
               </Button>
               <Button
                 variant="secondary"
-                className="w-full justify-start text-left h-12"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  setActiveMenu('equipment');
+                }}
+              >
+                <span className="text-lg mr-3">⚔️</span>
+                Экипировка
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
                 onClick={() => {
                   setActiveMenu('quests');
                 }}
@@ -641,6 +651,15 @@ const RPGGame = () => {
 
       {/* Menus */}
       {activeMenu === 'inventory' && (
+        <InventoryMenu
+          player={player}
+          onClose={() => setActiveMenu('none')}
+          onEquipItem={handleEquipItem}
+          onUnequipItem={handleUnequipItem}
+        />
+      )}
+
+      {activeMenu === 'equipment' && (
         <InventoryMenu
           player={player}
           onClose={() => setActiveMenu('none')}

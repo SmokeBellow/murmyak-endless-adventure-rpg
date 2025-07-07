@@ -310,16 +310,12 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     } else {
       return {
         backgroundImage: `
-          radial-gradient(circle at 400px 400px, rgba(20, 20, 20, 0.8) 0%, rgba(40, 40, 40, 0.4) 200px),
-          radial-gradient(circle at 600px 200px, rgba(30, 30, 35, 0.6) 0%, rgba(50, 50, 55, 0.3) 150px),
-          radial-gradient(circle at 200px 600px, rgba(25, 25, 30, 0.7) 0%, rgba(45, 45, 50, 0.2) 180px),
-          linear-gradient(45deg, rgba(10, 10, 15, 0.3) 25%, transparent 25%),
-          linear-gradient(-45deg, rgba(15, 15, 20, 0.3) 25%, transparent 25%),
-          linear-gradient(135deg, rgba(5, 5, 10, 0.2) 0%, rgba(25, 25, 30, 0.1) 100%)
+          radial-gradient(circle at 400px 400px, rgba(30, 30, 35, 0.6) 0%, rgba(50, 50, 55, 0.2) 200px),
+          linear-gradient(45deg, rgba(20, 20, 25, 0.2) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(25, 25, 30, 0.2) 25%, transparent 25%)
         `,
-        backgroundSize: '300px 300px, 250px 250px, 280px 280px, 40px 40px, 40px 40px, 800px 800px',
-        backgroundColor: 'rgba(15, 15, 20, 0.9)',
-        filter: 'brightness(0.6) contrast(1.2)'
+        backgroundSize: '300px 300px, 60px 60px, 60px 60px',
+        backgroundColor: 'rgba(25, 25, 30, 0.8)'
       };
     }
   };

@@ -249,15 +249,31 @@ const RPGGame = () => {
       newY = Math.max(50, Math.min(1950, newY));
       
       // Check collision for joystick movement
-      const buildings = [
+      const buildings = currentLocation === 'village' ? [
         { x: 450, y: 450, width: 100, height: 100 },
         { x: 350, y: 500, width: 80, height: 60 },
         { x: 300, y: 460, width: 60, height: 50 },
+      ] : [
+        // Collision objects in abandoned mines
+        { x: 300, y: 300, width: 80, height: 40 },
+        { x: 500, y: 350, width: 60, height: 30 },
+        { x: 250, y: 450, width: 40, height: 25 },
       ];
       
-      const fountainDistance = Math.sqrt(Math.pow(400 - newX, 2) + Math.pow(400 - newY, 2));
-      if (fountainDistance < 25) {
-        return prev; // Don't move if would collide with fountain
+      // Fountain collision (only in village)
+      if (currentLocation === 'village') {
+        const fountainDistance = Math.sqrt(Math.pow(400 - newX, 2) + Math.pow(400 - newY, 2));
+        if (fountainDistance < 25) {
+          return prev; // Don't move if would collide with fountain
+        }
+      }
+      
+      // Coal mine collision (only in abandoned mines)
+      if (currentLocation === 'abandoned-mines') {
+        const coalMineDistance = Math.sqrt(Math.pow(400 - newX, 2) + Math.pow(400 - newY, 2));
+        if (coalMineDistance < 35) {
+          return prev; // Don't move if would collide with coal mine
+        }
       }
       
       for (const building of buildings) {
@@ -274,7 +290,7 @@ const RPGGame = () => {
         isMoving: true
       };
     });
-  }, []);
+  }, [currentLocation]);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
     setSelectedNPC(npc);

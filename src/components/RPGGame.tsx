@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
@@ -557,27 +558,72 @@ const RPGGame = () => {
         disabled={activeMenu !== 'none' || selectedNPC !== null}
       />
 
-      {/* Game Controls */}
-      <div className="fixed bottom-4 left-4 right-4 z-40">
-        <div className="flex justify-center space-x-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setActiveMenu('inventory')}
-            className="bg-card/90 backdrop-blur-sm"
-          >
-            🎒 Инвентарь
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setActiveMenu('quests')}
-            className="bg-card/90 backdrop-blur-sm"
-          >
-            📜 Квесты
-          </Button>
-        </div>
+      {/* Sidebar Menu Trigger */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setActiveMenu('sidebar')}
+          className="bg-card/90 backdrop-blur-sm p-2"
+          disabled={activeMenu !== 'none'}
+        >
+          <span className="flex flex-col space-y-1">
+            <div className="w-4 h-0.5 bg-foreground"></div>
+            <div className="w-4 h-0.5 bg-foreground"></div>
+            <div className="w-4 h-0.5 bg-foreground"></div>
+          </span>
+        </Button>
       </div>
+
+      {/* Sidebar Menu */}
+      {activeMenu === 'sidebar' && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex">
+          <div className="w-1/2 h-full bg-card border-r border-border shadow-lg flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold text-foreground">Меню</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveMenu('none')}
+                className="p-2"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Menu Items */}
+            <div className="flex-1 p-4 space-y-3">
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-12"
+                onClick={() => {
+                  setActiveMenu('inventory');
+                }}
+              >
+                <span className="text-lg mr-3">🎒</span>
+                Инвентарь и Экипировка
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-12"
+                onClick={() => {
+                  setActiveMenu('quests');
+                }}
+              >
+                <span className="text-lg mr-3">📜</span>
+                Журнал квестов
+              </Button>
+            </div>
+          </div>
+          
+          {/* Empty area to close sidebar when clicked */}
+          <div 
+            className="flex-1 h-full"
+            onClick={() => setActiveMenu('none')}
+          />
+        </div>
+      )}
 
       {/* NPC Dialogue */}
       {selectedNPC && (

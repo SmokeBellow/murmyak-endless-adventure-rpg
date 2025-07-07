@@ -77,7 +77,13 @@ const InventoryMenu = ({ player, onClose, onEquipItem, onUnequipItem }: Inventor
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         <CardHeader className="border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-primary">Инвентарь и Экипировка</CardTitle>
+            <div className="flex items-center space-x-4">
+              <CardTitle className="text-primary">Инвентарь и Экипировка</CardTitle>
+              <div className="flex items-center space-x-2 bg-muted/50 px-3 py-1 rounded-lg">
+                <span className="text-lg">🪙</span>
+                <span className="text-sm font-medium text-yellow-500">{player.coins}</span>
+              </div>
+            </div>
             <Button variant="outline" size="sm" onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>

@@ -71,4 +71,4 @@ export interface Quest {
 }
 
 export type GameScreen = 'intro' | 'game';
-export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade';
+export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';

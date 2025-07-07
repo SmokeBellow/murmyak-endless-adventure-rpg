@@ -55,14 +55,6 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
           </span>
         </div>
 
-        {/* Coins */}
-        <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-foreground min-w-[80px]">Монеты:</span>
-          <div className="flex items-center space-x-1">
-            <span className="text-lg">🪙</span>
-            <span className="text-sm font-medium text-yellow-500">{player.coins}</span>
-          </div>
-        </div>
       </div>
     </div>
   );

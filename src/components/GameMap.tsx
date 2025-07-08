@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { Player, NPC, LocationType } from '@/types/gameTypes';
-import grassTexture from '@/assets/grass.png';
 
 interface GameMapProps {
   player: Player;
@@ -299,7 +298,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     if (currentLocation === 'village') {
       return {
         backgroundImage: `
-          url(${grassTexture}),
+          url(/grass.png),
           radial-gradient(circle at 500px 500px, rgba(139, 69, 19, 0.1) 0%, transparent 200px),
           radial-gradient(circle at 300px 800px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
           radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px)

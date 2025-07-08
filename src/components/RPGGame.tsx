@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
@@ -16,6 +17,7 @@ import LoadingScreen from './LoadingScreen';
 
 const RPGGame = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
@@ -440,15 +442,63 @@ const RPGGame = () => {
     setSelectedNPC(null);
   }, [npcs]);
 
-  // Player movement animation at 60fps
+  // Keyboard controls for desktop
   useEffect(() => {
-    const animationFrame = () => {
-      // This animation is now only for click-to-move, joystick uses direct movement
+    if (isMobile) return;
+
+    const pressedKeys = new Set<string>();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      
+      // WASD, Arrow keys, and ЦФЫВ (Russian layout)
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'ц', 'ф', 'ы', 'в'].includes(key)) {
+        event.preventDefault();
+        pressedKeys.add(key);
+      }
     };
 
-    const interval = setInterval(animationFrame, 16); // ~60fps
-    return () => clearInterval(interval);
-  }, []);
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      pressedKeys.delete(key);
+    };
+
+    const updateMovement = () => {
+      if (activeMenu !== 'none' || selectedNPC !== null) return;
+
+      let x = 0;
+      let y = 0;
+
+      // Check pressed keys for movement direction
+      if (pressedKeys.has('w') || pressedKeys.has('arrowup') || pressedKeys.has('ц')) y = -1;
+      if (pressedKeys.has('s') || pressedKeys.has('arrowdown') || pressedKeys.has('ы')) y = 1;
+      if (pressedKeys.has('a') || pressedKeys.has('arrowleft') || pressedKeys.has('ф')) x = -1;
+      if (pressedKeys.has('d') || pressedKeys.has('arrowright') || pressedKeys.has('в')) x = 1;
+
+      // Normalize diagonal movement
+      if (x !== 0 && y !== 0) {
+        x *= 0.707; // 1/√2
+        y *= 0.707;
+      }
+
+      if (x !== 0 || y !== 0) {
+        handleJoystickMove({ x, y });
+      } else {
+        handleJoystickMove(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    
+    const moveInterval = setInterval(updateMovement, 16); // ~60fps
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      clearInterval(moveInterval);
+    };
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];
@@ -597,10 +647,12 @@ const RPGGame = () => {
         onPortalUse={handlePortalUse}
       />
 
-      <VirtualJoystick
-        onMove={handleJoystickMove}
-        disabled={activeMenu !== 'none' || selectedNPC !== null}
-      />
+      {isMobile && (
+        <VirtualJoystick
+          onMove={handleJoystickMove}
+          disabled={activeMenu !== 'none' || selectedNPC !== null}
+        />
+      )}
 
       {/* Sidebar Menu Trigger */}
       <div className="fixed top-4 left-4 z-50">

@@ -138,7 +138,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       <img
         src="/house.png"
         alt="Village house"
-        className="absolute w-24 h-24 object-cover rounded-lg border-2 border-border shadow-lg"
+        className="absolute w-24 h-24 object-contain"
         style={{
           left: 450,
           top: 450,

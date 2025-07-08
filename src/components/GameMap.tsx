@@ -93,10 +93,28 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     // Removed player movement on click
   }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
 
-  // Calculate camera offset to center on player (with 20% zoom)
+  // Calculate camera offset to center on player (with 20% zoom and edge constraints)
   const zoomLevel = 1.2;
-  const cameraOffsetX = -player.position.x * zoomLevel + (window.innerWidth / 2);
-  const cameraOffsetY = -player.position.y * zoomLevel + (window.innerHeight / 2);
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  
+  // Calculate desired camera position to center player
+  let targetCameraX = -player.position.x * zoomLevel + (screenWidth / 2);
+  let targetCameraY = -player.position.y * zoomLevel + (screenHeight / 2);
+  
+  // Calculate map boundaries accounting for zoom
+  const scaledMapWidth = mapWidth * zoomLevel;
+  const scaledMapHeight = mapHeight * zoomLevel;
+  
+  // Constrain camera to not show areas outside the map
+  const minCameraX = screenWidth - scaledMapWidth;
+  const maxCameraX = 0;
+  const minCameraY = screenHeight - scaledMapHeight;
+  const maxCameraY = 0;
+  
+  // Apply constraints
+  const cameraOffsetX = Math.max(minCameraX, Math.min(maxCameraX, targetCameraX));
+  const cameraOffsetY = Math.max(minCameraY, Math.min(maxCameraY, targetCameraY));
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

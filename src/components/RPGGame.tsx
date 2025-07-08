@@ -128,7 +128,7 @@ const RPGGame = () => {
     {
       id: 'elder',
       name: 'Староста Эдвин',
-      position: { x: 530, y: 430 },
+      position: { x: 500, y: 480 }, // Moved below the house
       type: 'elder',
       dialogue: [
         'Приветствую тебя, молодой искатель приключений!',

@@ -134,14 +134,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         />
       ))}
 
-      {/* Village buildings */}
-      <div
-        className="absolute bg-stone/80 border-2 border-border rounded-lg"
+      {/* Village house - replaced with image */}
+      <img
+        src="/house.png"
+        alt="Village house"
+        className="absolute w-24 h-24 object-cover rounded-lg border-2 border-border shadow-lg"
         style={{
           left: 450,
           top: 450,
-          width: 100,
-          height: 100,
         }}
       />
       <div

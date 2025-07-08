@@ -338,7 +338,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         <img
           src="/player.png"
           alt="Player"
-          className="absolute w-8 h-8 rounded-full shadow-glow border-2 border-primary-foreground z-20 transition-all duration-150 ease-out object-cover"
+          className="absolute w-8 h-8 shadow-glow z-20 transition-all duration-150 ease-out"
           style={{
             left: player.position.x - 16,
             top: player.position.y - 16,

@@ -237,7 +237,7 @@ const RPGGame = () => {
       return;
     }
 
-    const moveSpeed = 4;
+    const moveSpeed = 3;
     
     setPlayer(prev => {
       const { x, y } = prev.position;

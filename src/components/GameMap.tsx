@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { Player, NPC, LocationType } from '@/types/gameTypes';
+import grassTexture from '@/assets/grass-texture.png';
 
 interface GameMapProps {
   player: Player;
@@ -298,13 +299,13 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     if (currentLocation === 'village') {
       return {
         backgroundImage: `
+          url(${grassTexture}),
           radial-gradient(circle at 500px 500px, rgba(139, 69, 19, 0.1) 0%, transparent 200px),
           radial-gradient(circle at 300px 800px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
-          radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px),
-          linear-gradient(45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%),
-          linear-gradient(-45deg, rgba(34, 139, 34, 0.05) 25%, transparent 25%)
+          radial-gradient(circle at 800px 300px, rgba(34, 139, 34, 0.1) 0%, transparent 150px)
         `,
-        backgroundSize: '400px 400px, 300px 300px, 300px 300px, 60px 60px, 60px 60px',
+        backgroundSize: '256px 256px, 400px 400px, 300px 300px, 300px 300px',
+        backgroundRepeat: 'repeat, no-repeat, no-repeat, no-repeat',
         backgroundColor: 'rgba(139, 186, 139, 0.1)'
       };
     } else {
@@ -336,7 +337,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       >
         {/* Player */}
         <div
-          className="absolute w-8 h-8 bg-primary rounded-full shadow-glow transition-all duration-100 border-2 border-primary-foreground z-20"
+          className="absolute w-8 h-8 bg-primary rounded-full shadow-glow border-2 border-primary-foreground z-20 transition-all duration-75 ease-out"
           style={{
             left: player.position.x - 16,
             top: player.position.y - 16,

@@ -336,10 +336,11 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       >
         {/* Player */}
         <div
-          className="absolute w-8 h-8 bg-primary rounded-full shadow-glow border-2 border-primary-foreground z-20 transition-all duration-75 ease-out"
+          className="absolute w-8 h-8 bg-primary rounded-full shadow-glow border-2 border-primary-foreground z-20 transition-all duration-100 ease-linear"
           style={{
             left: player.position.x - 16,
             top: player.position.y - 16,
+            transform: 'translateZ(0)' // Force hardware acceleration
           }}
         />
 

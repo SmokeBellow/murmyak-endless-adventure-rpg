@@ -237,12 +237,12 @@ const RPGGame = () => {
       return;
     }
 
-    const moveSpeed = 3;
+    const moveSpeed = 2; // Reduced speed for smoother movement
     
     setPlayer(prev => {
       const { x, y } = prev.position;
       
-      // Calculate new position
+      // Calculate new position with smoother increments
       let newX = x + (direction.x * moveSpeed);
       let newY = y + (direction.y * moveSpeed);
       
@@ -491,7 +491,7 @@ const RPGGame = () => {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     
-    const moveInterval = setInterval(updateMovement, 16); // ~60fps
+    const moveInterval = setInterval(updateMovement, 20); // ~50fps for smoother movement
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);

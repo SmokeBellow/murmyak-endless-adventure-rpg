@@ -93,9 +93,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     // Removed player movement on click
   }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
 
-  // Calculate camera offset to center on player
-  const cameraOffsetX = -player.position.x + (window.innerWidth / 2);
-  const cameraOffsetY = -player.position.y + (window.innerHeight / 2);
+  // Calculate camera offset to center on player (with 20% zoom)
+  const zoomLevel = 1.2;
+  const cameraOffsetX = -player.position.x * zoomLevel + (window.innerWidth / 2);
+  const cameraOffsetY = -player.position.y * zoomLevel + (window.innerHeight / 2);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {
@@ -327,7 +328,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       <div 
         className="absolute w-full h-full"
         style={{
-          transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px)`,
+          transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           width: mapWidth,
           height: mapHeight,
           ...getBackgroundStyle()

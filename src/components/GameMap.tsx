@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Player, NPC, LocationType } from '@/types/gameTypes';
-import grassTexture from '@/assets/grass-texture.png';
+import grassTexture from '@/assets/grass.png';
 
 interface GameMapProps {
   player: Player;

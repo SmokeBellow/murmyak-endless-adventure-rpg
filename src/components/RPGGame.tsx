@@ -250,7 +250,7 @@ const RPGGame = () => {
       newX = Math.max(50, Math.min(1950, newX));
       newY = Math.max(50, Math.min(1950, newY));
       
-      // Use the same collision detection as in GameMap
+      console.log('Player moving to:', newX, newY, 'from:', x, y);
       const isColliding = (x: number, y: number) => {
         if (currentLocation === 'village') {
           // Building collisions in village
@@ -343,6 +343,7 @@ const RPGGame = () => {
       
       // Check if new position would cause collision
       if (isColliding(newX, newY)) {
+        console.log('Collision detected at:', newX, newY);
         return prev; // Don't move if would collide
       }
       

@@ -339,16 +339,16 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }}
         onClick={handleMapClick}
       >
-        {/* Player */}
+        {/* Player - fixed in center of screen */}
         <img
           src="/player.png"
           alt="Player"
-          className="absolute w-8 h-8 shadow-glow z-20 transition-all duration-150 ease-out"
+          className="fixed w-8 h-8 shadow-glow z-20 transition-all duration-150 ease-out"
           style={{
-            left: player.position.x,
-            top: player.position.y,
-            transform: 'translate(-50%, -50%) translateZ(0)', // Center the player and force hardware acceleration
-            willChange: 'transform' // Optimize for frequent changes
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none'
           }}
         />
 

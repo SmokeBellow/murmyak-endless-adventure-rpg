@@ -98,9 +98,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
   
-  // Center player exactly in the middle of the screen
-  const cameraOffsetX = -player.position.x * zoomLevel + (screenWidth / 2);
-  const cameraOffsetY = -player.position.y * zoomLevel + (screenHeight / 2);
+  // Center player exactly in the middle of the screen (accounting for player size)
+  const playerSize = 32; // 8 * 4 = 32px (w-8 h-8 in Tailwind)
+  const cameraOffsetX = -(player.position.x - playerSize/2) * zoomLevel + (screenWidth / 2);
+  const cameraOffsetY = -(player.position.y - playerSize/2) * zoomLevel + (screenHeight / 2);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

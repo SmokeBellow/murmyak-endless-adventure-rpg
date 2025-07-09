@@ -70,8 +70,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       }
       
       // Check if clicking on return portal
-      const portalDistance = Math.sqrt(Math.pow(200 - x, 2) + Math.pow(200 - y, 2));
-      const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+      const portalDistance = Math.sqrt(Math.pow(200 - x, 2) + Math.pow(400 - y, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
         onPortalUse();
         return;
@@ -215,7 +215,59 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   const renderAbandonedMines = () => (
     <>
-      {/* Coal Mine - moved here from village */}
+      {/* Main horizontal tunnel */}
+      <div
+        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
+        style={{ left: 100, top: 390, width: 600, height: 20 }}
+      />
+      
+      {/* Vertical tunnel intersections */}
+      <div
+        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
+        style={{ left: 190, top: 200, width: 20, height: 400 }}
+      />
+      <div
+        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
+        style={{ left: 390, top: 250, width: 20, height: 350 }}
+      />
+      <div
+        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
+        style={{ left: 590, top: 300, width: 20, height: 200 }}
+      />
+      
+      {/* Secondary horizontal tunnels */}
+      <div
+        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
+        style={{ left: 190, top: 240, width: 220, height: 20 }}
+      />
+      <div
+        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
+        style={{ left: 390, top: 290, width: 220, height: 20 }}
+      />
+      <div
+        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
+        style={{ left: 300, top: 540, width: 200, height: 20 }}
+      />
+
+      {/* Tunnel walls and barriers */}
+      <div
+        className="absolute bg-stone-900/90 border border-stone-700"
+        style={{ left: 150, top: 350, width: 40, height: 40 }}
+      />
+      <div
+        className="absolute bg-stone-900/90 border border-stone-700"
+        style={{ left: 450, top: 320, width: 30, height: 50 }}
+      />
+      <div
+        className="absolute bg-stone-900/90 border border-stone-700"
+        style={{ left: 250, top: 450, width: 35, height: 35 }}
+      />
+      <div
+        className="absolute bg-stone-900/90 border border-stone-700"
+        style={{ left: 550, top: 420, width: 40, height: 30 }}
+      />
+
+      {/* Coal Mine - in a tunnel intersection */}
       <div
         className="absolute bg-gray-900/90 border-2 border-gray-700 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-orange-200 font-bold shadow-lg shadow-black/50"
         style={{
@@ -235,18 +287,18 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         ⛏️
       </div>
 
-      {/* Return Portal */}
+      {/* Return Portal - at tunnel entrance */}
       <div
         className="absolute bg-purple-700/90 border-2 border-purple-500 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-purple-200 font-bold shadow-lg shadow-black/60"
         style={{
           left: 180,
-          top: 180,
+          top: 380,
           width: 40,
           height: 40,
         }}
         onClick={(e) => {
           e.stopPropagation();
-          const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(200 - player.position.y, 2));
+          const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
           if (playerToPortalDistance < 80) {
             onPortalUse();
           }
@@ -255,47 +307,47 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         🌀
       </div>
 
-      {/* Mine rocks and environment - more detailed and dark */}
+      {/* Mine cart tracks */}
+      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 195, top: 320 }} />
+      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 205, top: 320 }} />
+      <div className="absolute w-1 h-30 bg-gray-600/60" style={{ left: 395, top: 350 }} />
+      <div className="absolute w-1 h-30 bg-gray-600/60" style={{ left: 405, top: 350 }} />
+
+      {/* Support beams */}
       <div
-        className="absolute bg-gray-800/80 border-2 border-gray-700 rounded-lg shadow-inner"
-        style={{ left: 300, top: 300, width: 80, height: 40 }}
+        className="absolute bg-amber-900/80 border border-amber-800"
+        style={{ left: 180, top: 200, width: 40, height: 8 }}
       />
       <div
-        className="absolute bg-gray-700/80 border-2 border-gray-600 rounded-lg shadow-inner"
-        style={{ left: 500, top: 350, width: 60, height: 30 }}
+        className="absolute bg-amber-900/80 border border-amber-800"
+        style={{ left: 380, top: 250, width: 40, height: 8 }}
       />
       <div
-        className="absolute bg-gray-900/70 border-2 border-gray-800 rounded-lg shadow-inner"
-        style={{ left: 250, top: 450, width: 40, height: 25 }}
+        className="absolute bg-amber-900/80 border border-amber-800"
+        style={{ left: 580, top: 300, width: 40, height: 8 }}
+      />
+
+      {/* Lanterns */}
+      <div
+        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
+        style={{ left: 198, top: 210, width: 4, height: 4 }}
       />
       <div
-        className="absolute bg-stone-800/60 border border-stone-700 rounded"
-        style={{ left: 450, top: 500, width: 30, height: 20 }}
+        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
+        style={{ left: 398, top: 260, width: 4, height: 4 }}
       />
       <div
-        className="absolute bg-slate-800/70 border border-slate-700 rounded-lg"
-        style={{ left: 350, top: 550, width: 70, height: 35 }}
+        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
+        style={{ left: 598, top: 310, width: 4, height: 4 }}
       />
-      <div
-        className="absolute bg-gray-900/80 border border-gray-800 rounded"
-        style={{ left: 580, top: 480, width: 25, height: 15 }}
-      />
-      
-      {/* Dark cave entrances */}
-      <div
-        className="absolute bg-black/90 border-2 border-gray-900 rounded-full shadow-2xl"
-        style={{ left: 150, top: 400, width: 50, height: 50 }}
-      />
-      <div
-        className="absolute bg-black/90 border-2 border-gray-900 rounded-full shadow-2xl"
-        style={{ left: 600, top: 250, width: 40, height: 40 }}
-      />
-      
-      {/* Scattered coal pieces */}
-      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 320, top: 380 }} />
-      <div className="absolute w-2 h-2 bg-black/70 rounded-full" style={{ left: 380, top: 420 }} />
-      <div className="absolute w-2 h-2 bg-gray-900/80 rounded-full" style={{ left: 450, top: 360 }} />
-      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 520, top: 390 }} />
+
+      {/* Scattered coal and ore */}
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 220, top: 395 }} />
+      <div className="absolute w-2 h-2 bg-black/70 rounded-full" style={{ left: 350, top: 405 }} />
+      <div className="absolute w-2 h-2 bg-gray-900/80 rounded-full" style={{ left: 480, top: 385 }} />
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 520, top: 415 }} />
+      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 300, top: 250 }} />
+      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 420, top: 370 }} />
     </>
   );
 

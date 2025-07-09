@@ -17,27 +17,88 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
-    // Building collisions
-    const buildings = [
-      { x: 450, y: 450, width: 100, height: 100 }, // Main building
-      { x: 350, y: 500, width: 80, height: 60 },   // Second building
-      { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
-    ];
-    
-    // Fountain collision
-    const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-    if (fountainDistance < 25) return true;
-    
-    // Check building collisions
-    for (const building of buildings) {
-      if (x >= building.x && x <= building.x + building.width &&
-          y >= building.y && y <= building.y + building.height) {
-        return true;
+    if (currentLocation === 'village') {
+      // Building collisions in village
+      const buildings = [
+        { x: 450, y: 450, width: 100, height: 100 }, // Main building
+        { x: 350, y: 500, width: 80, height: 60 },   // Second building
+        { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
+      ];
+      
+      // Fountain collision
+      const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      if (fountainDistance < 25) return true;
+      
+      // Check building collisions
+      for (const building of buildings) {
+        if (x >= building.x && x <= building.x + building.width &&
+            y >= building.y && y <= building.y + building.height) {
+          return true;
+        }
+      }
+    } else if (currentLocation === 'abandoned-mines') {
+      // Mine walls and barriers
+      const mineWalls = [
+        // Horizontal walls
+        { x: 100, y: 200, width: 90, height: 20 },
+        { x: 210, y: 200, width: 90, height: 20 },
+        { x: 320, y: 200, width: 90, height: 20 },
+        { x: 430, y: 200, width: 90, height: 20 },
+        { x: 540, y: 200, width: 80, height: 20 },
+        
+        { x: 100, y: 320, width: 90, height: 20 },
+        { x: 230, y: 320, width: 80, height: 20 },
+        { x: 350, y: 320, width: 90, height: 20 },
+        { x: 480, y: 320, width: 140, height: 20 },
+        
+        { x: 100, y: 440, width: 120, height: 20 },
+        { x: 260, y: 440, width: 80, height: 20 },
+        { x: 380, y: 440, width: 100, height: 20 },
+        { x: 520, y: 440, width: 100, height: 20 },
+        
+        { x: 150, y: 560, width: 100, height: 20 },
+        { x: 290, y: 560, width: 120, height: 20 },
+        { x: 450, y: 560, width: 90, height: 20 },
+        
+        // Vertical walls
+        { x: 100, y: 220, width: 20, height: 100 },
+        { x: 170, y: 220, width: 20, height: 80 },
+        { x: 210, y: 240, width: 20, height: 80 },
+        { x: 280, y: 220, width: 20, height: 120 },
+        { x: 350, y: 220, width: 20, height: 100 },
+        { x: 410, y: 220, width: 20, height: 80 },
+        { x: 480, y: 220, width: 20, height: 100 },
+        { x: 540, y: 220, width: 20, height: 120 },
+        { x: 600, y: 220, width: 20, height: 100 },
+        
+        { x: 120, y: 340, width: 20, height: 100 },
+        { x: 190, y: 340, width: 20, height: 80 },
+        { x: 230, y: 340, width: 20, height: 100 },
+        { x: 310, y: 340, width: 20, height: 100 },
+        { x: 380, y: 340, width: 20, height: 100 },
+        { x: 440, y: 340, width: 20, height: 80 },
+        { x: 520, y: 340, width: 20, height: 100 },
+        { x: 580, y: 340, width: 20, height: 120 },
+        
+        { x: 150, y: 460, width: 20, height: 100 },
+        { x: 220, y: 460, width: 20, height: 80 },
+        { x: 290, y: 460, width: 20, height: 100 },
+        { x: 360, y: 460, width: 20, height: 100 },
+        { x: 450, y: 460, width: 20, height: 100 },
+        { x: 520, y: 460, width: 20, height: 80 },
+      ];
+      
+      // Check mine wall collisions
+      for (const wall of mineWalls) {
+        if (x >= wall.x && x <= wall.x + wall.width &&
+            y >= wall.y && y <= wall.y + wall.height) {
+          return true;
+        }
       }
     }
     
     return false;
-  }, []);
+  }, [currentLocation]);
 
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -215,59 +276,55 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   const renderAbandonedMines = () => (
     <>
-      {/* Main horizontal tunnel */}
-      <div
-        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
-        style={{ left: 100, top: 390, width: 600, height: 20 }}
-      />
+      {/* Maze walls - Horizontal walls */}
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 100, top: 200, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 210, top: 200, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 320, top: 200, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 430, top: 200, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 540, top: 200, width: 80, height: 20 }} />
       
-      {/* Vertical tunnel intersections */}
-      <div
-        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
-        style={{ left: 190, top: 200, width: 20, height: 400 }}
-      />
-      <div
-        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
-        style={{ left: 390, top: 250, width: 20, height: 350 }}
-      />
-      <div
-        className="absolute bg-stone-800/30 border-l-2 border-r-2 border-stone-700"
-        style={{ left: 590, top: 300, width: 20, height: 200 }}
-      />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 100, top: 320, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 230, top: 320, width: 80, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 350, top: 320, width: 90, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 480, top: 320, width: 140, height: 20 }} />
       
-      {/* Secondary horizontal tunnels */}
-      <div
-        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
-        style={{ left: 190, top: 240, width: 220, height: 20 }}
-      />
-      <div
-        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
-        style={{ left: 390, top: 290, width: 220, height: 20 }}
-      />
-      <div
-        className="absolute bg-stone-800/30 border-t-2 border-b-2 border-stone-700"
-        style={{ left: 300, top: 540, width: 200, height: 20 }}
-      />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 100, top: 440, width: 120, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 260, top: 440, width: 80, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 380, top: 440, width: 100, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 520, top: 440, width: 100, height: 20 }} />
+      
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 150, top: 560, width: 100, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 290, top: 560, width: 120, height: 20 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 450, top: 560, width: 90, height: 20 }} />
 
-      {/* Tunnel walls and barriers */}
-      <div
-        className="absolute bg-stone-900/90 border border-stone-700"
-        style={{ left: 150, top: 350, width: 40, height: 40 }}
-      />
-      <div
-        className="absolute bg-stone-900/90 border border-stone-700"
-        style={{ left: 450, top: 320, width: 30, height: 50 }}
-      />
-      <div
-        className="absolute bg-stone-900/90 border border-stone-700"
-        style={{ left: 250, top: 450, width: 35, height: 35 }}
-      />
-      <div
-        className="absolute bg-stone-900/90 border border-stone-700"
-        style={{ left: 550, top: 420, width: 40, height: 30 }}
-      />
+      {/* Maze walls - Vertical walls */}
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 100, top: 220, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 170, top: 220, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 210, top: 240, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 280, top: 220, width: 20, height: 120 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 350, top: 220, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 410, top: 220, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 480, top: 220, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 540, top: 220, width: 20, height: 120 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 600, top: 220, width: 20, height: 100 }} />
+      
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 120, top: 340, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 190, top: 340, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 230, top: 340, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 310, top: 340, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 380, top: 340, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 440, top: 340, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 520, top: 340, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 580, top: 340, width: 20, height: 120 }} />
+      
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 150, top: 460, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 220, top: 460, width: 20, height: 80 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 290, top: 460, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 360, top: 460, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 450, top: 460, width: 20, height: 100 }} />
+      <div className="absolute bg-stone-900/90 border border-stone-700 shadow-inner" style={{ left: 520, top: 460, width: 20, height: 80 }} />
 
-      {/* Coal Mine - in a tunnel intersection */}
+      {/* Coal Mine - in a clear area of the maze */}
       <div
         className="absolute bg-gray-900/90 border-2 border-gray-700 rounded-lg cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-orange-200 font-bold shadow-lg shadow-black/50"
         style={{
@@ -287,7 +344,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         ⛏️
       </div>
 
-      {/* Return Portal - at tunnel entrance */}
+      {/* Return Portal - at maze entrance */}
       <div
         className="absolute bg-purple-700/90 border-2 border-purple-500 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-purple-200 font-bold shadow-lg shadow-black/60"
         style={{
@@ -307,47 +364,34 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         🌀
       </div>
 
-      {/* Mine cart tracks */}
-      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 195, top: 320 }} />
-      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 205, top: 320 }} />
-      <div className="absolute w-1 h-30 bg-gray-600/60" style={{ left: 395, top: 350 }} />
-      <div className="absolute w-1 h-30 bg-gray-600/60" style={{ left: 405, top: 350 }} />
+      {/* Mine cart tracks along the paths */}
+      <div className="absolute w-1 h-15 bg-gray-600/60 rotate-90" style={{ left: 135, top: 388 }} />
+      <div className="absolute w-1 h-15 bg-gray-600/60 rotate-90" style={{ left: 145, top: 388 }} />
+      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 195, top: 360 }} />
+      <div className="absolute w-1 h-20 bg-gray-600/60" style={{ left: 205, top: 360 }} />
 
-      {/* Support beams */}
-      <div
-        className="absolute bg-amber-900/80 border border-amber-800"
-        style={{ left: 180, top: 200, width: 40, height: 8 }}
-      />
-      <div
-        className="absolute bg-amber-900/80 border border-amber-800"
-        style={{ left: 380, top: 250, width: 40, height: 8 }}
-      />
-      <div
-        className="absolute bg-amber-900/80 border border-amber-800"
-        style={{ left: 580, top: 300, width: 40, height: 8 }}
-      />
+      {/* Support beams in corridors */}
+      <div className="absolute bg-amber-900/80 border border-amber-800" style={{ left: 130, top: 220, width: 30, height: 6 }} />
+      <div className="absolute bg-amber-900/80 border border-amber-800" style={{ left: 250, top: 340, width: 30, height: 6 }} />
+      <div className="absolute bg-amber-900/80 border border-amber-800" style={{ left: 470, top: 340, width: 30, height: 6 }} />
 
-      {/* Lanterns */}
-      <div
-        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
-        style={{ left: 198, top: 210, width: 4, height: 4 }}
-      />
-      <div
-        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
-        style={{ left: 398, top: 260, width: 4, height: 4 }}
-      />
-      <div
-        className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg"
-        style={{ left: 598, top: 310, width: 4, height: 4 }}
-      />
+      {/* Lanterns for lighting */}
+      <div className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg" style={{ left: 143, top: 228, width: 4, height: 4 }} />
+      <div className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg" style={{ left: 263, top: 348, width: 4, height: 4 }} />
+      <div className="absolute bg-yellow-500/60 border border-yellow-400 rounded-full shadow-lg" style={{ left: 483, top: 348, width: 4, height: 4 }} />
 
-      {/* Scattered coal and ore */}
-      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 220, top: 395 }} />
-      <div className="absolute w-2 h-2 bg-black/70 rounded-full" style={{ left: 350, top: 405 }} />
-      <div className="absolute w-2 h-2 bg-gray-900/80 rounded-full" style={{ left: 480, top: 385 }} />
-      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 520, top: 415 }} />
-      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 300, top: 250 }} />
-      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 420, top: 370 }} />
+      {/* Scattered coal and debris in corridors */}
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 130, top: 250 }} />
+      <div className="absolute w-2 h-2 bg-black/70 rounded-full" style={{ left: 250, top: 370 }} />
+      <div className="absolute w-2 h-2 bg-gray-900/80 rounded-full" style={{ left: 470, top: 370 }} />
+      <div className="absolute w-3 h-3 bg-black/80 rounded-full" style={{ left: 340, top: 480 }} />
+      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 160, top: 280 }} />
+      <div className="absolute w-2 h-2 bg-orange-600/80 rounded-full" style={{ left: 420, top: 385 }} />
+
+      {/* Corner rocks and rubble */}
+      <div className="absolute bg-gray-800/70 border border-gray-700 rounded" style={{ left: 122, top: 322, width: 16, height: 16 }} />
+      <div className="absolute bg-gray-800/70 border border-gray-700 rounded" style={{ left: 252, top: 442, width: 16, height: 16 }} />
+      <div className="absolute bg-gray-800/70 border border-gray-700 rounded" style={{ left: 472, top: 442, width: 16, height: 16 }} />
     </>
   );
 

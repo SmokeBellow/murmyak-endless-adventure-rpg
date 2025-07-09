@@ -435,21 +435,20 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }}
         onClick={handleMapClick}
       >
-        {/* Player - fixed in center of screen */}
+        {/* Render location-specific content */}
+        {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
+
+        {/* Player - positioned absolutely within the map, rendered last to be on top */}
         <img
           src="/player.png"
           alt="Player"
-          className="fixed w-8 h-8 shadow-glow z-20 transition-all duration-150 ease-out"
+          className="absolute w-8 h-8 shadow-glow z-20 transition-all duration-150 ease-out"
           style={{
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
+            left: player.position.x - 16,
+            top: player.position.y - 16,
             pointerEvents: 'none'
           }}
         />
-
-        {/* Render location-specific content */}
-        {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
       </div>
     </div>
   );

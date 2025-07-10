@@ -20,7 +20,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     if (currentLocation === 'village') {
       // Building collisions in village
       const buildings = [
-        { x: 450, y: 450, width: 100, height: 100 }, // Main building
+        { x: 450, y: 450, width: 96, height: 96 }, // House.png image (w-24 h-24 = 96px)
         { x: 350, y: 500, width: 80, height: 60 },   // Second building
         { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
       ];

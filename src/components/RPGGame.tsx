@@ -234,9 +234,9 @@ const RPGGame = () => {
   // Create collision detection function matching GameMap logic  
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Building collisions in village - exact same as GameMap
+      // Building collisions in village - exact coordinates as in GameMap
       const buildings = [
-        { x: 450, y: 450, width: 100, height: 100 }, // Main building
+        { x: 450, y: 450, width: 96, height: 96 }, // House.png (24*4=96px)
         { x: 350, y: 500, width: 80, height: 60 },   // Second building
         { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
       ];
@@ -335,6 +335,7 @@ const RPGGame = () => {
       newX = Math.max(50, Math.min(1950, newX));
       newY = Math.max(50, Math.min(1950, newY));
       
+      console.log('Checking collision at:', newX, newY, 'Current location:', currentLocation);
       // Check collision using our synchronized collision function
       if (isColliding(newX, newY)) {
         console.log('Collision detected at:', newX, newY);

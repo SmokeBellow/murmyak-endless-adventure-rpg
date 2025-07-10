@@ -357,6 +357,39 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     }
   };
 
+  // Function to convert world coordinates to screen coordinates
+  const worldToScreen = (worldX: number, worldY: number) => {
+    const screenX = (worldX * zoomLevel + cameraOffsetX);
+    const screenY = (worldY * zoomLevel + cameraOffsetY);
+    return { x: screenX, y: screenY };
+  };
+
+  // Log all object coordinates for debugging
+  console.log('=== OBJECT COORDINATES DEBUG ===');
+  console.log('Player world coords:', player.position);
+  console.log('Camera offset:', { x: cameraOffsetX, y: cameraOffsetY });
+  console.log('Zoom level:', zoomLevel);
+  
+  // NPC screen coordinates
+  npcs.forEach(npc => {
+    const screenCoords = worldToScreen(npc.position.x, npc.position.y);
+    console.log(`${npc.name} - World: (${npc.position.x}, ${npc.position.y}) -> Screen: (${Math.round(screenCoords.x)}, ${Math.round(screenCoords.y)})`);
+  });
+  
+  // Building screen coordinates
+  const buildings = [
+    { name: 'House', x: 870, y: 420 },
+    { name: 'Second building', x: 850, y: 550 },
+    { name: 'Blacksmith forge', x: 800, y: 510 },
+    { name: 'Fountain', x: 400, y: 400 },
+    { name: 'Portal', x: 700, y: 300 }
+  ];
+  
+  buildings.forEach(building => {
+    const screenCoords = worldToScreen(building.x, building.y);
+    console.log(`${building.name} - World: (${building.x}, ${building.y}) -> Screen: (${Math.round(screenCoords.x)}, ${Math.round(screenCoords.y)})`);
+  });
+
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'

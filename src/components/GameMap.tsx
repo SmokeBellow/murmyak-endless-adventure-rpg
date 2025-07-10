@@ -234,15 +234,16 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         />
       ))}
 
-      {/* Village house - координаты исправлены согласно скриншоту */}
+      {/* Village house - точные координаты с отладкой */}
       <img
-        src="/house.png"
+        src="/house.png" 
         alt="Village house"
-        className="absolute w-24 h-24 object-contain"
+        className="absolute w-24 h-24 object-contain border-2 border-red-500/50"
         style={{
           left: 870,
           top: 420,
         }}
+        title="House: (870, 420) - 96x96"
       />
       <div
         className="absolute bg-stone/80 border-2 border-border rounded-lg"

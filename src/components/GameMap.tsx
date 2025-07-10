@@ -102,38 +102,46 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX - rect.left - rect.width / 2 + player.position.x;
-    const y = event.clientY - rect.top - rect.height / 2 + player.position.y;
+    // Calculate click position in world coordinates
+    const zoomLevel = 1.2;
+    const clickX = (event.clientX - rect.left - rect.width / 2) / zoomLevel + player.position.x;
+    const clickY = (event.clientY - rect.top - rect.height / 2) / zoomLevel + player.position.y;
+    
+    console.log('Map clicked at world coords:', clickX, clickY, 'player at:', player.position);
     
     if (currentLocation === 'village') {
       // Check if clicking on fountain
-      const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      const fountainDistance = Math.sqrt(Math.pow(400 - clickX, 2) + Math.pow(400 - clickY, 2));
       const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
       if (fountainDistance < 30 && playerToFountainDistance < 80) {
+        console.log('Fountain clicked!');
         onFountainUse();
         return;
       }
       
       // Check if clicking on portal
-      const portalDistance = Math.sqrt(Math.pow(700 - x, 2) + Math.pow(300 - y, 2));
+      const portalDistance = Math.sqrt(Math.pow(700 - clickX, 2) + Math.pow(300 - clickY, 2));
       const playerToPortalDistance = Math.sqrt(Math.pow(700 - player.position.x, 2) + Math.pow(300 - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
+        console.log('Portal clicked!');
         onPortalUse();
         return;
       }
     } else if (currentLocation === 'abandoned-mines') {
       // Check if clicking on coal mine in abandoned mines
-      const coalMineDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      const coalMineDistance = Math.sqrt(Math.pow(400 - clickX, 2) + Math.pow(400 - clickY, 2));
       const playerToCoalMineDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
       if (coalMineDistance < 40 && playerToCoalMineDistance < 80) {
+        console.log('Coal mine clicked!');
         onCoalMineInteract();
         return;
       }
       
       // Check if clicking on return portal
-      const portalDistance = Math.sqrt(Math.pow(200 - x, 2) + Math.pow(400 - y, 2));
+      const portalDistance = Math.sqrt(Math.pow(200 - clickX, 2) + Math.pow(400 - clickY, 2));
       const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
+        console.log('Return portal clicked!');
         onPortalUse();
         return;
       }
@@ -142,12 +150,13 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     // Check if clicking on NPC (only in village)
     if (currentLocation === 'village') {
       const clickedNPC = npcs.find(npc => {
-        const distance = Math.sqrt(Math.pow(npc.position.x - x, 2) + Math.pow(npc.position.y - y, 2));
+        const distance = Math.sqrt(Math.pow(npc.position.x - clickX, 2) + Math.pow(npc.position.y - clickY, 2));
         const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
         return distance < 30 && playerToNPCDistance < 80;
       });
       
       if (clickedNPC) {
+        console.log('NPC clicked:', clickedNPC.name);
         onNPCInteract(clickedNPC);
       }
     }

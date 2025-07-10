@@ -20,9 +20,9 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     if (currentLocation === 'village') {
       // Building collisions in village
       const buildings = [
-        { x: 450, y: 450, width: 96, height: 96 }, // House.png image (w-24 h-24 = 96px)
-        { x: 350, y: 500, width: 80, height: 60 },   // Second building
-        { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
+        { x: 950, y: 500, width: 96, height: 96 }, // House.png image - исправленные координаты
+        { x: 850, y: 550, width: 80, height: 60 },   // Second building - перемещено 
+        { x: 800, y: 510, width: 60, height: 50 },   // Blacksmith forge - перемещено
       ];
       
       // Fountain collision - center at (400,400), visual object at (380,380,40,40)
@@ -214,31 +214,30 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         />
       ))}
 
-      {/* Village house - replaced with image */}
+      {/* Village house - исправленные координаты */}
       <img
         src="/house.png"
         alt="Village house"
         className="absolute w-24 h-24 object-contain"
         style={{
-          left: 450,
-          top: 450,
+          left: 950,
+          top: 500,
         }}
       />
       <div
         className="absolute bg-stone/80 border-2 border-border rounded-lg"
         style={{
-          left: 350,
-          top: 500,
+          left: 850,
+          top: 550,
           width: 80,
           height: 60,
         }}
       />
-      {/* Blacksmith forge */}
       <div
         className="absolute bg-orange-800/80 border-2 border-orange-600 rounded-lg flex items-center justify-center text-white font-bold"
         style={{
-          left: 300,
-          top: 460,
+          left: 800,
+          top: 510,
           width: 60,
           height: 50,
         }}

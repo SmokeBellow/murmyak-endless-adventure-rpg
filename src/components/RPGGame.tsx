@@ -87,7 +87,7 @@ const RPGGame = () => {
     {
       id: 'merchant',
       name: 'Торговец Марк',
-      position: { x: 570, y: 430 }, // Moved outside the house
+      position: { x: 1070, y: 530 }, // Moved near the corrected house position
       type: 'merchant',
       dialogue: [
         'Добро пожаловать в мою лавку!',
@@ -128,7 +128,7 @@ const RPGGame = () => {
     {
       id: 'elder',
       name: 'Староста Эдвин',
-      position: { x: 320, y: 440 }, // Moved outside buildings
+      position: { x: 820, y: 490 }, // Moved near buildings area
       type: 'elder',
       dialogue: [
         'Приветствую тебя, молодой искатель приключений!',
@@ -171,7 +171,7 @@ const RPGGame = () => {
     {
       id: 'blacksmith',
       name: 'Кузнец Гром',
-      position: { x: 280, y: 500 }, // Moved outside blacksmith
+      position: { x: 780, y: 540 }, // Moved near blacksmith forge
       type: 'blacksmith',
       dialogue: [
         'Добро пожаловать в мою кузницу!',
@@ -234,11 +234,11 @@ const RPGGame = () => {
   // Create collision detection function matching GameMap logic  
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Building collisions in village - EXACT same coordinates as visual objects
+      // Building collisions in village - ИСПРАВЛЕННЫЕ координаты соответствуют фактическому расположению
       const buildings = [
-        { x: 450, y: 450, width: 96, height: 96 }, // House.png image (w-24 h-24 = 96px)
-        { x: 350, y: 500, width: 80, height: 60 },   // Second building  
-        { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
+        { x: 950, y: 500, width: 96, height: 96 }, // House.png image - ИСПРАВЛЕНО
+        { x: 850, y: 550, width: 80, height: 60 },   // Second building - ИСПРАВЛЕНО  
+        { x: 800, y: 510, width: 60, height: 50 },   // Blacksmith forge - ИСПРАВЛЕНО
       ];
       
       // Fountain collision - center at (400,400), visual object at (380,380,40,40)  

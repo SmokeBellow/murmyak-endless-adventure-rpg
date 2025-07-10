@@ -20,7 +20,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     if (currentLocation === 'village') {
       // Building collisions in village - ИСПРАВЛЕННЫЕ координаты
       const buildings = [
-        { x: 900, y: 250, width: 96, height: 96 }, // House.png image - исправлено положение
+        { x: 870, y: 420, width: 96, height: 96 }, // House.png image - дом справа и ниже персонажа
         { x: 850, y: 550, width: 80, height: 60 },   // Second building
         { x: 800, y: 510, width: 60, height: 50 },   // Blacksmith forge
       ];
@@ -230,14 +230,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         />
       ))}
 
-      {/* Village house - исправленные координаты */}
+      {/* Village house - координаты исправлены согласно скриншоту */}
       <img
         src="/house.png"
         alt="Village house"
         className="absolute w-24 h-24 object-contain"
         style={{
-          left: 900,
-          top: 250,
+          left: 870,
+          top: 420,
         }}
       />
       <div

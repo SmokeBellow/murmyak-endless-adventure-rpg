@@ -37,11 +37,11 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }
       }
       
-      // NPC collisions
+      // NPC collisions - синхронизировано с визуальным отображением (центр NPC)
       const npcPositions = [
-        { x: 1070, y: 530, radius: 20 }, // Торговец
-        { x: 820, y: 490, radius: 20 },  // Староста  
-        { x: 780, y: 540, radius: 20 },  // Кузнец
+        { x: 1070 - 16, y: 530 - 16, radius: 20 }, // Торговец (центр)
+        { x: 820 - 16, y: 490 - 16, radius: 20 },  // Староста (центр)
+        { x: 780 - 16, y: 540 - 16, radius: 20 },  // Кузнец (центр)
       ];
       
       for (const npcPos of npcPositions) {

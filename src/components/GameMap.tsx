@@ -27,26 +27,33 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       
       // Fountain collision - center at (400,400)
       const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-      if (fountainDistance < 25) return true;
+      if (fountainDistance < 25) {
+        console.log('COLLISION DEBUG (GameMap): Fountain collision at', x, y, 'distance:', fountainDistance);
+        return true;
+      }
       
       // Check building collisions
       for (const building of buildings) {
         if (x >= building.x && x <= building.x + building.width &&
             y >= building.y && y <= building.y + building.height) {
+          console.log('COLLISION DEBUG (GameMap): Building collision at', x, y, 'building:', building);
           return true;
         }
       }
       
-      // NPC collisions - синхронизировано с визуальным отображением (центр NPC)
+      // NPC collisions - синхронизировано с визуальным отображением (исходные координаты)
       const npcPositions = [
-        { x: 1070 - 16, y: 530 - 16, radius: 20 }, // Торговец (центр)
-        { x: 820 - 16, y: 490 - 16, radius: 20 },  // Староста (центр)
-        { x: 780 - 16, y: 540 - 16, radius: 20 },  // Кузнец (центр)
+        { x: 1070, y: 530, radius: 20 }, // Торговец (исходные координаты)
+        { x: 820, y: 490, radius: 20 },  // Староста (исходные координаты)
+        { x: 780, y: 540, radius: 20 },  // Кузнец (исходные координаты)
       ];
       
       for (const npcPos of npcPositions) {
         const distance = Math.sqrt(Math.pow(npcPos.x - x, 2) + Math.pow(npcPos.y - y, 2));
-        if (distance < npcPos.radius) return true;
+        if (distance < npcPos.radius) {
+          console.log('COLLISION DEBUG (GameMap): NPC collision at', x, y, 'NPC:', npcPos, 'distance:', distance);
+          return true;
+        }
       }
       
     } else if (currentLocation === 'abandoned-mines') {

@@ -236,7 +236,7 @@ const RPGGame = () => {
     if (currentLocation === 'village') {
       // Building collisions in village - ИСПРАВЛЕННЫЕ координаты
       const buildings = [
-        { x: 950, y: 500, width: 96, height: 96 }, // House.png image
+        { x: 900, y: 250, width: 96, height: 96 }, // House.png image - исправлено положение
         { x: 850, y: 550, width: 80, height: 60 },   // Second building
         { x: 800, y: 510, width: 60, height: 50 },   // Blacksmith forge
       ];

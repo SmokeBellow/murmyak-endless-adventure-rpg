@@ -231,9 +231,101 @@ const RPGGame = () => {
     }));
   }, []);
 
-  // Collision detection REMOVED - персонаж может свободно перемещаться
+  // Collision detection RESTORED - персонаж не может проходить сквозь препятствия
   const isColliding = useCallback((x: number, y: number) => {
-    // Все коллизии отключены
+    if (currentLocation === 'village') {
+      // Building collisions in village - ИСПРАВЛЕННЫЕ координаты
+      const buildings = [
+        { x: 950, y: 500, width: 96, height: 96 }, // House.png image
+        { x: 850, y: 550, width: 80, height: 60 },   // Second building
+        { x: 800, y: 510, width: 60, height: 50 },   // Blacksmith forge
+      ];
+      
+      // Fountain collision - center at (400,400)
+      const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
+      if (fountainDistance < 25) return true;
+      
+      // Check building collisions
+      for (const building of buildings) {
+        if (x >= building.x && x <= building.x + building.width &&
+            y >= building.y && y <= building.y + building.height) {
+          return true;
+        }
+      }
+      
+      // NPC collisions - персонаж не может проходить сквозь NPC
+      const npcPositions = [
+        { x: 1070, y: 530, radius: 20 }, // Торговец
+        { x: 820, y: 490, radius: 20 },  // Староста
+        { x: 780, y: 540, radius: 20 },  // Кузнец
+      ];
+      
+      for (const npcPos of npcPositions) {
+        const distance = Math.sqrt(Math.pow(npcPos.x - x, 2) + Math.pow(npcPos.y - y, 2));
+        if (distance < npcPos.radius) return true;
+      }
+      
+    } else if (currentLocation === 'abandoned-mines') {
+      // Mine walls and barriers
+      const mineWalls = [
+        // Horizontal walls
+        { x: 100, y: 200, width: 90, height: 20 },
+        { x: 210, y: 200, width: 90, height: 20 },
+        { x: 320, y: 200, width: 90, height: 20 },
+        { x: 430, y: 200, width: 90, height: 20 },
+        { x: 540, y: 200, width: 80, height: 20 },
+        
+        { x: 100, y: 320, width: 90, height: 20 },
+        { x: 230, y: 320, width: 80, height: 20 },
+        { x: 350, y: 320, width: 90, height: 20 },
+        { x: 480, y: 320, width: 140, height: 20 },
+        
+        { x: 100, y: 440, width: 120, height: 20 },
+        { x: 260, y: 440, width: 80, height: 20 },
+        { x: 380, y: 440, width: 100, height: 20 },
+        { x: 520, y: 440, width: 100, height: 20 },
+        
+        { x: 150, y: 560, width: 100, height: 20 },
+        { x: 290, y: 560, width: 120, height: 20 },
+        { x: 450, y: 560, width: 90, height: 20 },
+        
+        // Vertical walls
+        { x: 100, y: 220, width: 20, height: 100 },
+        { x: 170, y: 220, width: 20, height: 80 },
+        { x: 210, y: 240, width: 20, height: 80 },
+        { x: 280, y: 220, width: 20, height: 120 },
+        { x: 350, y: 220, width: 20, height: 100 },
+        { x: 410, y: 220, width: 20, height: 80 },
+        { x: 480, y: 220, width: 20, height: 100 },
+        { x: 540, y: 220, width: 20, height: 120 },
+        { x: 600, y: 220, width: 20, height: 100 },
+        
+        { x: 120, y: 340, width: 20, height: 100 },
+        { x: 190, y: 340, width: 20, height: 80 },
+        { x: 230, y: 340, width: 20, height: 100 },
+        { x: 310, y: 340, width: 20, height: 100 },
+        { x: 380, y: 340, width: 20, height: 100 },
+        { x: 440, y: 340, width: 20, height: 80 },
+        { x: 520, y: 340, width: 20, height: 100 },
+        { x: 580, y: 340, width: 20, height: 120 },
+        
+        { x: 150, y: 460, width: 20, height: 100 },
+        { x: 220, y: 460, width: 20, height: 80 },
+        { x: 290, y: 460, width: 20, height: 100 },
+        { x: 360, y: 460, width: 20, height: 100 },
+        { x: 450, y: 460, width: 20, height: 100 },
+        { x: 520, y: 460, width: 20, height: 80 },
+      ];
+      
+      // Check mine wall collisions
+      for (const wall of mineWalls) {
+        if (x >= wall.x && x <= wall.x + wall.width &&
+            y >= wall.y && y <= wall.y + wall.height) {
+          return true;
+        }
+      }
+    }
+    
     return false;
   }, [currentLocation]);
 
@@ -256,11 +348,11 @@ const RPGGame = () => {
       newX = Math.max(50, Math.min(1950, newX));
       newY = Math.max(50, Math.min(1950, newY));
       
-      // Collision detection REMOVED - персонаж может свободно проходить везде
-      // if (isColliding(newX, newY)) {
-      //   console.log('Collision detected at:', newX, newY);
-      //   return prev; // Don't move if would collide
-      // }
+      // Collision detection RESTORED - проверяем коллизии с препятствиями
+      if (isColliding(newX, newY)) {
+        console.log('Collision detected at:', newX, newY, '- movement blocked');
+        return prev; // Don't move if would collide
+      }
       
       return {
         ...prev,

@@ -73,11 +73,12 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       const clickedNPC = npcs.find(npc => {
         const distance = Math.sqrt(Math.pow(npc.position.x - clickX, 2) + Math.pow(npc.position.y - clickY, 2));
         const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
-        return distance < 30 && playerToNPCDistance < 80;
+        return distance < 50 && playerToNPCDistance < 300; // Увеличили радиус
       });
       
       if (clickedNPC) {
-        console.log('NPC clicked:', clickedNPC.name);
+        console.log('NPC clicked via map:', clickedNPC.name);
+        console.log('Click coords:', clickX, clickY, 'NPC coords:', clickedNPC.position, 'Player coords:', player.position);
         onNPCInteract(clickedNPC);
       }
     }
@@ -123,13 +124,15 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           onClick={(e) => {
             e.stopPropagation();
             console.log('NPC clicked directly:', npc.name, 'at', npc.position);
+            console.log('Player position:', player.position);
             const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
             console.log('Distance to player:', playerToNPCDistance);
-            if (playerToNPCDistance < 80) {
+            // Увеличиваем радиус взаимодействия до 300 пикселей
+            if (playerToNPCDistance < 300) {
               console.log('Opening dialogue with:', npc.name);
               onNPCInteract(npc);
             } else {
-              console.log('Too far from NPC');
+              console.log('Too far from NPC - need to be within 300 pixels');
             }
           }}
         />

@@ -272,6 +272,9 @@ const RPGGame = () => {
   }, [currentLocation]);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
+    console.log('handleNPCInteract called with:', npc.name);
+    console.log('Current player position:', player.position);
+    console.log('NPC position:', npc.position);
     setSelectedNPC(npc);
     
     // Mark merchant as visited for quest progress

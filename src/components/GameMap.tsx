@@ -245,6 +245,18 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }}
         title="House: (870, 420) - 96x96"
       />
+      
+      {/* House collision box visualization */}
+      <div
+        className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-10"
+        style={{
+          left: 870,
+          top: 420,
+          width: 96,
+          height: 96,
+        }}
+        title="House Collision: (870, 420) - 96x96"
+      />
       <div
         className="absolute bg-stone/80 border-2 border-border rounded-lg"
         style={{

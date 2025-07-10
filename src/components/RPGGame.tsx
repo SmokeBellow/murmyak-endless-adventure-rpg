@@ -241,9 +241,9 @@ const RPGGame = () => {
         { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
       ];
       
-      // Fountain collision - center at (400,400), visual size (380,380,40,40)
+      // Fountain collision - center at (400,400), visual object at (380,380,40,40)  
       const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-      if (fountainDistance < 20) return true; // Reduced collision radius
+      if (fountainDistance < 20) return true;
       
       // Check building collisions
       for (const building of buildings) {
@@ -692,7 +692,14 @@ const RPGGame = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-      <PlayerStats player={player} />
+        {/* Player coordinates display */}
+        <div className="absolute top-4 left-4 bg-black/80 text-white p-2 rounded text-sm font-mono z-50">
+          Player: ({Math.round(player.position.x)}, {Math.round(player.position.y)})
+          <br />
+          Location: {currentLocation}
+        </div>
+
+        <PlayerStats player={player} />
       
       <GameMap 
         player={player}

@@ -25,9 +25,9 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         { x: 300, y: 460, width: 60, height: 50 },   // Blacksmith forge
       ];
       
-      // Fountain collision
+      // Fountain collision - center at (400,400), visual object at (380,380,40,40)
       const fountainDistance = Math.sqrt(Math.pow(400 - x, 2) + Math.pow(400 - y, 2));
-      if (fountainDistance < 25) return true;
+      if (fountainDistance < 20) return true;
       
       // Check building collisions
       for (const building of buildings) {
@@ -192,7 +192,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       {npcs.map(npc => (
         <div
           key={npc.id}
-          className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-10 border-2 border-foreground/20 ${
+          className={`absolute w-8 h-8 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform z-20 border-2 border-foreground/20 ${
             npc.type === 'merchant' ? 'bg-accent' : npc.type === 'blacksmith' ? 'bg-orange-500' : 'bg-secondary'
           }`}
           style={{
@@ -201,9 +201,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           }}
           onClick={(e) => {
             e.stopPropagation();
+            console.log('NPC clicked directly:', npc.name, 'at', npc.position);
             const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
+            console.log('Distance to player:', playerToNPCDistance);
             if (playerToNPCDistance < 80) {
+              console.log('Opening dialogue with:', npc.name);
               onNPCInteract(npc);
+            } else {
+              console.log('Too far from NPC');
             }
           }}
         />

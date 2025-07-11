@@ -119,10 +119,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   const handleMapClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    // Calculate click position in world coordinates
-    const zoomLevel = 1.2;
-    const clickX = (event.clientX - rect.left - rect.width / 2) / zoomLevel + player.position.x;
-    const clickY = (event.clientY - rect.top - rect.height / 2) / zoomLevel + player.position.y;
+    
+    // Calculate click position relative to screen center
+    const clickScreenX = event.clientX - rect.left - rect.width / 2;
+    const clickScreenY = event.clientY - rect.top - rect.height / 2;
+    
+    // Convert to world coordinates by accounting for zoom and player position
+    const clickX = player.position.x + clickScreenX / zoomLevel;
+    const clickY = player.position.y + clickScreenY / zoomLevel;
     
     console.log('Map clicked at world coords:', clickX, clickY, 'player at:', player.position);
     

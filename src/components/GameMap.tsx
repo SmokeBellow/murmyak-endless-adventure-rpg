@@ -240,8 +240,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         alt="Village house"
         className="absolute w-24 h-24 object-contain border-2 border-red-500/50"
         style={{
-          left: 870,
-          top: 420,
+          left: 870 * zoomLevel,
+          top: 420 * zoomLevel,
         }}
         title="House: (870, 420) - 96x96"
       />
@@ -250,10 +250,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       <div
         className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-10"
         style={{
-          left: 870,
-          top: 420,
-          width: 96,
-          height: 96,
+          left: 870 * zoomLevel,
+          top: 420 * zoomLevel,
+          width: 96 * zoomLevel,
+          height: 96 * zoomLevel,
         }}
         title="House Collision: (870, 420) - 96x96"
       />

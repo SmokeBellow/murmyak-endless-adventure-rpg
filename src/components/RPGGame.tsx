@@ -231,8 +231,14 @@ const RPGGame = () => {
     }));
   }, []);
 
-  // Collision detection - disabled
+  // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
+    if (currentLocation === 'village') {
+      // Merchant house collision (300x300 to 500x450)
+      if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
+        return true;
+      }
+    }
     return false;
   }, [currentLocation]);
 

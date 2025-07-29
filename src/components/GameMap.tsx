@@ -15,8 +15,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
   const mapWidth = 2000;
   const mapHeight = 2000;
 
-  // Collision detection - disabled
+  // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
+    if (currentLocation === 'village') {
+      // Merchant house collision (300x300 to 500x450)
+      if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
+        return true;
+      }
+    }
     return false;
   }, [currentLocation]);
 
@@ -113,7 +119,22 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
   const renderVillage = () => (
     <>
-      {/* All objects removed */}
+      {/* Merchant House */}
+      <div
+        className="absolute bg-amber-800 border-2 border-amber-900 rounded shadow-lg"
+        style={{
+          left: 300,
+          top: 300,
+          width: 200,
+          height: 150,
+        }}
+      >
+        <div className="w-full h-full bg-gradient-to-b from-amber-700 to-amber-800 rounded">
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-12 bg-amber-900 rounded-t-full"></div>
+          <div className="absolute bottom-4 left-4 w-6 h-8 bg-amber-900 rounded"></div>
+          <div className="absolute bottom-4 right-4 w-6 h-8 bg-amber-900 rounded"></div>
+        </div>
+      </div>
     </>
   );
 

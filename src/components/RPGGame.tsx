@@ -234,10 +234,8 @@ const RPGGame = () => {
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Merchant house collision - accounting for player size (16px radius)
-      const playerRadius = 16;
-      if (x - playerRadius >= 300 && x + playerRadius <= 500 && 
-          y - playerRadius >= 300 && y + playerRadius <= 450) {
+      // Merchant house collision - exact match with visual house (300,300 -> 500,450)
+      if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
         return true;
       }
     }

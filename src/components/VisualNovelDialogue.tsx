@@ -7,9 +7,10 @@ import { DialogueState, DialogueOption } from '@/types/dialogueTypes';
 interface VisualNovelDialogueProps {
   npc: NPC;
   onClose: () => void;
+  onQuestAccept?: (questId: string) => void;
 }
 
-const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
@@ -69,8 +70,18 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
       dialogueStack: [...dialogueState.dialogueStack, option]
     });
 
+    // Check for quest-triggering responses
+    const isQuestTrigger = (
+      (npc.type === 'elder' && option.player === 'Конечно, помогу.') ||
+      (npc.type === 'merchant' && option.player === 'Договорились.') ||
+      (npc.type === 'blacksmith' && option.player === 'Договорились.')
+    );
+
     // After player speaks, NPC responds
     setTimeout(() => {
+      // If this is the last response in the branch (no more options), close after showing it
+      const hasMoreOptions = option.options && option.options.length > 0;
+      
       setDialogueState({
         currentSpeaker: 'npc',
         currentText: option.response,
@@ -78,6 +89,25 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
         showOptions: false,
         dialogueStack: [...dialogueState.dialogueStack, option]
       });
+
+      // If quest should be triggered, call the callback
+      if (isQuestTrigger && onQuestAccept) {
+        let questId = '';
+        if (npc.type === 'elder') questId = 'village-defense';
+        else if (npc.type === 'merchant') questId = 'wolf-pelts';
+        else if (npc.type === 'blacksmith') questId = 'ore-mining';
+        
+        if (questId) {
+          onQuestAccept(questId);
+        }
+      }
+
+      // Auto-close if this is the end of the dialogue branch
+      if (!hasMoreOptions) {
+        setTimeout(() => {
+          onClose();
+        }, 2500);
+      }
     }, 1500);
   };
 
@@ -157,11 +187,6 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
             <div className="text-lg text-white leading-relaxed">
               {dialogueState.currentText}
             </div>
-            {dialogueState.currentSpeaker === 'npc' && !dialogueState.showOptions && (
-              <div className="text-xs text-gray-500 animate-pulse">
-                Ожидание ответа...
-              </div>
-            )}
           </div>
         )}
 

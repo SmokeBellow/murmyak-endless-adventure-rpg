@@ -772,6 +772,65 @@ const RPGGame = () => {
             setSelectedNPC(null);
             setShowVisualNovel(false);
           }}
+          onQuestAccept={(questId) => {
+            // Create simple quest objects based on quest ID
+            const questTemplates = {
+              'village-defense': {
+                id: 'village-defense',
+                title: 'Защита деревни',
+                description: 'Помочь старосте справиться с угрозой.',
+                status: 'active' as const,
+                giver: 'elder',
+                repeatable: false,
+                objectives: [
+                  { description: 'Защитить деревню от зверей', completed: false }
+                ],
+                rewards: {
+                  experience: 100,
+                  coins: 50
+                }
+              },
+              'wolf-pelts': {
+                id: 'wolf-pelts',
+                title: 'Шкуры волков',
+                description: 'Добыть шкуры волков для торговца.',
+                status: 'active' as const,
+                giver: 'merchant',
+                repeatable: false,
+                objectives: [
+                  { description: 'Принести шкуры волков', completed: false }
+                ],
+                rewards: {
+                  experience: 75,
+                  coins: 30
+                }
+              },
+              'ore-mining': {
+                id: 'ore-mining',
+                title: 'Добыча руды',
+                description: 'Добыть руду для кузнеца.',
+                status: 'active' as const,
+                giver: 'blacksmith',
+                repeatable: false,
+                objectives: [
+                  { description: 'Добыть руду в шахте', completed: false }
+                ],
+                rewards: {
+                  experience: 85,
+                  coins: 40
+                }
+              }
+            };
+
+            const newQuest = questTemplates[questId];
+            if (newQuest && !quests.some(q => q.id === questId)) {
+              setQuests(prev => [...prev, newQuest]);
+              toast({
+                title: "Новый квест!",
+                description: `Принят квест: ${newQuest.title}`,
+              });
+            }
+          }}
         />
       )}
 

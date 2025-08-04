@@ -30,7 +30,17 @@ const EquipmentMenu = ({ player, onClose, onUnequipItem }: EquipmentMenuProps) =
         <div className="w-20 h-20 border-2 border-border rounded-lg bg-muted/50 flex items-center justify-center relative">
           {item ? (
             <div className="text-center">
-              <div className="text-2xl">{item.icon}</div>
+              <div className="w-full h-full flex items-center justify-center">
+                {item.icon.startsWith('/') ? (
+                  <img 
+                    src={item.icon} 
+                    alt={item.name} 
+                    className="w-full h-full object-contain rounded-lg" 
+                  />
+                ) : (
+                  <span className="text-2xl">{item.icon}</span>
+                )}
+              </div>
               <Button
                 size="sm"
                 variant="destructive"

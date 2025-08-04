@@ -486,7 +486,7 @@ const RPGGame = () => {
     const movePlayer = () => {
       if (activeMenu !== 'none' || showCoalMining || showVisualNovel) return;
       
-      const speed = 2.5;
+      const speed = 1.5;
       let deltaX = 0;
       let deltaY = 0;
       let newDirection = playerRef.current.direction;

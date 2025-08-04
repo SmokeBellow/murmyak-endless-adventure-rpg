@@ -34,17 +34,36 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
     dialogueStack: []
   });
 
-  // Automatically show player options after NPC finishes speaking
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Typing effect for NPC text
   useEffect(() => {
     if (dialogueState.currentSpeaker === 'npc') {
-      const timer = setTimeout(() => {
-        setDialogueState(prev => ({
-          ...prev,
-          showOptions: true
-        }));
-      }, 2000); // Show options after 2 seconds
+      setIsTyping(true);
+      setDisplayedText('');
+      
+      const text = dialogueState.currentText;
+      let currentIndex = 0;
+      
+      const typeTimer = setInterval(() => {
+        if (currentIndex < text.length) {
+          setDisplayedText(prev => prev + text[currentIndex]);
+          currentIndex++;
+        } else {
+          clearInterval(typeTimer);
+          setIsTyping(false);
+          // Show options after typing is complete
+          setTimeout(() => {
+            setDialogueState(prev => ({
+              ...prev,
+              showOptions: true
+            }));
+          }, 500);
+        }
+      }, 50); // 50ms per character
 
-      return () => clearTimeout(timer);
+      return () => clearInterval(typeTimer);
     }
   }, [dialogueState.currentSpeaker, dialogueState.currentText]);
 
@@ -159,12 +178,23 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
         </div>
       </div>
 
-      {/* Dialogue menu - Bottom 15% */}
-      <div className="h-[15%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col justify-center px-8 mb-[2vh]">
-        {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' ? (
-          // Player choice options
-          <div className="space-y-2">
-            <div className="text-sm text-gray-400 mb-2">Выберите ответ:</div>
+      {/* Dialogue menu - Bottom 30% */}
+      <div className="h-[30%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col px-8 mb-[2vh]">
+        {/* NPC Text - Always shown at top */}
+        <div className="flex-1 flex flex-col justify-center space-y-3 border-b border-white/10 pb-4">
+          <div className="text-sm text-gray-400">
+            {npc.name}:
+          </div>
+          <div className="text-lg text-white leading-relaxed">
+            {dialogueState.currentSpeaker === 'npc' ? displayedText : dialogueState.currentText}
+            {isTyping && <span className="animate-pulse">|</span>}
+          </div>
+        </div>
+
+        {/* Player Options - Shown at bottom when available */}
+        {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' && (
+          <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
+            <div className="text-sm text-gray-400">Выберите ответ:</div>
             <div className="grid grid-cols-2 gap-3">
               {dialogueState.currentOptions.map((option, index) => (
                 <Button
@@ -178,12 +208,12 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
               ))}
             </div>
           </div>
-        ) : (
-          // Current speaker's text
-          <div className="space-y-3">
-            <div className="text-sm text-gray-400">
-              {dialogueState.currentSpeaker === 'npc' ? npc.name : 'Герой'}:
-            </div>
+        )}
+
+        {/* Player's spoken text when they're speaking */}
+        {dialogueState.currentSpeaker === 'player' && (
+          <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
+            <div className="text-sm text-gray-400">Герой:</div>
             <div className="text-lg text-white leading-relaxed">
               {dialogueState.currentText}
             </div>

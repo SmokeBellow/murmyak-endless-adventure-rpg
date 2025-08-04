@@ -170,6 +170,15 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     }
   };
 
+  // Check if player is near NPC for interaction
+  const isNearNPC = (npc: NPC) => {
+    const distance = Math.sqrt(
+      Math.pow(npc.position.x - player.position.x, 2) + 
+      Math.pow(npc.position.y - player.position.y, 2)
+    );
+    return distance < 80;
+  };
+
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
@@ -186,6 +195,37 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       >
         {/* Render location-specific content */}
         {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
+        
+        {/* Render NPCs */}
+        {npcs.map(npc => (
+          <div
+            key={npc.id}
+            className="absolute"
+            style={{
+              left: npc.position.x - 20,
+              top: npc.position.y - 20,
+            }}
+          >
+            {/* NPC sprite */}
+            <div className="w-10 h-10 bg-blue-600 rounded-full border-2 border-blue-800 flex items-center justify-center relative cursor-pointer">
+              <span className="text-white text-xs font-bold">
+                {npc.type === 'merchant' ? '💰' : npc.type === 'elder' ? '👑' : '🔨'}
+              </span>
+              
+              {/* E prompt when player is near */}
+              {isNearNPC(npc) && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
+            </div>
+            
+            {/* NPC name label */}
+            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
+              {npc.name}
+            </div>
+          </div>
+        ))}
       </div>
       
       {/* Player - fixed in center of screen, outside the map container */}

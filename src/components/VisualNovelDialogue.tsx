@@ -1,25 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { NPC } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
+import { dialoguesData } from '@/data/dialogues';
+import { DialogueState, DialogueOption } from '@/types/dialogueTypes';
 
 interface VisualNovelDialogueProps {
   npc: NPC;
   onClose: () => void;
 }
 
-interface DialogueState {
-  currentSpeaker: 'npc' | 'player';
-  currentText: string;
-  playerOptions: string[];
-  showOptions: boolean;
-}
-
 const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
+  const getDialogueKey = () => {
+    switch (npc.type) {
+      case 'elder':
+        return 'starosta';
+      case 'merchant':
+        return 'torgovec';
+      case 'blacksmith':
+        return 'kuznec';
+      default:
+        return 'starosta';
+    }
+  };
+
+  const currentDialogue = dialoguesData.dialogs[getDialogueKey()];
+
   const [dialogueState, setDialogueState] = useState<DialogueState>({
     currentSpeaker: 'npc',
-    currentText: npc.dialogue[0] || 'Привет!',
-    playerOptions: ['Привет!', 'Как дела?', 'Увидимся позже'],
-    showOptions: false
+    currentText: currentDialogue.text,
+    currentOptions: currentDialogue.options,
+    showOptions: false,
+    dialogueStack: []
   });
 
   // Automatically show player options after NPC finishes speaking
@@ -49,22 +60,23 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
     }
   };
 
-  const handlePlayerChoice = (choice: string) => {
+  const handlePlayerChoice = (option: DialogueOption) => {
     setDialogueState({
       currentSpeaker: 'player',
-      currentText: choice,
-      playerOptions: [],
-      showOptions: false
+      currentText: option.player,
+      currentOptions: [],
+      showOptions: false,
+      dialogueStack: [...dialogueState.dialogueStack, option]
     });
 
     // After player speaks, NPC responds
     setTimeout(() => {
-      const randomResponse = npc.dialogue[Math.floor(Math.random() * npc.dialogue.length)];
       setDialogueState({
         currentSpeaker: 'npc',
-        currentText: randomResponse,
-        playerOptions: ['Интересно!', 'Расскажи еще', 'Понятно', 'Пока!'],
-        showOptions: false
+        currentText: option.response,
+        currentOptions: option.options || [],
+        showOptions: false,
+        dialogueStack: [...dialogueState.dialogueStack, option]
       });
     }, 1500);
   };
@@ -124,14 +136,14 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
           <div className="space-y-2">
             <div className="text-sm text-gray-400 mb-2">Выберите ответ:</div>
             <div className="grid grid-cols-2 gap-3">
-              {dialogueState.playerOptions.map((option, index) => (
+              {dialogueState.currentOptions.map((option, index) => (
                 <Button
                   key={index}
                   variant="outline"
                   className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
                   onClick={() => handlePlayerChoice(option)}
                 >
-                  {option}
+                  {option.player}
                 </Button>
               ))}
             </div>

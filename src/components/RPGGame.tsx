@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
+import EquipmentMenu from './EquipmentMenu';
 import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
 import VisualNovelDialogue from './VisualNovelDialogue';
@@ -854,15 +855,13 @@ const RPGGame = () => {
           player={player}
           onClose={() => setActiveMenu('none')}
           onEquipItem={handleEquipItem}
-          onUnequipItem={handleUnequipItem}
         />
       )}
 
       {activeMenu === 'equipment' && (
-        <InventoryMenu
+        <EquipmentMenu
           player={player}
           onClose={() => setActiveMenu('none')}
-          onEquipItem={handleEquipItem}
           onUnequipItem={handleUnequipItem}
         />
       )}

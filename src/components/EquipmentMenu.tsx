@@ -10,6 +10,17 @@ interface EquipmentMenuProps {
 }
 
 const EquipmentMenu = ({ player, onClose, onUnequipItem }: EquipmentMenuProps) => {
+  const getEmptySlotImage = (slot: keyof Equipment) => {
+    const emptySlotImages = {
+      head: '/helmet_empty.png',
+      chest: '/armor_empty.png',
+      legs: '/boots_empty.png',
+      weapon: '/weapon_empty.png',
+      shield: '/shield_empty.png'
+    };
+    return emptySlotImages[slot];
+  };
+
   const renderEquipmentSlot = (slot: keyof Equipment, label: string) => {
     const item = player.equipment[slot];
     
@@ -30,7 +41,11 @@ const EquipmentMenu = ({ player, onClose, onUnequipItem }: EquipmentMenuProps) =
               </Button>
             </div>
           ) : (
-            <span className="text-3xl text-muted-foreground">?</span>
+            <img 
+              src={getEmptySlotImage(slot)} 
+              alt={`Empty ${label.toLowerCase()}`}
+              className="w-12 h-12 opacity-50"
+            />
           )}
         </div>
         {item && (

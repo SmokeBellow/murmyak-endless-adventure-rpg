@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -444,6 +444,10 @@ const RPGGame = () => {
   useEffect(() => {
     if (isMobile) return;
 
+    // Use refs to access current values without causing re-renders
+    const playerRef = { current: player };
+    const npcsRef = { current: npcs };
+    
     const pressedKeys = new Set<string>();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -453,10 +457,10 @@ const RPGGame = () => {
       if (key === 'e' && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
         // Check if player is near any NPC
-        const nearbyNPC = npcs.find(npc => {
+        const nearbyNPC = npcsRef.current.find(npc => {
           const distance = Math.sqrt(
-            Math.pow(npc.position.x - player.position.x, 2) + 
-            Math.pow(npc.position.y - player.position.y, 2)
+            Math.pow(npc.position.x - playerRef.current.position.x, 2) + 
+            Math.pow(npc.position.y - playerRef.current.position.y, 2)
           );
           return distance < 80;
         });
@@ -504,6 +508,10 @@ const RPGGame = () => {
       }
     };
 
+    // Update refs with current values
+    playerRef.current = player;
+    npcsRef.current = npcs;
+
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     
@@ -514,7 +522,7 @@ const RPGGame = () => {
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, player, npcs]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];

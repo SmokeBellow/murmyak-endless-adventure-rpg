@@ -441,19 +441,25 @@ const RPGGame = () => {
   }, [npcs]);
 
   // Keyboard controls for desktop
+  // Use refs to access current values for E key functionality
+  const playerRef = useRef(player);
+  const npcsRef = useRef(npcs);
+
+  // Update refs when values change
+  useEffect(() => {
+    playerRef.current = player;
+    npcsRef.current = npcs;
+  }, [player, npcs]);
+
   useEffect(() => {
     if (isMobile) return;
-
-    // Use refs to access current values without causing re-renders
-    const playerRef = { current: player };
-    const npcsRef = { current: npcs };
     
     const pressedKeys = new Set<string>();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
+      pressedKeys.add(key);
       
-      // Handle E key for NPC interaction
       if (key === 'e' && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
         // Check if player is near any NPC
@@ -470,12 +476,6 @@ const RPGGame = () => {
           setShowVisualNovel(true);
         }
       }
-      
-      // WASD, Arrow keys, and ЦФЫВ (Russian layout)
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'ц', 'ф', 'ы', 'в'].includes(key)) {
-        event.preventDefault();
-        pressedKeys.add(key);
-      }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
@@ -483,46 +483,48 @@ const RPGGame = () => {
       pressedKeys.delete(key);
     };
 
-    const updateMovement = () => {
-      if (activeMenu !== 'none' || selectedNPC !== null) return;
-
-      let x = 0;
-      let y = 0;
-
-      // Check pressed keys for movement direction
-      if (pressedKeys.has('w') || pressedKeys.has('arrowup') || pressedKeys.has('ц')) y = -1;
-      if (pressedKeys.has('s') || pressedKeys.has('arrowdown') || pressedKeys.has('ы')) y = 1;
-      if (pressedKeys.has('a') || pressedKeys.has('arrowleft') || pressedKeys.has('ф')) x = -1;
-      if (pressedKeys.has('d') || pressedKeys.has('arrowright') || pressedKeys.has('в')) x = 1;
-
-      // Normalize diagonal movement
-      if (x !== 0 && y !== 0) {
-        x *= 0.707; // 1/√2
-        y *= 0.707;
+    const movePlayer = () => {
+      if (activeMenu !== 'none' || showCoalMining || showVisualNovel) return;
+      
+      const speed = 2.5;
+      let deltaX = 0;
+      let deltaY = 0;
+      let newDirection = playerRef.current.direction;
+      
+      if (pressedKeys.has('arrowup') || pressedKeys.has('w')) {
+        deltaY = -speed;
+        newDirection = 'up';
       }
-
-      if (x !== 0 || y !== 0) {
-        handleJoystickMove({ x, y });
-      } else {
-        handleJoystickMove(null);
+      if (pressedKeys.has('arrowdown') || pressedKeys.has('s')) {
+        deltaY = speed;
+        newDirection = 'down';
+      }
+      if (pressedKeys.has('arrowleft') || pressedKeys.has('a')) {
+        deltaX = -speed;
+        newDirection = 'left';
+      }
+      if (pressedKeys.has('arrowright') || pressedKeys.has('d')) {
+        deltaX = speed;
+        newDirection = 'right';
+      }
+      
+      if (deltaX !== 0 || deltaY !== 0) {
+        handleJoystickMove({ x: deltaX, y: deltaY });
       }
     };
-
-    // Update refs with current values
-    playerRef.current = player;
-    npcsRef.current = npcs;
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     
-    const moveInterval = setInterval(updateMovement, 16); // 60fps for maximum smoothness
+    let moveInterval: NodeJS.Timeout;
+    moveInterval = setInterval(movePlayer, 16);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, player, npcs]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];

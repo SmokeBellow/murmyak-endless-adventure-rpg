@@ -95,7 +95,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
   }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
 
   // Calculate camera offset to center player exactly in the middle of screen
-  const zoomLevel = 1.2;
+  const zoomLevel = 1.0;
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
   

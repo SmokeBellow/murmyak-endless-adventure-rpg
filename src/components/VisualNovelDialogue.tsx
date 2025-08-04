@@ -190,8 +190,8 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
 
       {/* Dialogue menu - Bottom 30% */}
       <div className="h-[30%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col px-8 mb-[2vh]">
-        {/* NPC Text - Always shown */}
-        <div className="flex-1 flex flex-col justify-center space-y-3 border-b border-white/10 pb-4">
+        {/* NPC Text - Top half */}
+        <div className="h-1/2 flex flex-col justify-center space-y-2 border-b border-white/10 pb-2">
           <div className="text-sm text-gray-400">
             {npc.name}:
           </div>
@@ -201,18 +201,18 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
           </div>
         </div>
 
-        {/* Player Text - Always shown */}
-        <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
+        {/* Player Text - Bottom half */}
+        <div className="h-1/2 flex flex-col justify-center space-y-2 pt-2">
           <div className="text-sm text-gray-400">Герой:</div>
           <div className="text-lg text-white leading-relaxed min-h-[1.5rem]">
             {displayedPlayerText}
           </div>
         </div>
 
-        {/* Player Options - Shown when available */}
+        {/* Player Options - Overlay when available */}
         {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' && (
-          <div className="absolute bottom-16 left-8 right-8">
-            <div className="text-sm text-gray-400 mb-2">Выберите ответ:</div>
+          <div className="absolute bottom-4 left-8 right-8 bg-black/90 p-4 rounded-lg border border-white/20">
+            <div className="text-sm text-gray-400 mb-3">Выберите ответ:</div>
             <div className="grid grid-cols-2 gap-3">
               {dialogueState.currentOptions.map((option, index) => (
                 <Button

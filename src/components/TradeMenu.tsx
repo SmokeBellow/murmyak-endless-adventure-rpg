@@ -44,7 +44,11 @@ const TradeMenu = ({ player, merchant, onClose, onBuyItem }: TradeMenuProps) => 
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg">{item.icon}</span>
+                        {item.icon.startsWith('/') ? (
+                          <img src={item.icon} alt={item.name} className="w-8 h-8 object-contain" />
+                        ) : (
+                          <span className="text-lg">{item.icon}</span>
+                        )}
                         <div>
                           <h4 className="font-medium text-foreground">{item.name}</h4>
                           <p className="text-sm text-muted-foreground">{item.description}</p>

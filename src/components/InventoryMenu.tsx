@@ -13,7 +13,13 @@ const InventoryMenu = ({ player, onClose, onEquipItem }: InventoryMenuProps) => 
   const renderInventoryItem = (item: Item) => (
     <div key={item.id} className="flex items-center justify-between p-3 bg-card/80 border border-border rounded-lg hover:bg-card transition-colors">
       <div className="flex items-center space-x-3">
-        <div className="text-2xl">{item.icon}</div>
+        <div className="w-8 h-8 flex items-center justify-center">
+          {item.icon.startsWith('/') ? (
+            <img src={item.icon} alt={item.name} className="w-full h-full object-contain" />
+          ) : (
+            <span className="text-2xl">{item.icon}</span>
+          )}
+        </div>
         <div className="flex-1">
           <h4 className="font-medium text-foreground">{item.name}</h4>
           <p className="text-xs text-muted-foreground">{item.description}</p>

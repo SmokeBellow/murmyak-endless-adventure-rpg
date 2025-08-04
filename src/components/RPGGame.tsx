@@ -47,14 +47,14 @@ const RPGGame = () => {
       slot: 'chest',
       stats: { armor: 3 },
       description: 'Простая кожаная броня',
-      icon: '🛡️'
+      icon: '/leatherarmor.png'
     },
     {
       id: 'health-potion',
       name: 'Зелье здоровья',
       type: 'consumable',
       description: 'Восстанавливает 50 единиц здоровья',
-      icon: '🧪'
+      icon: '/healthpotion.png'
     }
   ];
 
@@ -106,7 +106,7 @@ const RPGGame = () => {
           slot: 'weapon',
           stats: { damage: 12 },
           description: 'Прочный железный меч',
-          icon: '⚔️',
+          icon: '/sword.png',
           price: 25
         },
         {
@@ -116,7 +116,7 @@ const RPGGame = () => {
           slot: 'chest',
           stats: { armor: 8 },
           description: 'Прочная стальная броня',
-          icon: '🛡️',
+          icon: '/steelarmor.png',
           price: 40
         },
         {

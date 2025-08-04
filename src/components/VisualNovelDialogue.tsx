@@ -36,6 +36,19 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
     }
   }, [dialogueState.currentSpeaker, dialogueState.currentText]);
 
+  const getNPCImage = () => {
+    switch (npc.type) {
+      case 'elder':
+        return '/headman_image.png';
+      case 'merchant':
+        return '/trademan_image.png';
+      case 'blacksmith':
+        return '/blacksmith_image.png';
+      default:
+        return '/headman_image.png';
+    }
+  };
+
   const handlePlayerChoice = (choice: string) => {
     setDialogueState({
       currentSpeaker: 'player',
@@ -68,7 +81,7 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
             }`}
           >
             <img 
-              src="/lovable-uploads/0a5678b6-372c-4296-8aef-e92f5915a9c0.png" 
+              src={getNPCImage()} 
               alt="NPC" 
               className="w-full h-full object-cover"
             />
@@ -91,10 +104,9 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
             }`}
           >
             <img 
-              src="/walk_up2.png" 
+              src="/player_image.png" 
               alt="Player" 
               className="w-full h-full object-cover object-center"
-              style={{ imageRendering: 'pixelated' }}
             />
           </div>
           
@@ -106,7 +118,7 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
       </div>
 
       {/* Dialogue menu - Bottom 15% */}
-      <div className="h-[15%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col justify-center px-8">
+      <div className="h-[15%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col justify-center px-8 mb-4">
         {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' ? (
           // Player choice options
           <div className="space-y-2">

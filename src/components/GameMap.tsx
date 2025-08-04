@@ -193,6 +193,13 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return frames[frameIndex];
   };
 
+  // Get walking animation frame for side direction (left/right)
+  const getWalkSideFrame = () => {
+    const frames = ['walk_side1.png', 'walk_side2.png', 'walk_side3.png'];
+    const frameIndex = Math.floor(Date.now() / 200) % 3; // Change frame every 200ms
+    return frames[frameIndex];
+  };
+
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
@@ -249,7 +256,9 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         src={
           player.isMoving 
             ? (player.direction === 'down' ? `/${getWalkDownFrame()}` 
-               : player.direction === 'up' ? `/${getWalkUpFrame()}` 
+               : player.direction === 'up' ? `/${getWalkUpFrame()}`
+               : player.direction === 'left' ? `/${getWalkSideFrame()}`
+               : player.direction === 'right' ? `/${getWalkSideFrame()}`
                : "/player.png")
             : "/player.png"
         }
@@ -258,7 +267,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         style={{
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: `translate(-50%, -50%) ${player.direction === 'right' && player.isMoving ? 'scaleX(-1)' : ''}`,
           pointerEvents: 'none',
           imageRendering: 'pixelated'
         }}

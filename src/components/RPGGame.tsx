@@ -514,7 +514,7 @@ const RPGGame = () => {
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, npcs, player.position]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];

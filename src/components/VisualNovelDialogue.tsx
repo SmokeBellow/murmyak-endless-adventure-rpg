@@ -34,21 +34,22 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
     dialogueStack: []
   });
 
-  const [displayedText, setDisplayedText] = useState('');
+  const [displayedNPCText, setDisplayedNPCText] = useState('');
+  const [displayedPlayerText, setDisplayedPlayerText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   // Typing effect for NPC text
   useEffect(() => {
     if (dialogueState.currentSpeaker === 'npc') {
       setIsTyping(true);
-      setDisplayedText('');
+      setDisplayedNPCText('');
       
       const text = dialogueState.currentText;
       let currentIndex = 0;
       
       const typeTimer = setInterval(() => {
         if (currentIndex < text.length) {
-          setDisplayedText(prev => prev + text[currentIndex]);
+          setDisplayedNPCText(text.substring(0, currentIndex + 1));
           currentIndex++;
         } else {
           clearInterval(typeTimer);
@@ -64,6 +65,15 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
       }, 50); // 50ms per character
 
       return () => clearInterval(typeTimer);
+    }
+  }, [dialogueState.currentSpeaker, dialogueState.currentText]);
+
+  // Update player text when player speaks
+  useEffect(() => {
+    if (dialogueState.currentSpeaker === 'player') {
+      setDisplayedPlayerText(dialogueState.currentText);
+    } else {
+      setDisplayedPlayerText('');
     }
   }, [dialogueState.currentSpeaker, dialogueState.currentText]);
 
@@ -180,21 +190,29 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
 
       {/* Dialogue menu - Bottom 30% */}
       <div className="h-[30%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col px-8 mb-[2vh]">
-        {/* NPC Text - Always shown at top */}
+        {/* NPC Text - Always shown */}
         <div className="flex-1 flex flex-col justify-center space-y-3 border-b border-white/10 pb-4">
           <div className="text-sm text-gray-400">
             {npc.name}:
           </div>
           <div className="text-lg text-white leading-relaxed">
-            {dialogueState.currentSpeaker === 'npc' ? displayedText : dialogueState.currentText}
+            {displayedNPCText}
             {isTyping && <span className="animate-pulse">|</span>}
           </div>
         </div>
 
-        {/* Player Options - Shown at bottom when available */}
+        {/* Player Text - Always shown */}
+        <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
+          <div className="text-sm text-gray-400">Герой:</div>
+          <div className="text-lg text-white leading-relaxed min-h-[1.5rem]">
+            {displayedPlayerText}
+          </div>
+        </div>
+
+        {/* Player Options - Shown when available */}
         {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' && (
-          <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
-            <div className="text-sm text-gray-400">Выберите ответ:</div>
+          <div className="absolute bottom-16 left-8 right-8">
+            <div className="text-sm text-gray-400 mb-2">Выберите ответ:</div>
             <div className="grid grid-cols-2 gap-3">
               {dialogueState.currentOptions.map((option, index) => (
                 <Button
@@ -206,16 +224,6 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
                   {option.player}
                 </Button>
               ))}
-            </div>
-          </div>
-        )}
-
-        {/* Player's spoken text when they're speaking */}
-        {dialogueState.currentSpeaker === 'player' && (
-          <div className="flex-1 flex flex-col justify-center space-y-3 pt-4">
-            <div className="text-sm text-gray-400">Герой:</div>
-            <div className="text-lg text-white leading-relaxed">
-              {dialogueState.currentText}
             </div>
           </div>
         )}

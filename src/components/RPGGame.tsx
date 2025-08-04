@@ -61,6 +61,7 @@ const RPGGame = () => {
     position: { x: 600, y: 400 }, // Safe position away from buildings
     targetPosition: { x: 600, y: 400 },
     isMoving: false,
+    direction: 'down', // Add direction tracking
     health: 100,
     maxHealth: 100,
     mana: 50,
@@ -266,11 +267,22 @@ const RPGGame = () => {
         return prev; // Don't move if would collide
       }
       
+      // Determine player direction based on movement
+      let playerDirection = prev.direction;
+      if (Math.abs(direction.x) > Math.abs(direction.y)) {
+        // Horizontal movement is dominant
+        playerDirection = direction.x > 0 ? 'right' : 'left';
+      } else if (direction.y !== 0) {
+        // Vertical movement
+        playerDirection = direction.y < 0 ? 'up' : 'down';
+      }
+      
       return {
         ...prev,
         position: { x: newX, y: newY },
         targetPosition: { x: newX, y: newY },
-        isMoving: true
+        isMoving: true,
+        direction: playerDirection
       };
     });
   }, [currentLocation]);

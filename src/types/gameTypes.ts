@@ -3,6 +3,7 @@ export interface Player {
   position: { x: number; y: number };
   targetPosition: { x: number; y: number };
   isMoving: boolean;
+  direction: 'up' | 'down' | 'left' | 'right';
   health: number;
   maxHealth: number;
   mana: number;

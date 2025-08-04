@@ -179,6 +179,21 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return distance < 80;
   };
 
+  // Get sprite position based on player direction
+  const getPlayerSpritePosition = (direction: string) => {
+    const spriteWidth = 48; // Each sprite is 48px wide
+    switch (direction) {
+      case 'up':
+        return `-${spriteWidth * 0}px`; // First sprite (front view)
+      case 'left':
+        return `-${spriteWidth * 3}px`; // Fourth sprite (left view)  
+      case 'right':
+        return `-${spriteWidth * 5}px`; // Sixth sprite (right view)
+      default:
+        return '0px';
+    }
+  };
+
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
@@ -231,17 +246,33 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       </div>
       
       {/* Player - fixed in center of screen, outside the map container */}
-      <img
-        src="/player.png"
-        alt="Player"
-        className="fixed w-8 h-8 shadow-glow z-30 transition-all duration-150 ease-out"
+      <div
+        className="fixed w-8 h-8 z-30 transition-all duration-150 ease-out"
         style={{
           left: '50%',
           top: '50%',
           transform: 'translate(-50%, -50%)',
           pointerEvents: 'none'
         }}
-      />
+      >
+        {player.direction === 'down' ? (
+          <img
+            src="/player.png"
+            alt="Player"
+            className="w-8 h-8 shadow-glow"
+          />
+        ) : (
+          <div
+            className="w-8 h-8 shadow-glow"
+            style={{
+              backgroundImage: 'url(/lovable-uploads/16ef28be-4215-4805-99af-fe0f1d4ddf10.png)',
+              backgroundSize: '288px 128px', // 6 sprites * 48px width, 2 rows * 64px height
+              backgroundPosition: `${getPlayerSpritePosition(player.direction)} 0px`,
+              imageRendering: 'pixelated'
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

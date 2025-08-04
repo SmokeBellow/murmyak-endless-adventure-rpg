@@ -240,7 +240,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       {/* Player - fixed in center of screen, outside the map container */}
       <img
         src={player.direction === 'down' && player.isMoving ? 
-          `/public/${getWalkDownFrame()}` : 
+          `/${getWalkDownFrame()}` : 
           "/player.png"
         }
         alt="Player"

@@ -44,7 +44,7 @@ const EquipmentMenu = ({ player, onClose, onUnequipItem }: EquipmentMenuProps) =
             <img 
               src={getEmptySlotImage(slot)} 
               alt={`Empty ${label.toLowerCase()}`}
-              className="w-12 h-12 opacity-50"
+              className="w-full h-full object-contain opacity-50 rounded-lg"
             />
           )}
         </div>

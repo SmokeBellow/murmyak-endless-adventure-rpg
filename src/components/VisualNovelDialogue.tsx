@@ -201,32 +201,35 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
           </div>
         </div>
 
-        {/* Player Text - Bottom half */}
+        {/* Player Text or Options - Bottom half */}
         <div className="h-1/2 flex flex-col justify-center space-y-2 pt-2">
-          <div className="text-sm text-gray-400">Герой:</div>
-          <div className="text-lg text-white leading-relaxed min-h-[1.5rem]">
-            {displayedPlayerText}
-          </div>
+          {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' ? (
+            // Show player options
+            <>
+              <div className="text-sm text-gray-400">Выберите ответ:</div>
+              <div className="grid grid-cols-2 gap-3">
+                {dialogueState.currentOptions.map((option, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
+                    onClick={() => handlePlayerChoice(option)}
+                  >
+                    {option.player}
+                  </Button>
+                ))}
+              </div>
+            </>
+          ) : (
+            // Show player text
+            <>
+              <div className="text-sm text-gray-400">Герой:</div>
+              <div className="text-lg text-white leading-relaxed min-h-[1.5rem]">
+                {displayedPlayerText}
+              </div>
+            </>
+          )}
         </div>
-
-        {/* Player Options - Overlay when available */}
-        {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' && (
-          <div className="absolute bottom-4 left-8 right-8 bg-black/90 p-4 rounded-lg border border-white/20">
-            <div className="text-sm text-gray-400 mb-3">Выберите ответ:</div>
-            <div className="grid grid-cols-2 gap-3">
-              {dialogueState.currentOptions.map((option, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
-                  onClick={() => handlePlayerChoice(option)}
-                >
-                  {option.player}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Close button */}
         <Button

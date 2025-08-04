@@ -220,14 +220,17 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogu
                 ))}
               </div>
             </>
-          ) : (
-            // Show player text
+          ) : displayedPlayerText ? (
+            // Show player text only if there is text
             <>
               <div className="text-sm text-gray-400">Герой:</div>
               <div className="text-lg text-white leading-relaxed min-h-[1.5rem]">
                 {displayedPlayerText}
               </div>
             </>
+          ) : (
+            // Empty space when NPC is typing
+            <div className="min-h-[1.5rem]"></div>
           )}
         </div>
 

@@ -201,16 +201,25 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
   };
 
   return (
-    <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
-      currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
-    }`}>
+    <div 
+      className={`flex-1 overflow-hidden relative cursor-crosshair ${
+        currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
+      }`}
+      style={{
+        backgroundImage: 'url(/forest.png)',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'repeat'
+      }}
+    >
       <div 
         className="absolute w-full h-full"
         style={{
           transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           width: mapWidth,
           height: mapHeight,
-          ...getBackgroundStyle()
+          ...getBackgroundStyle(),
+          margin: '10px',
+          boxShadow: '0 0 0 10px transparent'
         }}
         onClick={handleMapClick}
       >

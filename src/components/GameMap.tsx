@@ -206,23 +206,25 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
               top: npc.position.y - 20,
             }}
           >
+            {/* NPC name label */}
+            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs whitespace-nowrap font-bold">
+              {npc.name}
+            </div>
+            
             {/* NPC sprite */}
-            <div className="w-10 h-10 bg-blue-600 rounded-full border-2 border-blue-800 flex items-center justify-center relative cursor-pointer">
-              <span className="text-white text-xs font-bold">
-                {npc.type === 'merchant' ? '💰' : npc.type === 'elder' ? '👑' : '🔨'}
-              </span>
+            <div className="relative cursor-pointer">
+              <img 
+                src="/lovable-uploads/0a5678b6-372c-4296-8aef-e92f5915a9c0.png" 
+                alt="NPC" 
+                className="w-10 h-10"
+              />
               
               {/* E prompt when player is near */}
               {isNearNPC(npc) && (
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
                   E
                 </div>
               )}
-            </div>
-            
-            {/* NPC name label */}
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
-              {npc.name}
             </div>
           </div>
         ))}

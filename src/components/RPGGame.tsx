@@ -9,6 +9,7 @@ import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
 import QuestMenu from './QuestMenu';
 import NPCDialogue from './NPCDialogue';
+import VisualNovelDialogue from './VisualNovelDialogue';
 import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
@@ -21,6 +22,7 @@ const RPGGame = () => {
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
+  const [showVisualNovel, setShowVisualNovel] = useState(false);
   const [showCoalMining, setShowCoalMining] = useState(false);
   const [questReward, setQuestReward] = useState<Quest | null>(null);
   const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
@@ -447,6 +449,24 @@ const RPGGame = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       
+      // Handle E key for NPC interaction
+      if (key === 'e' && selectedNPC === null && activeMenu === 'none') {
+        event.preventDefault();
+        // Check if player is near any NPC
+        const nearbyNPC = npcs.find(npc => {
+          const distance = Math.sqrt(
+            Math.pow(npc.position.x - player.position.x, 2) + 
+            Math.pow(npc.position.y - player.position.y, 2)
+          );
+          return distance < 80;
+        });
+        
+        if (nearbyNPC) {
+          setSelectedNPC(nearbyNPC);
+          setShowVisualNovel(true);
+        }
+      }
+      
       // WASD, Arrow keys, and ЦФЫВ (Russian layout)
       if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'ц', 'ф', 'ы', 'в'].includes(key)) {
         event.preventDefault();
@@ -494,7 +514,7 @@ const RPGGame = () => {
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, npcs, player.position]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];
@@ -735,8 +755,19 @@ const RPGGame = () => {
         </div>
       )}
 
+      {/* Visual Novel Dialogue */}
+      {selectedNPC && showVisualNovel && (
+        <VisualNovelDialogue
+          npc={selectedNPC}
+          onClose={() => {
+            setSelectedNPC(null);
+            setShowVisualNovel(false);
+          }}
+        />
+      )}
+
       {/* NPC Dialogue */}
-      {selectedNPC && (
+      {selectedNPC && !showVisualNovel && (
         <NPCDialogue
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}

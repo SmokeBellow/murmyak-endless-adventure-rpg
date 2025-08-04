@@ -516,8 +516,7 @@ const RPGGame = () => {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     
-    let moveInterval: NodeJS.Timeout;
-    moveInterval = setInterval(movePlayer, 16);
+    const moveInterval = setInterval(movePlayer, 16);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);

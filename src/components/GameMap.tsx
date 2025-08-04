@@ -205,11 +205,6 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       className={`flex-1 overflow-hidden relative cursor-crosshair ${
         currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
       }`}
-      style={{
-        backgroundImage: 'url(/forest.png)',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'repeat'
-      }}
     >
       <div 
         className="absolute w-full h-full"
@@ -223,6 +218,46 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }}
         onClick={handleMapClick}
       >
+        {/* Forest images outside grass area */}
+        {currentLocation === 'village' && (
+          <>
+            {/* Forest images around the map */}
+            {Array.from({ length: Math.ceil((mapWidth + 20) / 256) }, (_, x) =>
+              Array.from({ length: Math.ceil((mapHeight + 20) / 256) }, (_, y) => {
+                const posX = x * 256 - 10;
+                const posY = y * 256 - 10;
+                
+                // Skip areas where grass is placed (grass covers the center area)
+                const grassAreaLeft = 256;
+                const grassAreaTop = 256;
+                const grassAreaRight = mapWidth - 256;
+                const grassAreaBottom = mapHeight - 256;
+                
+                if (posX + 256 > grassAreaLeft && posX < grassAreaRight && 
+                    posY + 256 > grassAreaTop && posY < grassAreaBottom) {
+                  return null;
+                }
+                
+                return (
+                  <img
+                    key={`forest-${x}-${y}`}
+                    src="/forest.png"
+                    alt="Forest"
+                    className="absolute"
+                    style={{
+                      left: posX,
+                      top: posY,
+                      width: 'auto',
+                      height: 'auto',
+                      imageRendering: 'pixelated'
+                    }}
+                  />
+                );
+              })
+            )}
+          </>
+        )}
+
         {/* Render location-specific content */}
         {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
         

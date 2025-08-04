@@ -186,6 +186,13 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return frames[frameIndex];
   };
 
+  // Get walking animation frame for up direction
+  const getWalkUpFrame = () => {
+    const frames = ['walk_up1.png', 'walk_up2.png', 'walk_up3.png'];
+    const frameIndex = Math.floor(Date.now() / 200) % 3; // Change frame every 200ms
+    return frames[frameIndex];
+  };
+
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
@@ -239,9 +246,12 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       
       {/* Player - fixed in center of screen, outside the map container */}
       <img
-        src={player.direction === 'down' && player.isMoving ? 
-          `/${getWalkDownFrame()}` : 
-          "/player.png"
+        src={
+          player.isMoving 
+            ? (player.direction === 'down' ? `/${getWalkDownFrame()}` 
+               : player.direction === 'up' ? `/${getWalkUpFrame()}` 
+               : "/player.png")
+            : "/player.png"
         }
         alt="Player"
         className="fixed w-8 h-8 shadow-glow z-30 transition-all duration-150 ease-out"

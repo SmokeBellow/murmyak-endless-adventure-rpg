@@ -118,7 +118,7 @@ const VisualNovelDialogue = ({ npc, onClose }: VisualNovelDialogueProps) => {
       </div>
 
       {/* Dialogue menu - Bottom 15% */}
-      <div className="h-[15%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col justify-center px-8 mb-4">
+      <div className="h-[15%] bg-gradient-to-t from-black/95 to-black/80 border-t border-white/20 flex flex-col justify-center px-8 mb-[2vh]">
         {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' ? (
           // Player choice options
           <div className="space-y-2">

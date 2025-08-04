@@ -259,8 +259,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
                : player.direction === 'up' ? `/${getWalkUpFrame()}`
                : player.direction === 'left' ? `/${getWalkSideFrame()}`
                : player.direction === 'right' ? `/${getWalkSideFrame()}`
-               : "/player.png")
-            : "/player.png"
+               : "/walk_up2.png")
+            : "/walk_up2.png"
         }
         alt="Player"
         className="fixed w-8 h-8 shadow-glow z-30 transition-all duration-150 ease-out"

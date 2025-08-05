@@ -288,6 +288,11 @@ const RPGGame = () => {
 
   // Battle system
   const handleBattleStart = useCallback((enemy: Enemy) => {
+    // Don't start battle if already in battle
+    if (battleState || gameScreen === 'battle') return;
+    
+    console.log('Starting battle with', enemy.name, 'health:', enemy.health);
+    
     setBattleState({
       player,
       enemy,
@@ -298,7 +303,7 @@ const RPGGame = () => {
     setGameScreen('battle');
     setBattleLog([`Бой с ${enemy.name} начинается!`]);
     setDamageTexts([]);
-  }, [player, currentLocation]);
+  }, [player, currentLocation, battleState, gameScreen]);
 
   const handleBattleEnd = useCallback(() => {
     setBattleState(null);

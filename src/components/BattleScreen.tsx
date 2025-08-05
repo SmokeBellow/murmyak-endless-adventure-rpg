@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -31,6 +31,14 @@ export const BattleScreen = ({
   battleLog
 }: BattleScreenProps) => {
   const { player, enemy, location } = battleState;
+  const battleLogRef = useRef<HTMLDivElement>(null);
+  
+  // Auto-scroll battle log to bottom
+  useEffect(() => {
+    if (battleLogRef.current) {
+      battleLogRef.current.scrollTop = battleLogRef.current.scrollHeight;
+    }
+  }, [battleLog]);
   
   // Get background image based on location
   const getBackgroundImage = () => {
@@ -208,7 +216,7 @@ export const BattleScreen = ({
         {/* Battle Log - Right 1/3 */}
         <div className="w-1/3">
           <h3 className="text-white text-lg font-bold mb-4">Лог боя</h3>
-          <div className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm">
+          <div ref={battleLogRef} className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm">
             {battleLog.length === 0 ? (
               <div className="text-gray-400">Бой начинается...</div>
             ) : (

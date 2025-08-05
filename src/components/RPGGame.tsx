@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType, Enemy, BattleState } from '@/types/gameTypes';
+import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType, Enemy, BattleState, BattleResult } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -19,12 +19,15 @@ import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
 import { BattleScreen } from './BattleScreen';
+import { BattleVictory } from './BattleVictory';
+import { BattleDefeat } from './BattleDefeat';
 
 const RPGGame = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+  const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [damageTexts, setDamageTexts] = useState<any[]>([]);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
@@ -299,6 +302,7 @@ const RPGGame = () => {
 
   const handleBattleEnd = useCallback(() => {
     setBattleState(null);
+    setBattleResult(null);
     setGameScreen('game');
     setBattleLog([]);
     setDamageTexts([]);
@@ -340,12 +344,37 @@ const RPGGame = () => {
     if (newEnemyHealth <= 0) {
       // Enemy defeated
       addBattleLog(`${battleState.enemy.name} повержен!`);
+      
+      // Generate battle result
+      const experienceGained = Math.floor(Math.random() * 20) + 10;
+      const coinsGained = Math.floor(Math.random() * 10) + 5;
+      const lootItems: Item[] = [];
+      
+      // Random loot chance
+      if (Math.random() < 0.3) { // 30% chance for loot
+        lootItems.push({
+          id: 'health-potion-' + Date.now(),
+          name: 'Зелье здоровья',
+          type: 'consumable',
+          description: 'Восстанавливает 50 единиц здоровья',
+          icon: '/healthpotion.png'
+        });
+      }
+      
+      setBattleResult({
+        victory: true,
+        experienceGained,
+        coinsGained,
+        lootItems
+      });
+      
       setTimeout(() => {
-        handleBattleEnd();
+        setGameScreen('battle-victory');
         setPlayer(prev => ({
           ...prev,
-          experience: prev.experience + 10,
-          coins: prev.coins + 5
+          experience: prev.experience + experienceGained,
+          coins: prev.coins + coinsGained,
+          inventory: [...prev.inventory, ...lootItems]
         }));
       }, 1500);
       return;
@@ -361,9 +390,11 @@ const RPGGame = () => {
     setTimeout(() => {
       if (updatedBattleState) {
         const enemyDamage = updatedBattleState.enemy.damage;
+        const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+        
         setPlayer(prev => ({
           ...prev,
-          health: Math.max(0, prev.health - enemyDamage)
+          health: newPlayerHealth
         }));
         
         setBattleState(prev => prev ? {
@@ -373,6 +404,14 @@ const RPGGame = () => {
         
         addDamageText(enemyDamage, 'player', 'damage');
         addBattleLog(`${updatedBattleState.enemy.name} атакует вас и наносит ${enemyDamage} урона!`);
+        
+        // Check if player is defeated
+        if (newPlayerHealth <= 0) {
+          addBattleLog("Вы падаете без сознания...");
+          setTimeout(() => {
+            setGameScreen('battle-defeat');
+          }, 1500);
+        }
       }
     }, 1000);
   }, [battleState, handleBattleEnd, player.equipment.weapon, addDamageText, addBattleLog]);
@@ -393,9 +432,11 @@ const RPGGame = () => {
     setTimeout(() => {
       if (battleState) {
         const enemyDamage = Math.floor(battleState.enemy.damage * 0.5);
+        const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+        
         setPlayer(prev => ({
           ...prev,
-          health: Math.max(0, prev.health - enemyDamage)
+          health: newPlayerHealth
         }));
         
         setBattleState(prev => prev ? {
@@ -405,6 +446,14 @@ const RPGGame = () => {
         
         addDamageText(enemyDamage, 'player', 'damage');
         addBattleLog(`${battleState.enemy.name} атакует, но вы блокируете часть урона! Получено ${enemyDamage} урона!`);
+        
+        // Check if player is defeated
+        if (newPlayerHealth <= 0) {
+          addBattleLog("Вы падаете без сознания...");
+          setTimeout(() => {
+            setGameScreen('battle-defeat');
+          }, 1500);
+        }
       }
     }, 1000);
   }, [battleState, addDamageText, addBattleLog]);
@@ -434,9 +483,11 @@ const RPGGame = () => {
     setTimeout(() => {
       if (battleState) {
         const enemyDamage = battleState.enemy.damage;
+        const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+        
         setPlayer(prev => ({
           ...prev,
-          health: Math.max(0, prev.health - enemyDamage)
+          health: newPlayerHealth
         }));
         
         setBattleState(prev => prev ? {
@@ -446,9 +497,45 @@ const RPGGame = () => {
         
         addDamageText(enemyDamage, 'player', 'damage');
         addBattleLog(`${battleState.enemy.name} атакует и наносит ${enemyDamage} урона!`);
+        
+        // Check if player is defeated
+        if (newPlayerHealth <= 0) {
+          addBattleLog("Вы падаете без сознания...");
+          setTimeout(() => {
+            setGameScreen('battle-defeat');
+          }, 1500);
+        }
       }
     }, 1000);
-  }, [battleState, addDamageText, addBattleLog]);
+  }, [battleState, addDamageText, addBattleLog, player.health]);
+
+  // Handle battle defeat
+  const handleBattleDefeat = useCallback(() => {
+    // Reset player health and teleport to village
+    setPlayer(prev => ({
+      ...prev,
+      health: Math.floor(prev.maxHealth * 0.5), // Half health after defeat
+      position: { x: 820, y: 490 }, // Elder's position in village
+      targetPosition: { x: 820, y: 490 }
+    }));
+    
+    setCurrentLocation('village');
+    handleBattleEnd();
+    
+    // Show recovery message
+    setTimeout(() => {
+      toast({
+        title: "Восстановление",
+        description: "Вы приходите в себя в доме старосты",
+        duration: 3000
+      });
+    }, 500);
+  }, [handleBattleEnd, toast]);
+
+  // Handle battle victory
+  const handleBattleVictory = useCallback(() => {
+    handleBattleEnd();
+  }, [handleBattleEnd]);
 
   // Enemy system (only in abandoned mines)
   const { enemies, attackEnemy } = useEnemySystem({
@@ -1109,7 +1196,7 @@ const RPGGame = () => {
     });
   }, [resourceNodes.ore.count, quests, player.inventory, toast]);
 
-  // Render battle screen if in battle mode
+  // Render battle screens
   if (gameScreen === 'battle' && battleState) {
     return (
       <BattleScreen
@@ -1120,6 +1207,25 @@ const RPGGame = () => {
         onBattleEnd={handleBattleEnd}
         damageTexts={damageTexts}
         battleLog={battleLog}
+      />
+    );
+  }
+
+  if (gameScreen === 'battle-victory' && battleResult) {
+    return (
+      <BattleVictory
+        experienceGained={battleResult.experienceGained}
+        coinsGained={battleResult.coinsGained}
+        lootItems={battleResult.lootItems}
+        onContinue={handleBattleVictory}
+      />
+    );
+  }
+
+  if (gameScreen === 'battle-defeat') {
+    return (
+      <BattleDefeat
+        onContinue={handleBattleDefeat}
       />
     );
   }

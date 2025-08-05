@@ -95,7 +95,7 @@ export interface Enemy {
   isDead: boolean;
 }
 
-export type GameScreen = 'intro' | 'game' | 'battle';
+export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';
 export type LocationType = 'village' | 'abandoned-mines';
 
@@ -105,4 +105,11 @@ export interface BattleState {
   location: LocationType;
   playerAction: 'attack' | 'defend' | 'item' | null;
   turn: 'player' | 'enemy';
+}
+
+export interface BattleResult {
+  victory: boolean;
+  experienceGained: number;
+  coinsGained: number;
+  lootItems: Item[];
 }

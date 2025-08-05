@@ -16,6 +16,8 @@ export interface Player {
   questProgress: {
     visitedMerchant: boolean;
     usedFountain: boolean;
+    talkedToMerchant: boolean;
+    talkedToBlacksmith: boolean;
   };
 }
 

@@ -82,7 +82,9 @@ const RPGGame = () => {
     },
     questProgress: {
       visitedMerchant: false,
-      usedFountain: false
+      usedFountain: false,
+      talkedToMerchant: false,
+      talkedToBlacksmith: false
     }
   });
 
@@ -141,19 +143,19 @@ const RPGGame = () => {
       ],
       quests: [
         {
-          id: 'first-quest',
+          id: 'village-introduction',
           title: 'Знакомство с деревней',
-          description: 'Познакомься с жителями деревни и изучи окрестности.',
+          description: 'Поговори со всеми жителями деревни, чтобы познакомиться с ними.',
           status: 'available',
           giver: 'elder',
           repeatable: false,
           objectives: [
             { description: 'Поговори с торговцем', completed: false },
-            { description: 'Используй фонтан исцеления', completed: false }
+            { description: 'Поговори с кузнецом', completed: false }
           ],
           rewards: {
-            experience: 50,
-            coins: 20
+            experience: 100,
+            coins: 30
           }
         },
         {
@@ -296,29 +298,48 @@ const RPGGame = () => {
     console.log('NPC position:', npc.position);
     setSelectedNPC(npc);
     
-    // Mark merchant as visited for quest progress
+    // Mark merchant as visited for quest progress and update village introduction quest
     if (npc.type === 'merchant') {
       setPlayer(prev => ({
         ...prev,
         questProgress: {
           ...prev.questProgress,
-          visitedMerchant: true
+          visitedMerchant: true,
+          talkedToMerchant: true
         }
       }));
       
-      // Update first quest objective
-      const firstQuest = quests.find(q => q.id === 'first-quest' && q.status === 'active');
-      if (firstQuest) {
-        const updatedObjectives = firstQuest.objectives.map(obj => 
+      // Update village introduction quest objective
+      const villageQuest = quests.find(q => q.id === 'village-introduction' && q.status === 'active');
+      if (villageQuest) {
+        const updatedObjectives = villageQuest.objectives.map(obj => 
           obj.description === 'Поговори с торговцем' ? { ...obj, completed: true } : obj
         );
-        const updatedQuest = { ...firstQuest, objectives: updatedObjectives };
-        setQuests(prev => [...prev.filter(q => q.id !== firstQuest.id), updatedQuest]);
+        const updatedQuest = { ...villageQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== villageQuest.id), updatedQuest]);
       }
     }
     
-    // Handle blacksmith interaction for find-blacksmith quest
+    // Handle blacksmith interaction
     if (npc.type === 'blacksmith') {
+      setPlayer(prev => ({
+        ...prev,
+        questProgress: {
+          ...prev.questProgress,
+          talkedToBlacksmith: true
+        }
+      }));
+
+      // Update village introduction quest objective
+      const villageQuest = quests.find(q => q.id === 'village-introduction' && q.status === 'active');
+      if (villageQuest) {
+        const updatedObjectives = villageQuest.objectives.map(obj => 
+          obj.description === 'Поговори с кузнецом' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...villageQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== villageQuest.id), updatedQuest]);
+      }
+
       const findBlacksmithQuest = quests.find(q => q.id === 'find-blacksmith' && q.status === 'active');
       if (findBlacksmithQuest) {
         const updatedObjectives = findBlacksmithQuest.objectives.map(obj => ({ ...obj, completed: true }));
@@ -769,6 +790,8 @@ const RPGGame = () => {
       {selectedNPC && showVisualNovel && (
         <VisualNovelDialogue
           npc={selectedNPC}
+          hasActiveVillageQuest={quests.some(q => q.id === 'village-introduction' && q.status === 'active')}
+          hasCompletedVillageQuest={completedQuestIds.includes('village-introduction')}
           onClose={() => {
             setSelectedNPC(null);
             setShowVisualNovel(false);

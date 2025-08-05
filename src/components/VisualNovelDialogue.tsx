@@ -8,12 +8,19 @@ interface VisualNovelDialogueProps {
   npc: NPC;
   onClose: () => void;
   onQuestAccept?: (questId: string) => void;
+  hasActiveVillageQuest?: boolean;
+  hasCompletedVillageQuest?: boolean;
 }
 
-const VisualNovelDialogue = ({ npc, onClose, onQuestAccept }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
+        if (hasCompletedVillageQuest) {
+          return 'starosta_quest_completed';
+        } else if (hasActiveVillageQuest) {
+          return 'starosta_quest_active';
+        }
         return 'starosta';
       case 'merchant':
         return 'torgovec';

@@ -151,7 +151,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Left village boundary - fence */}
       <div 
-        className="absolute"
+        className="absolute bg-amber-800 border-r-2 border-amber-900"
         style={{
           left: 0,
           top: 0,
@@ -160,13 +160,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundImage: 'url(/chastokol_side.png)',
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
-          imageRendering: 'pixelated'
+          imageRendering: 'pixelated',
+          zIndex: 1
         }}
       />
 
       {/* Right village boundary - fence */}
       <div 
-        className="absolute"
+        className="absolute bg-amber-800 border-l-2 border-amber-900"
         style={{
           left: mapWidth - 64,
           top: 0,
@@ -175,7 +176,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundImage: 'url(/chastokol_side.png)',
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
-          imageRendering: 'pixelated'
+          imageRendering: 'pixelated',
+          zIndex: 1
         }}
       />
 

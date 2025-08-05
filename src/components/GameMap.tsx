@@ -531,11 +531,11 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             : "/walk_up2.png"
         }
         alt="Player"
-        className="fixed w-8 h-8 shadow-glow z-30 transition-all duration-150 ease-out"
+        className="fixed w-8 h-8 shadow-glow z-30 transition-[left,top] duration-150 ease-out"
         style={{
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: `translate(-50%, -50%) ${player.direction === 'right' ? 'scaleX(-1)' : ''}`,
           pointerEvents: 'none',
           imageRendering: 'pixelated'
         }}

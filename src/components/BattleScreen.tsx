@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BattleState, Item } from '@/types/gameTypes';
+import { BattleState, Item, Player } from '@/types/gameTypes';
 
 interface DamageText {
   id: string;
@@ -13,6 +13,7 @@ interface DamageText {
 
 interface BattleScreenProps {
   battleState: BattleState;
+  currentPlayer: Player;
   onAttack: () => void;
   onDefend: () => void;
   onUseItem: (item: Item) => void;
@@ -23,6 +24,7 @@ interface BattleScreenProps {
 
 export const BattleScreen = ({ 
   battleState, 
+  currentPlayer,
   onAttack, 
   onDefend, 
   onUseItem, 
@@ -30,7 +32,7 @@ export const BattleScreen = ({
   damageTexts,
   battleLog
 }: BattleScreenProps) => {
-  const { player, enemy, location } = battleState;
+  const { enemy, location } = battleState;
   const battleLogRef = useRef<HTMLDivElement>(null);
   
   // Auto-scroll battle log to bottom
@@ -51,7 +53,7 @@ export const BattleScreen = ({
   };
 
   // Filter consumable items from inventory
-  const consumableItems = player.inventory.filter(item => item.type === 'consumable');
+  const consumableItems = currentPlayer.inventory.filter(item => item.type === 'consumable');
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -71,13 +73,13 @@ export const BattleScreen = ({
             }}
           />
           <div className="mt-4 text-white text-center">
-            <div className="text-lg font-bold">{player.name}</div>
+            <div className="text-lg font-bold">{currentPlayer.name}</div>
             <div className="w-32">
               <Progress 
-                value={(player.health / player.maxHealth) * 100} 
+                value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
                 className="h-3 bg-red-900"
               />
-              <div className="text-sm">{player.health}/{player.maxHealth} HP</div>
+              <div className="text-sm">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
             </div>
           </div>
           

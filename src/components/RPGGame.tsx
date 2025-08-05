@@ -1295,6 +1295,7 @@ const RPGGame = () => {
     return (
       <BattleScreen
         battleState={battleState}
+        currentPlayer={player}
         onAttack={handleBattleAttack}
         onDefend={handleBattleDefend}
         onUseItem={handleBattleUseItem}

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Player, NPC, LocationType } from '@/types/gameTypes';
 
 interface GameMapProps {
@@ -12,6 +12,39 @@ interface GameMapProps {
 }
 
 const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
+  const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+
+  // Handle cheat code for light (123 keys)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setPressedKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      setPressedKeys(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(e.key.toLowerCase());
+        return newSet;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Check for cheat code
+  useEffect(() => {
+    if (pressedKeys.has('1') && pressedKeys.has('2') && pressedKeys.has('3')) {
+      setIsLightCheatEnabled(prev => !prev);
+      setPressedKeys(new Set()); // Clear keys after activation
+    }
+  }, [pressedKeys]);
   const mapWidth = 2000;
   const mapHeight = 2000;
 
@@ -329,6 +362,20 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
     }`}>
+      {/* Mine darkness overlay - only for abandoned-mines location */}
+      {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-40"
+          style={{
+            background: `radial-gradient(circle 120px at ${50 + (cameraOffsetX + player.position.x * zoomLevel) / window.innerWidth * 100}% ${50 + (cameraOffsetY + player.position.y * zoomLevel) / window.innerHeight * 100}%, 
+              transparent 0%, 
+              rgba(0, 0, 0, 0.2) 40%, 
+              rgba(0, 0, 0, 0.7) 80%, 
+              rgba(0, 0, 0, 0.9) 100%)`,
+          }}
+        />
+      )}
+      
       <div 
         className="absolute w-full h-full"
         style={{

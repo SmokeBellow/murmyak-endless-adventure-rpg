@@ -151,7 +151,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Left village boundary - fence */}
       <div 
-        className="absolute bg-amber-800 border-r-2 border-amber-900"
+        className="absolute"
         style={{
           left: 0,
           top: 0,
@@ -167,7 +167,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Right village boundary - fence */}
       <div 
-        className="absolute bg-amber-800 border-l-2 border-amber-900"
+        className="absolute"
         style={{
           left: mapWidth - 64,
           top: 0,

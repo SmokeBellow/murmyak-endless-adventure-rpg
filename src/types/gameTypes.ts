@@ -73,6 +73,27 @@ export interface Quest {
   };
 }
 
+export interface Enemy {
+  id: string;
+  name: string;
+  type: 'bat' | 'rat';
+  position: { x: number; y: number };
+  spawnPosition: { x: number; y: number };
+  targetPosition: { x: number; y: number };
+  isMoving: boolean;
+  direction: 'up' | 'down' | 'left' | 'right';
+  health: number;
+  maxHealth: number;
+  damage: number;
+  speed: number;
+  attackRange: number;
+  wanderRadius: number;
+  lastAttack: number;
+  attackCooldown: number;
+  isAttacking: boolean;
+  isDead: boolean;
+}
+
 export type GameScreen = 'intro' | 'game';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';
 export type LocationType = 'village' | 'abandoned-mines';

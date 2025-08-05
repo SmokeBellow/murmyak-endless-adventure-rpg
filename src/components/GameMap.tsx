@@ -1,17 +1,19 @@
 import { useCallback, useState, useEffect } from 'react';
-import { Player, NPC, LocationType } from '@/types/gameTypes';
+import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 
 interface GameMapProps {
   player: Player;
   npcs: NPC[];
+  enemies: Enemy[];
   onNPCInteract: (npc: NPC) => void;
+  onEnemyClick: (enemy: Enemy) => void;
   onFountainUse: () => void;
   onCoalMineInteract: () => void;
   currentLocation: LocationType;
   onPortalUse: () => void;
 }
 
-const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
+const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
 
@@ -131,10 +133,27 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         console.log('NPC clicked via map:', clickedNPC.name);
         console.log('Click coords:', clickX, clickY, 'NPC coords:', clickedNPC.position, 'Player coords:', player.position);
         onNPCInteract(clickedNPC);
+        return;
+      }
+    }
+    
+    // Check if clicking on enemy (only in abandoned mines)
+    if (currentLocation === 'abandoned-mines') {
+      const clickedEnemy = enemies.find(enemy => {
+        if (enemy.isDead) return false;
+        const distance = Math.sqrt(Math.pow(enemy.position.x - clickX, 2) + Math.pow(enemy.position.y - clickY, 2));
+        const playerToEnemyDistance = Math.sqrt(Math.pow(enemy.position.x - player.position.x, 2) + Math.pow(enemy.position.y - player.position.y, 2));
+        return distance < 30 && playerToEnemyDistance < 150; // Attack range
+      });
+      
+      if (clickedEnemy) {
+        console.log('Enemy clicked via map:', clickedEnemy.name);
+        onEnemyClick(clickedEnemy);
+        return;
       }
     }
     // Removed player movement on click
-  }, [player.position, npcs, onNPCInteract, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
+  }, [player.position, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
 
   // Calculate camera offset to center player exactly in the middle of screen
   const zoomLevel = 1.0;
@@ -575,6 +594,54 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             </div>
           </div>
         ))}
+
+        {/* Render enemies only in abandoned mines */}
+        {currentLocation === 'abandoned-mines' && enemies.map(enemy => {
+          if (enemy.isDead) return null;
+          
+          return (
+            <div
+              key={enemy.id}
+              className="absolute"
+              style={{
+                left: enemy.position.x - 16,
+                top: enemy.position.y - 16,
+              }}
+            >
+              {/* Enemy health bar */}
+              {enemy.health < enemy.maxHealth && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-8 bg-gray-700 rounded-full overflow-hidden border border-gray-500">
+                  <div 
+                    className="h-1 bg-red-500 transition-all duration-300"
+                    style={{ width: `${(enemy.health / enemy.maxHealth) * 100}%` }}
+                  />
+                </div>
+              )}
+              
+              {/* Enemy sprite */}
+              <div className="relative cursor-pointer">
+                <img 
+                  src={enemy.type === 'bat' ? '/bat.png' : '/rat.png'} 
+                  alt={enemy.name} 
+                  className={`w-8 h-8 transition-all duration-200 ${
+                    enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
+                  } ${
+                    enemy.direction === 'left' ? 'scale-x-[-1]' : ''
+                  }`}
+                  style={{
+                    imageRendering: 'pixelated',
+                    filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
+                  }}
+                />
+                
+                {/* Attack indicator */}
+                {enemy.isAttacking && (
+                  <div className="absolute inset-0 rounded-full bg-red-500/30 animate-ping" />
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
       
       {/* Player - fixed in center of screen, outside the map container */}

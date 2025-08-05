@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType } from '@/types/gameTypes';
+import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType, Enemy } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,6 +17,7 @@ import CoalMining from './CoalMining';
 import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
+import { useEnemySystem } from './EnemySystem';
 
 const RPGGame = () => {
   const { toast } = useToast();
@@ -253,6 +254,52 @@ const RPGGame = () => {
 
   const [quests, setQuests] = useState<Quest[]>([]);
   const [completedQuestIds, setCompletedQuestIds] = useState<string[]>([]);
+
+  // Handle player taking damage from enemies
+  const handlePlayerTakeDamage = useCallback((damage: number) => {
+    setPlayer(prev => {
+      const newHealth = Math.max(0, prev.health - damage);
+      if (newHealth === 0) {
+        toast({
+          title: "Вы погибли!",
+          description: "Вы были повержены противником",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Получен урон!",
+          description: `Вы потеряли ${damage} здоровья`,
+          variant: "destructive"
+        });
+      }
+      return {
+        ...prev,
+        health: newHealth
+      };
+    });
+  }, [toast]);
+
+  // Enemy system (only in abandoned mines)
+  const { enemies, attackEnemy } = useEnemySystem({
+    player,
+    onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {}
+  });
+
+  // Handle enemy attack
+  const handleEnemyClick = useCallback((enemy: Enemy) => {
+    if (enemy.isDead) return;
+    
+    // Calculate player's total damage
+    const weaponDamage = player.equipment.weapon?.stats?.damage || 5;
+    const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4)); // Random variance
+    
+    attackEnemy(enemy.id, totalDamage);
+    
+    toast({
+      title: "Атака!",
+      description: `Вы нанесли ${totalDamage} урона ${enemy.name}`,
+    });
+  }, [player.equipment.weapon, attackEnemy, toast]);
 
   // Regeneration effect
   useEffect(() => {
@@ -902,15 +949,17 @@ const RPGGame = () => {
 
         <PlayerStats player={player} />
       
-      <GameMap 
-        player={player}
-        npcs={npcs}
-        onNPCInteract={handleNPCInteract}
-        onFountainUse={handleFountainUse}
-        onCoalMineInteract={handleCoalMineInteract}
-        currentLocation={currentLocation}
-        onPortalUse={handlePortalUse}
-      />
+          <GameMap
+            player={player}
+            npcs={npcs}
+            enemies={currentLocation === 'abandoned-mines' ? enemies : []}
+            onNPCInteract={handleNPCInteract}
+            onEnemyClick={handleEnemyClick}
+            onFountainUse={handleFountainUse}
+            onCoalMineInteract={handleCoalMineInteract}
+            currentLocation={currentLocation}
+            onPortalUse={handlePortalUse}
+          />
 
       {isMobile && (
         <VirtualJoystick

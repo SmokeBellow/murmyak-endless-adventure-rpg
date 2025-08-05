@@ -235,7 +235,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             {/* NPC sprite */}
             <div className="relative cursor-pointer">
               <img 
-                src="/lovable-uploads/0a5678b6-372c-4296-8aef-e92f5915a9c0.png" 
+                src={npc.type === 'elder' ? '/headman.png' : '/lovable-uploads/0a5678b6-372c-4296-8aef-e92f5915a9c0.png'} 
                 alt="NPC" 
                 className="w-10 h-10"
               />

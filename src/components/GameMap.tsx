@@ -535,7 +535,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         style={{
           left: '50%',
           top: '50%',
-          transform: `translate(-50%, -50%) ${player.direction === 'right' && player.isMoving ? 'scaleX(-1)' : ''}`,
+          transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
           imageRendering: 'pixelated'
         }}

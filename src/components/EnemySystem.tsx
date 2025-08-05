@@ -5,9 +5,10 @@ interface EnemySystemProps {
   player: Player;
   onPlayerTakeDamage: (damage: number) => void;
   onBattleStart: (enemy: Enemy) => void;
+  isInBattle?: boolean;
 }
 
-export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart }: EnemySystemProps) => {
+export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isInBattle = false }: EnemySystemProps) => {
   const [enemies, setEnemies] = useState<Enemy[]>([]);
 
   // Initialize enemies when component mounts
@@ -130,8 +131,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart }: En
           const distanceToPlayer = getDistance(enemy.position, player.position);
           const now = Date.now();
 
-          // Check if player is in attack range - start battle
-          if (distanceToPlayer <= enemy.attackRange) {
+          // Check if player is in attack range - start battle (only if not already in battle)
+          if (distanceToPlayer <= enemy.attackRange && !isInBattle) {
             onBattleStart(enemy);
             return enemy;
           }
@@ -217,7 +218,7 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart }: En
     }, 50); // Update every 50ms for smooth movement
 
     return () => clearInterval(updateInterval);
-  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart]);
+  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart, isInBattle]);
 
   const attackEnemy = useCallback((enemyId: string, damage: number) => {
     setEnemies(prev => 

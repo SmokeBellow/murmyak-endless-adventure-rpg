@@ -625,7 +625,8 @@ const RPGGame = () => {
   const { enemies, attackEnemy, removeEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
-    onBattleStart: handleBattleStart
+    onBattleStart: handleBattleStart,
+    isInBattle: gameScreen === 'battle' || battleState !== null
   });
 
   // Handle battle victory

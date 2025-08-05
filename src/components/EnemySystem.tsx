@@ -137,8 +137,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             return enemy;
           }
           
-          // Check if player is in aggression range - chase player
-          if (distanceToPlayer <= enemy.aggressionRange) {
+          // Check if player is in aggression range - chase player (continue even during battle)
+          if (distanceToPlayer <= enemy.aggressionRange && !isInBattle) {
             const dx = player.position.x - enemy.position.x;
             const dy = player.position.y - enemy.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);

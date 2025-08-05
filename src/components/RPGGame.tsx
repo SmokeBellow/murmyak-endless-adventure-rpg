@@ -526,8 +526,17 @@ const RPGGame = () => {
   const handleBattleFlee = useCallback(() => {
     if (!battleState) return;
     
+    // Prevent multiple flee attempts
+    if (battleState.playerAction === 'fleeing') return;
+    
     console.log('Attempting to flee from battle');
     addBattleLog("Вы пытаетесь сбежать...");
+    
+    // Mark as fleeing to prevent multiple attempts
+    setBattleState(prev => prev ? {
+      ...prev,
+      playerAction: 'fleeing'
+    } : null);
     
     // 70% chance to successfully flee
     if (Math.random() < 0.7) {
@@ -567,10 +576,11 @@ const RPGGame = () => {
           return;
         }
         
-        // Set turn back to player
+        // Set turn back to player and reset action
         setBattleState(prev => prev ? {
           ...prev,
-          turn: 'player'
+          turn: 'player',
+          playerAction: null
         } : null);
       }, 1000);
     }

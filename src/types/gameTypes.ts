@@ -103,7 +103,7 @@ export interface BattleState {
   player: Player;
   enemy: Enemy;
   location: LocationType;
-  playerAction: 'attack' | 'defend' | 'item' | null;
+  playerAction: 'attack' | 'defend' | 'item' | 'fleeing' | null;
   turn: 'player' | 'enemy';
 }
 

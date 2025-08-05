@@ -2,19 +2,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X } from 'lucide-react';
 
-interface CoalMiningProps {
+interface OreMiningProps {
   onClose: () => void;
-  onMineCoal: () => void;
+  onMineOre: () => void;
   resourceCount: number;
 }
 
-const CoalMining = ({ onClose, onMineCoal, resourceCount }: CoalMiningProps) => {
+const OreMining = ({ onClose, onMineOre, resourceCount }: OreMiningProps) => {
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="border-b border-border">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-primary">🪨 Кусок антрацита</CardTitle>
+            <CardTitle className="text-primary">⛰️ Рудная жила</CardTitle>
             <Button variant="outline" size="sm" onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>
@@ -25,15 +25,15 @@ const CoalMining = ({ onClose, onMineCoal, resourceCount }: CoalMiningProps) => 
           <div className="text-center space-y-4">
             <div className="text-6xl">⛏️</div>
             <p className="text-foreground">
-              Вы нашли старую угольную шахту. Здесь можно добыть уголь для кузнеца.
+              Вы нашли богатую рудную жилу. Здесь можно добыть железную руду.
             </p>
             
             {resourceCount > 0 ? (
               <Button 
-                onClick={onMineCoal}
+                onClick={onMineOre}
                 className="w-full"
               >
-                Добыть уголь ({resourceCount} ед.)
+                Добыть руду ({resourceCount} ед.)
               </Button>
             ) : (
               <p className="text-muted-foreground text-sm">
@@ -47,4 +47,4 @@ const CoalMining = ({ onClose, onMineCoal, resourceCount }: CoalMiningProps) => 
   );
 };
 
-export default CoalMining;
+export default OreMining;

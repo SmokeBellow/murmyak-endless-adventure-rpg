@@ -14,6 +14,7 @@ import VisualNovelDialogue from './VisualNovelDialogue';
 import TradeMenu from './TradeMenu';
 import VirtualJoystick from './VirtualJoystick';
 import CoalMining from './CoalMining';
+import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 
@@ -25,9 +26,22 @@ const RPGGame = () => {
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showVisualNovel, setShowVisualNovel] = useState(false);
   const [showCoalMining, setShowCoalMining] = useState(false);
+  const [showOreMining, setShowOreMining] = useState(false);
   const [questReward, setQuestReward] = useState<Quest | null>(null);
   const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+
+  // Resource nodes with regeneration
+  const [resourceNodes, setResourceNodes] = useState({
+    coal: {
+      count: Math.floor(Math.random() * 4) + 1,
+      lastRegen: Date.now()
+    },
+    ore: {
+      count: Math.floor(Math.random() * 4) + 1,
+      lastRegen: Date.now()
+    }
+  });
 
   // Initial game items
   const initialItems: Item[] = [
@@ -251,6 +265,33 @@ const RPGGame = () => {
     }, 3000);
 
     return () => clearInterval(regenInterval);
+  }, []);
+
+  // Resource nodes regeneration
+  useEffect(() => {
+    const resourceRegenInterval = setInterval(() => {
+      setResourceNodes(prev => {
+        const now = Date.now();
+        const REGEN_TIME = 5 * 60 * 1000; // 5 minutes
+        
+        return {
+          coal: {
+            count: now - prev.coal.lastRegen >= REGEN_TIME 
+              ? Math.floor(Math.random() * 4) + 1 
+              : prev.coal.count,
+            lastRegen: now - prev.coal.lastRegen >= REGEN_TIME ? now : prev.coal.lastRegen
+          },
+          ore: {
+            count: now - prev.ore.lastRegen >= REGEN_TIME 
+              ? Math.floor(Math.random() * 4) + 1 
+              : prev.ore.count,
+            lastRegen: now - prev.ore.lastRegen >= REGEN_TIME ? now : prev.ore.lastRegen
+          }
+        };
+      });
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(resourceRegenInterval);
   }, []);
 
   const handlePlayerMove = useCallback((newPosition: { x: number; y: number }) => {
@@ -590,7 +631,7 @@ const RPGGame = () => {
             Math.pow(500 - playerRef.current.position.y, 2)
           );
           if (oreMineDistance < 80) {
-            handleCoalMineInteract(); // Reuse coal mining interface for ore
+            handleOreMineInteract();
             return;
           }
           
@@ -731,6 +772,10 @@ const RPGGame = () => {
     setShowCoalMining(true);
   }, []);
 
+  const handleOreMineInteract = useCallback(() => {
+    setShowOreMining(true);
+  }, []);
+
   const handlePortalUse = useCallback(() => {
     setIsLoadingLocation(true);
     
@@ -755,65 +800,95 @@ const RPGGame = () => {
   }, [currentLocation]);
 
   const handleMineCoal = useCallback(() => {
+    if (resourceNodes.coal.count <= 0) return;
+
+    // Add coal to inventory
+    const coal = {
+      id: 'coal',
+      name: 'Уголь',
+      type: 'misc' as const,
+      description: 'Высококачественный уголь для кузнечных работ',
+      icon: '🪨'
+    };
+    
+    setPlayer(prev => ({
+      ...prev,
+      inventory: [...prev.inventory, coal]
+    }));
+
+    // Decrease resource count
+    setResourceNodes(prev => ({
+      ...prev,
+      coal: {
+        ...prev.coal,
+        count: prev.coal.count - 1
+      }
+    }));
+
+    // Update quest objective if exists
     const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
-    const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
-    const hasCoal = player.inventory.some(item => item.id === 'coal');
-    const oreCount = player.inventory.filter(item => item.id === 'ore').length;
-    
-    // Check which mine the player clicked based on location and position
-    const isNearOreMine = Math.sqrt(Math.pow(600 - player.position.x, 2) + Math.pow(500 - player.position.y, 2)) < 80;
-    
-    if (oreQuest && isNearOreMine && oreCount < 3) {
-      // Add ore to inventory
-      const ore = {
-        id: 'ore',
-        name: 'Железная руда',
-        type: 'misc' as const,
-        description: 'Кусок железной руды высокого качества',
-        icon: '⛏️'
-      };
-      
-      setPlayer(prev => ({
-        ...prev,
-        inventory: [...prev.inventory, ore]
-      }));
-      
-      // Update quest objective
-      const newOreCount = oreCount + 1;
-      const updatedObjectives = oreQuest.objectives.map(obj => 
-        obj.description.includes('Найти 3 куска руды') 
-          ? { ...obj, description: `Найти 3 куска руды в заброшенных шахтах (${newOreCount}/3)`, completed: newOreCount >= 3 }
-          : obj
-      );
-      const updatedQuest = { ...oreQuest, objectives: updatedObjectives };
-      setQuests(prev => [...prev.filter(q => q.id !== oreQuest.id), updatedQuest]);
-      
-      setShowCoalMining(false);
-    } else if (coalQuest && !hasCoal && !isNearOreMine) {
-      // Add coal to inventory (original coal mining logic)
-      const coal = {
-        id: 'coal',
-        name: 'Уголь',
-        type: 'misc' as const,
-        description: 'Высококачественный уголь для кузнечных работ',
-        icon: '🪨'
-      };
-      
-      setPlayer(prev => ({
-        ...prev,
-        inventory: [...prev.inventory, coal]
-      }));
-      
-      // Update quest objective
+    if (coalQuest) {
       const updatedObjectives = coalQuest.objectives.map(obj => 
         obj.description === 'Найди уголь в лесу' ? { ...obj, completed: true } : obj
       );
       const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
       setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
-      
-      setShowCoalMining(false);
     }
-  }, [quests, player.inventory, player.position]);
+    
+    setShowCoalMining(false);
+    
+    toast({
+      title: "Добыча угля",
+      description: "Вы добыли уголь!",
+    });
+  }, [resourceNodes.coal.count, quests, toast]);
+
+  const handleMineOre = useCallback(() => {
+    if (resourceNodes.ore.count <= 0) return;
+
+    // Add ore to inventory
+    const ore = {
+      id: 'ore',
+      name: 'Железная руда',
+      type: 'misc' as const,
+      description: 'Кусок железной руды высокого качества',
+      icon: '⛏️'
+    };
+    
+    setPlayer(prev => ({
+      ...prev,
+      inventory: [...prev.inventory, ore]
+    }));
+
+    // Decrease resource count
+    setResourceNodes(prev => ({
+      ...prev,
+      ore: {
+        ...prev.ore,
+        count: prev.ore.count - 1
+      }
+    }));
+
+    // Update quest objective if exists
+    const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
+    if (oreQuest) {
+      const oreCount = player.inventory.filter(item => item.id === 'ore').length + 1; // +1 for the one we just added
+      const updatedObjectives = oreQuest.objectives.map(obj => 
+        obj.description.includes('Найти 3 куска руды') 
+          ? { ...obj, description: `Найти 3 куска руды в заброшенных шахтах (${oreCount}/3)`, completed: oreCount >= 3 }
+          : obj
+      );
+      const updatedQuest = { ...oreQuest, objectives: updatedObjectives };
+      setQuests(prev => [...prev.filter(q => q.id !== oreQuest.id), updatedQuest]);
+    }
+    
+    setShowOreMining(false);
+    
+    toast({
+      title: "Добыча руды",
+      description: "Вы добыли железную руду!",
+    });
+  }, [resourceNodes.ore.count, quests, player.inventory, toast]);
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
@@ -1045,10 +1120,16 @@ const RPGGame = () => {
         <CoalMining
           onClose={() => setShowCoalMining(false)}
           onMineCoal={handleMineCoal}
-          canMine={
-            (quests.some(q => q.id === 'find-coal' && q.status === 'active') && !player.inventory.some(item => item.id === 'coal')) ||
-            (quests.some(q => q.id === 'ore-mining' && q.status === 'active') && player.inventory.filter(item => item.id === 'ore').length < 3)
-          }
+          resourceCount={resourceNodes.coal.count}
+        />
+      )}
+
+      {/* Ore Mining */}
+      {showOreMining && (
+        <OreMining
+          onClose={() => setShowOreMining(false)}
+          onMineOre={handleMineOre}
+          resourceCount={resourceNodes.ore.count}
         />
       )}
 

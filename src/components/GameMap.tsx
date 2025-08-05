@@ -376,11 +376,12 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
               rgba(255, 180, 80, 0.3) 30%, 
               rgba(255, 150, 60, 0.2) 50%, 
               rgba(255, 120, 40, 0.1) 70%, 
-              transparent 80%, 
-              rgba(0, 0, 0, 0.9) 90%, 
-              rgba(0, 0, 0, 1) 95%, 
-              rgba(0, 0, 0, 1) 100%),
-            linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1))`,
+              rgba(0, 0, 0, 0.1) 80%, 
+              rgba(0, 0, 0, 0.5) 85%, 
+              rgba(0, 0, 0, 0.8) 90%, 
+              rgba(0, 0, 0, 0.95) 95%, 
+              rgba(0, 0, 0, 1) 100%), 
+            rgba(0, 0, 0, 1)`,
             transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           }}
         />

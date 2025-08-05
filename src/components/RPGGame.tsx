@@ -325,25 +325,26 @@ const RPGGame = () => {
   const handleBattleAttack = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
     
+    console.log('Battle attack started, enemy health:', battleState.enemy.health);
+    
+    // Store enemy name and damage before state update
+    const enemyName = battleState.enemy.name;
+    const enemyDamage = battleState.enemy.damage;
+    
     // Player attacks enemy
     const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
     const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4));
     
     const newEnemyHealth = Math.max(0, battleState.enemy.health - totalDamage);
     
-    // Update battle state with new enemy health FIRST
-    setBattleState(prev => prev ? {
-      ...prev,
-      enemy: { ...prev.enemy, health: newEnemyHealth },
-      turn: 'enemy'
-    } : null);
+    console.log('Damage dealt:', totalDamage, 'New enemy health:', newEnemyHealth);
     
     addDamageText(totalDamage, 'enemy', 'damage');
-    addBattleLog(`Вы атакуете ${battleState.enemy.name} и наносите ${totalDamage} урона!`);
+    addBattleLog(`Вы атакуете ${enemyName} и наносите ${totalDamage} урона!`);
     
     if (newEnemyHealth <= 0) {
       // Enemy defeated
-      addBattleLog(`${battleState.enemy.name} повержен!`);
+      addBattleLog(`${enemyName} повержен!`);
       
       // Generate battle result
       const experienceGained = Math.floor(Math.random() * 20) + 10;
@@ -380,9 +381,16 @@ const RPGGame = () => {
       return;
     }
     
+    // Update battle state with new enemy health
+    setBattleState(prev => prev ? {
+      ...prev,
+      enemy: { ...prev.enemy, health: newEnemyHealth },
+      turn: 'enemy'
+    } : null);
+    
     // Enemy attacks after delay
     setTimeout(() => {
-      const enemyDamage = battleState.enemy.damage;
+      console.log('Enemy counterattack');
       const newPlayerHealth = Math.max(0, player.health - enemyDamage);
       
       setPlayer(prev => ({
@@ -396,7 +404,7 @@ const RPGGame = () => {
       } : null);
       
       addDamageText(enemyDamage, 'player', 'damage');
-      addBattleLog(`${battleState.enemy.name} атакует вас и наносит ${enemyDamage} урона!`);
+      addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
       
       // Check if player is defeated
       if (newPlayerHealth <= 0) {
@@ -411,19 +419,26 @@ const RPGGame = () => {
   const handleBattleDefend = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
     
+    console.log('Battle defend started');
+    
+    // Store enemy info before state updates
+    const enemyName = battleState.enemy.name;
+    const enemyDamage = battleState.enemy.damage;
+    
+    addDamageText(0, 'player', 'defend');
+    addBattleLog("Вы принимаете защитную стойку!");
+    
     // Player defends - reduced damage from enemy
     setBattleState(prev => prev ? {
       ...prev,
       turn: 'enemy'
     } : null);
     
-    addDamageText(0, 'player', 'defend');
-    addBattleLog("Вы принимаете защитную стойку!");
-    
     // Enemy attacks with reduced damage
     setTimeout(() => {
-      const enemyDamage = Math.floor(battleState.enemy.damage * 0.5);
-      const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+      console.log('Enemy attacks with reduced damage');
+      const reducedDamage = Math.floor(enemyDamage * 0.5);
+      const newPlayerHealth = Math.max(0, player.health - reducedDamage);
       
       setPlayer(prev => ({
         ...prev,
@@ -435,8 +450,8 @@ const RPGGame = () => {
         turn: 'player'
       } : null);
       
-      addDamageText(enemyDamage, 'player', 'damage');
-      addBattleLog(`${battleState.enemy.name} атакует, но вы блокируете часть урона! Получено ${enemyDamage} урона!`);
+      addDamageText(reducedDamage, 'player', 'damage');
+      addBattleLog(`${enemyName} атакует, но вы блокируете часть урона! Получено ${reducedDamage} урона!`);
       
       // Check if player is defeated
       if (newPlayerHealth <= 0) {
@@ -499,16 +514,22 @@ const RPGGame = () => {
 
   // Handle battle flee
   const handleBattleFlee = useCallback(() => {
+    console.log('Attempting to flee from battle');
     addBattleLog("Вы пытаетесь сбежать...");
     
     // 70% chance to successfully flee
     if (Math.random() < 0.7) {
       addBattleLog("Вы успешно сбегаете из боя!");
       setTimeout(() => {
+        console.log('Successfully fled, ending battle');
         handleBattleEnd();
       }, 1000);
     } else {
       addBattleLog("Побег не удался! Враг атакует!");
+      
+      // Store enemy info
+      const enemyName = battleState?.enemy.name || 'Враг';
+      const enemyDamage = battleState?.enemy.damage || 5;
       
       // Enemy gets a free attack
       setBattleState(prev => prev ? {
@@ -517,30 +538,28 @@ const RPGGame = () => {
       } : null);
       
       setTimeout(() => {
-        if (battleState) {
-          const enemyDamage = battleState.enemy.damage;
-          const newPlayerHealth = Math.max(0, player.health - enemyDamage);
-          
-          setPlayer(prev => ({
-            ...prev,
-            health: newPlayerHealth
-          }));
-          
-          setBattleState(prev => prev ? {
-            ...prev,
-            turn: 'player'
-          } : null);
-          
-          addDamageText(enemyDamage, 'player', 'damage');
-          addBattleLog(`${battleState.enemy.name} атакует и наносит ${enemyDamage} урона!`);
-          
-          // Check if player is defeated
-          if (newPlayerHealth <= 0) {
-            addBattleLog("Вы падаете без сознания...");
-            setTimeout(() => {
-              setGameScreen('battle-defeat');
-            }, 1500);
-          }
+        console.log('Failed flee, enemy attacks');
+        const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+        
+        setPlayer(prev => ({
+          ...prev,
+          health: newPlayerHealth
+        }));
+        
+        setBattleState(prev => prev ? {
+          ...prev,
+          turn: 'player'
+        } : null);
+        
+        addDamageText(enemyDamage, 'player', 'damage');
+        addBattleLog(`${enemyName} атакует и наносит ${enemyDamage} урона!`);
+        
+        // Check if player is defeated
+        if (newPlayerHealth <= 0) {
+          addBattleLog("Вы падаете без сознания...");
+          setTimeout(() => {
+            setGameScreen('battle-defeat');
+          }, 1500);
         }
       }, 1000);
     }

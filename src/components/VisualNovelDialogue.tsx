@@ -110,7 +110,7 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
     const isQuestTrigger = (
       (npc.type === 'elder' && option.player === 'Конечно, помогу.') ||
       (npc.type === 'merchant' && option.player === 'Договорились.') ||
-      (npc.type === 'blacksmith' && option.player === 'Договорились.')
+      (npc.type === 'blacksmith' && option.player === 'Согласен помочь!')
     );
 
     // After player speaks, NPC responds

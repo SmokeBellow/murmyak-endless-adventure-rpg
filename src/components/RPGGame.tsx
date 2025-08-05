@@ -391,17 +391,13 @@ const RPGGame = () => {
     // Enemy attacks after delay
     setTimeout(() => {
       console.log('Enemy counterattack');
-      const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+      const currentPlayerHealth = player.health;
+      const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamage);
       
       setPlayer(prev => ({
         ...prev,
         health: newPlayerHealth
       }));
-      
-      setBattleState(prev => prev ? {
-        ...prev,
-        turn: 'player'
-      } : null);
       
       addDamageText(enemyDamage, 'player', 'damage');
       addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
@@ -412,7 +408,13 @@ const RPGGame = () => {
         setTimeout(() => {
           setGameScreen('battle-defeat');
         }, 1500);
+        return;
       }
+      
+      setBattleState(prev => prev ? {
+        ...prev,
+        turn: 'player'
+      } : null);
     }, 1000);
   }, [battleState, player.equipment.weapon, player.health, addDamageText, addBattleLog]);
 
@@ -437,18 +439,14 @@ const RPGGame = () => {
     // Enemy attacks with reduced damage
     setTimeout(() => {
       console.log('Enemy attacks with reduced damage');
+      const currentPlayerHealth = player.health;
       const reducedDamage = Math.floor(enemyDamage * 0.5);
-      const newPlayerHealth = Math.max(0, player.health - reducedDamage);
+      const newPlayerHealth = Math.max(0, currentPlayerHealth - reducedDamage);
       
       setPlayer(prev => ({
         ...prev,
         health: newPlayerHealth
       }));
-      
-      setBattleState(prev => prev ? {
-        ...prev,
-        turn: 'player'
-      } : null);
       
       addDamageText(reducedDamage, 'player', 'damage');
       addBattleLog(`${enemyName} атакует, но вы блокируете часть урона! Получено ${reducedDamage} урона!`);
@@ -459,7 +457,13 @@ const RPGGame = () => {
         setTimeout(() => {
           setGameScreen('battle-defeat');
         }, 1500);
+        return;
       }
+      
+      setBattleState(prev => prev ? {
+        ...prev,
+        turn: 'player'
+      } : null);
     }, 1000);
   }, [battleState, addDamageText, addBattleLog, player.health]);
 

@@ -268,6 +268,42 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return false;
   };
 
+  // Check if player is near fountain for interaction
+  const isNearFountain = () => {
+    if (currentLocation === 'village') {
+      const distance = Math.sqrt(
+        Math.pow(400 - player.position.x, 2) + 
+        Math.pow(400 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
+  // Check if player is near coal mine for interaction
+  const isNearCoalMine = () => {
+    if (currentLocation === 'abandoned-mines') {
+      const distance = Math.sqrt(
+        Math.pow(400 - player.position.x, 2) + 
+        Math.pow(400 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
+  // Check if player is near ore mine for interaction
+  const isNearOreMine = () => {
+    if (currentLocation === 'abandoned-mines') {
+      const distance = Math.sqrt(
+        Math.pow(600 - player.position.x, 2) + 
+        Math.pow(500 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
   // Get walking animation frame for down direction
   const getWalkDownFrame = () => {
     const frames = ['walk_down1.png', 'walk_down2.png', 'walk_down3.png'];
@@ -311,15 +347,28 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           <>
             {/* Fountain */}
             <div
-              className="absolute bg-blue-500 rounded-full border-4 border-blue-400 shadow-lg cursor-pointer hover:bg-blue-400 transition-colors"
+              className="absolute"
               style={{
                 left: 380,
                 top: 380,
-                width: 40,
-                height: 40,
               }}
-              title="Фонтан исцеления"
-            />
+            >
+              <div
+                className="bg-blue-500 rounded-full border-4 border-blue-400 shadow-lg cursor-pointer hover:bg-blue-400 transition-colors"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+                title="Фонтан исцеления"
+              />
+              
+              {/* E prompt when player is near */}
+              {isNearFountain() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
+            </div>
             
             {/* Portal to mines */}
             <div
@@ -354,27 +403,53 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           <>
             {/* Coal mine */}
             <div
-              className="absolute bg-gray-700 rounded-lg border-2 border-gray-600 shadow-lg cursor-pointer hover:bg-gray-600 transition-colors"
+              className="absolute"
               style={{
                 left: 380,
                 top: 380,
-                width: 40,
-                height: 40,
               }}
-              title="Угольная шахта"
-            />
+            >
+              <div
+                className="bg-gray-700 rounded-lg border-2 border-gray-600 shadow-lg cursor-pointer hover:bg-gray-600 transition-colors"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+                title="Угольная шахта"
+              />
+              
+              {/* E prompt when player is near */}
+              {isNearCoalMine() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
+            </div>
             
             {/* Ore mine */}
             <div
-              className="absolute bg-amber-600 rounded-lg border-2 border-amber-500 shadow-lg cursor-pointer hover:bg-amber-500 transition-colors"
+              className="absolute"
               style={{
                 left: 580,
                 top: 480,
-                width: 40,
-                height: 40,
               }}
-              title="Рудная жила"
-            />
+            >
+              <div
+                className="bg-amber-600 rounded-lg border-2 border-amber-500 shadow-lg cursor-pointer hover:bg-amber-500 transition-colors"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+                title="Рудная жила"
+              />
+              
+              {/* E prompt when player is near */}
+              {isNearOreMine() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
+            </div>
             
             {/* Return portal */}
             <div

@@ -532,22 +532,35 @@ const RPGGame = () => {
       const key = event.key.toLowerCase();
       pressedKeys.add(key);
       
-      if (key === 'e' && selectedNPC === null && activeMenu === 'none') {
+      // E key for interaction (both English and Russian layout)
+      if ((key === 'e' || key === 'у') && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
         
-        // Check if player is near any NPC
-        const nearbyNPC = npcsRef.current.find(npc => {
-          const distance = Math.sqrt(
-            Math.pow(npc.position.x - playerRef.current.position.x, 2) + 
-            Math.pow(npc.position.y - playerRef.current.position.y, 2)
+        // Check if player is near any NPC (only in village)
+        if (currentLocation === 'village') {
+          const nearbyNPC = npcsRef.current.find(npc => {
+            const distance = Math.sqrt(
+              Math.pow(npc.position.x - playerRef.current.position.x, 2) + 
+              Math.pow(npc.position.y - playerRef.current.position.y, 2)
+            );
+            return distance < 80;
+          });
+          
+          if (nearbyNPC) {
+            setSelectedNPC(nearbyNPC);
+            setShowVisualNovel(true);
+            return;
+          }
+          
+          // Check if player is near fountain (only in village)
+          const fountainDistance = Math.sqrt(
+            Math.pow(400 - playerRef.current.position.x, 2) + 
+            Math.pow(400 - playerRef.current.position.y, 2)
           );
-          return distance < 80;
-        });
-        
-        if (nearbyNPC) {
-          setSelectedNPC(nearbyNPC);
-          setShowVisualNovel(true);
-          return;
+          if (fountainDistance < 80) {
+            handleFountainUse();
+            return;
+          }
         }
         
         // Check if player is near portal
@@ -561,6 +574,27 @@ const RPGGame = () => {
             return;
           }
         } else if (currentLocation === 'abandoned-mines') {
+          // Check for coal mine
+          const coalMineDistance = Math.sqrt(
+            Math.pow(400 - playerRef.current.position.x, 2) + 
+            Math.pow(400 - playerRef.current.position.y, 2)
+          );
+          if (coalMineDistance < 80) {
+            handleCoalMineInteract();
+            return;
+          }
+          
+          // Check for ore mine
+          const oreMineDistance = Math.sqrt(
+            Math.pow(600 - playerRef.current.position.x, 2) + 
+            Math.pow(500 - playerRef.current.position.y, 2)
+          );
+          if (oreMineDistance < 80) {
+            handleCoalMineInteract(); // Reuse coal mining interface for ore
+            return;
+          }
+          
+          // Check for return portal
           const portalDistance = Math.sqrt(
             Math.pow(200 - playerRef.current.position.x, 2) + 
             Math.pow(400 - playerRef.current.position.y, 2)
@@ -586,19 +620,20 @@ const RPGGame = () => {
       let deltaY = 0;
       let newDirection = playerRef.current.direction;
       
-      if (pressedKeys.has('arrowup') || pressedKeys.has('w')) {
+      // Movement keys (English and Russian layout)
+      if (pressedKeys.has('arrowup') || pressedKeys.has('w') || pressedKeys.has('ц')) {
         deltaY = -speed;
         newDirection = 'up';
       }
-      if (pressedKeys.has('arrowdown') || pressedKeys.has('s')) {
+      if (pressedKeys.has('arrowdown') || pressedKeys.has('s') || pressedKeys.has('ы')) {
         deltaY = speed;
         newDirection = 'down';
       }
-      if (pressedKeys.has('arrowleft') || pressedKeys.has('a')) {
+      if (pressedKeys.has('arrowleft') || pressedKeys.has('a') || pressedKeys.has('ф')) {
         deltaX = -speed;
         newDirection = 'left';
       }
-      if (pressedKeys.has('arrowright') || pressedKeys.has('d')) {
+      if (pressedKeys.has('arrowright') || pressedKeys.has('d') || pressedKeys.has('в')) {
         deltaX = speed;
         newDirection = 'right';
       }

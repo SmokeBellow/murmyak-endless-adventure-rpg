@@ -124,7 +124,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         className="absolute"
         style={{
           left: 0,
-          top: -64,
+          top: -34,
           width: mapWidth,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',

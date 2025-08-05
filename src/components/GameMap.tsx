@@ -159,10 +159,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           height: mapHeight,
           backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: 'auto 64px',
+          backgroundSize: '64px 64px',
           imageRendering: 'pixelated',
-          transform: 'rotate(90deg)',
-          transformOrigin: '32px 32px',
           zIndex: 10
         }}
       />
@@ -177,10 +175,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           height: mapHeight,
           backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: 'auto 64px',
+          backgroundSize: '64px 64px',
           imageRendering: 'pixelated',
-          transform: 'rotate(90deg)',
-          transformOrigin: '32px 32px',
           zIndex: 10
         }}
       />

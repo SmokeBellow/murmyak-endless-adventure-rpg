@@ -367,11 +367,14 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         <div 
           className="absolute inset-0 pointer-events-none z-40"
           style={{
-            background: `radial-gradient(circle 120px at ${50 + (cameraOffsetX + player.position.x * zoomLevel) / window.innerWidth * 100}% ${50 + (cameraOffsetY + player.position.y * zoomLevel) / window.innerHeight * 100}%, 
+            background: `radial-gradient(circle 150px at 50% 50%, 
               transparent 0%, 
-              rgba(0, 0, 0, 0.2) 40%, 
-              rgba(0, 0, 0, 0.7) 80%, 
-              rgba(0, 0, 0, 0.9) 100%)`,
+              transparent 20%, 
+              rgba(0, 0, 0, 0.3) 40%, 
+              rgba(0, 0, 0, 0.6) 60%, 
+              rgba(0, 0, 0, 0.85) 80%, 
+              rgba(0, 0, 0, 0.95) 100%)`,
+            transform: `translate(${-player.position.x + window.innerWidth/2}px, ${-player.position.y + window.innerHeight/2}px)`,
           }}
         />
       )}

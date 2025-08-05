@@ -365,16 +365,20 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       {/* Mine darkness overlay - only for abandoned-mines location */}
       {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
         <div 
-          className="absolute inset-0 pointer-events-none z-40"
+          className="absolute pointer-events-none z-40"
           style={{
-            background: `radial-gradient(circle 150px at 50% 50%, 
-              transparent 0%, 
-              transparent 20%, 
-              rgba(0, 0, 0, 0.3) 40%, 
-              rgba(0, 0, 0, 0.6) 60%, 
-              rgba(0, 0, 0, 0.85) 80%, 
-              rgba(0, 0, 0, 0.95) 100%)`,
-            transform: `translate(${-player.position.x + window.innerWidth/2}px, ${-player.position.y + window.innerHeight/2}px)`,
+            left: 0,
+            top: 0,
+            width: mapWidth,
+            height: mapHeight,
+            background: `radial-gradient(circle 150px at ${player.position.x}px ${player.position.y}px, 
+              rgba(255, 200, 100, 0.3) 0%, 
+              rgba(255, 180, 80, 0.1) 15%, 
+              transparent 30%, 
+              rgba(0, 0, 0, 0.4) 50%, 
+              rgba(0, 0, 0, 0.7) 70%, 
+              rgba(0, 0, 0, 0.9) 100%)`,
+            transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           }}
         />
       )}

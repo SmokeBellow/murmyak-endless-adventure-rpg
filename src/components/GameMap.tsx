@@ -149,6 +149,36 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         }}
       />
 
+      {/* Left village boundary - fence */}
+      <div 
+        className="absolute"
+        style={{
+          left: -64,
+          top: 0,
+          width: 64,
+          height: mapHeight,
+          backgroundImage: 'url(/chastokol_side.png)',
+          backgroundRepeat: 'repeat-y',
+          backgroundSize: '64px auto',
+          imageRendering: 'pixelated'
+        }}
+      />
+
+      {/* Right village boundary - fence */}
+      <div 
+        className="absolute"
+        style={{
+          left: mapWidth,
+          top: 0,
+          width: 64,
+          height: mapHeight,
+          backgroundImage: 'url(/chastokol_side.png)',
+          backgroundRepeat: 'repeat-y',
+          backgroundSize: '64px auto',
+          imageRendering: 'pixelated'
+        }}
+      />
+
       {/* Merchant House */}
       <div
         className="absolute bg-amber-800 border-2 border-amber-900 rounded shadow-lg"

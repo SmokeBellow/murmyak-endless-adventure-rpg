@@ -161,6 +161,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
           imageRendering: 'pixelated',
+          transform: 'rotate(90deg)',
+          transformOrigin: 'center',
           zIndex: 10
         }}
       />
@@ -177,6 +179,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
           imageRendering: 'pixelated',
+          transform: 'rotate(90deg)',
+          transformOrigin: 'center',
           zIndex: 10
         }}
       />

@@ -153,7 +153,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       <div 
         className="absolute"
         style={{
-          left: -64,
+          left: 0,
           top: 0,
           width: 64,
           height: mapHeight,
@@ -168,7 +168,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       <div 
         className="absolute"
         style={{
-          left: mapWidth,
+          left: mapWidth - 64,
           top: 0,
           width: 64,
           height: mapHeight,

@@ -403,24 +403,31 @@ const RPGGame = () => {
     // Enemy attacks after delay
     setTimeout(() => {
       console.log('Enemy counterattack');
-      const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamage);
       
-      setPlayer(prev => ({
-        ...prev,
-        health: newPlayerHealth
-      }));
+      setPlayer(prev => {
+        const newPlayerHealth = Math.max(0, prev.health - enemyDamage);
+        console.log('Player health before:', prev.health, 'damage:', enemyDamage, 'after:', newPlayerHealth);
+        return {
+          ...prev,
+          health: newPlayerHealth
+        };
+      });
       
       addDamageText(enemyDamage, 'player', 'damage');
       addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
       
-      // Check if player is defeated
-      if (newPlayerHealth <= 0) {
-        addBattleLog("Вы падаете без сознания...");
-        setTimeout(() => {
-          setGameScreen('battle-defeat');
-        }, 1500);
-        return;
-      }
+      // Check if player is defeated using a ref to get current health
+      setTimeout(() => {
+        setPlayer(current => {
+          if (current.health <= 0) {
+            addBattleLog("Вы падаете без сознания...");
+            setTimeout(() => {
+              setGameScreen('battle-defeat');
+            }, 1500);
+          }
+          return current;
+        });
+      }, 100);
       
       setBattleState(prev => prev ? {
         ...prev,
@@ -614,17 +621,21 @@ const RPGGame = () => {
     }, 500);
   }, [handleBattleEnd, toast]);
 
-  // Handle battle victory
-  const handleBattleVictory = useCallback(() => {
-    handleBattleEnd();
-  }, [handleBattleEnd]);
-
   // Enemy system (only in abandoned mines)
-  const { enemies, attackEnemy } = useEnemySystem({
+  const { enemies, attackEnemy, removeEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
     onBattleStart: handleBattleStart
   });
+
+  // Handle battle victory
+  const handleBattleVictory = useCallback(() => {
+    // Remove defeated enemy from the map and schedule respawn
+    if (battleState) {
+      removeEnemy(battleState.enemy.id);
+    }
+    handleBattleEnd();
+  }, [handleBattleEnd, battleState, removeEnemy]);
 
   // Handle enemy attack
   const handleEnemyClick = useCallback((enemy: Enemy) => {

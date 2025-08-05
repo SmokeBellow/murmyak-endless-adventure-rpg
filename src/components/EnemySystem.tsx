@@ -235,5 +235,113 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart }: En
     );
   }, []);
 
-  return { enemies, attackEnemy };
+  const removeEnemy = useCallback((enemyId: string) => {
+    setEnemies(prev => prev.filter(enemy => enemy.id !== enemyId));
+    
+    // Respawn after 5 minutes (300000ms)
+    setTimeout(() => {
+      setEnemies(prev => {
+        // Check if enemy is already respawned
+        if (prev.find(e => e.id === enemyId)) return prev;
+        
+        // Find original enemy data by id and respawn it
+        const originalEnemies: Enemy[] = [
+          {
+            id: 'bat-1',
+            name: 'Летучая мышь',
+            type: 'bat',
+            position: { x: 300, y: 300 },
+            spawnPosition: { x: 300, y: 300 },
+            targetPosition: { x: 300, y: 300 },
+            isMoving: false,
+            direction: 'down',
+            health: 30,
+            maxHealth: 30,
+            damage: 8,
+            speed: 1.5,
+            attackRange: 50,
+            aggressionRange: 100,
+            wanderRadius: 50,
+            lastAttack: 0,
+            attackCooldown: 2000,
+            isAttacking: false,
+            isDead: false
+          },
+          {
+            id: 'bat-2',
+            name: 'Летучая мышь',
+            type: 'bat',
+            position: { x: 500, y: 600 },
+            spawnPosition: { x: 500, y: 600 },
+            targetPosition: { x: 500, y: 600 },
+            isMoving: false,
+            direction: 'down',
+            health: 30,
+            maxHealth: 30,
+            damage: 8,
+            speed: 1.5,
+            attackRange: 50,
+            aggressionRange: 100,
+            wanderRadius: 50,
+            lastAttack: 0,
+            attackCooldown: 2000,
+            isAttacking: false,
+            isDead: false
+          },
+          {
+            id: 'rat-1',
+            name: 'Крыса',
+            type: 'rat',
+            position: { x: 700, y: 400 },
+            spawnPosition: { x: 700, y: 400 },
+            targetPosition: { x: 700, y: 400 },
+            isMoving: false,
+            direction: 'down',
+            health: 20,
+            maxHealth: 20,
+            damage: 5,
+            speed: 1.2,
+            attackRange: 40,
+            aggressionRange: 80,
+            wanderRadius: 30,
+            lastAttack: 0,
+            attackCooldown: 1500,
+            isAttacking: false,
+            isDead: false
+          },
+          {
+            id: 'rat-2',
+            name: 'Крыса',
+            type: 'rat',
+            position: { x: 200, y: 500 },
+            spawnPosition: { x: 200, y: 500 },
+            targetPosition: { x: 200, y: 500 },
+            isMoving: false,
+            direction: 'down',
+            health: 20,
+            maxHealth: 20,
+            damage: 5,
+            speed: 1.2,
+            attackRange: 40,
+            aggressionRange: 80,
+            wanderRadius: 30,
+            lastAttack: 0,
+            attackCooldown: 1500,
+            isAttacking: false,
+            isDead: false
+          }
+        ];
+        
+        const enemyToRespawn = originalEnemies.find(e => e.id === enemyId);
+        if (enemyToRespawn) {
+          console.log(`Respawning enemy ${enemyId}`);
+          return [...prev, enemyToRespawn];
+        }
+        
+        return prev;
+      });
+    }, 300000); // 5 minutes
+  }, []);
+
+  return { enemies, attackEnemy, removeEnemy };
 };

@@ -151,38 +151,38 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Left village boundary - fence */}
       <div 
-        className="absolute bg-red-500"
+        className="absolute"
         style={{
           left: 0,
           top: 0,
           width: 64,
           height: mapHeight,
-          backgroundImage: 'url("/chastokol_side.png")',
+          backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: '64px auto',
+          backgroundSize: 'auto 64px',
           imageRendering: 'pixelated',
-          zIndex: 10,
-          border: '2px solid yellow'
+          transform: 'rotate(90deg)',
+          transformOrigin: '32px 32px',
+          zIndex: 10
         }}
-        onClick={() => console.log('Left fence clicked!')}
       />
 
       {/* Right village boundary - fence */}
       <div 
-        className="absolute bg-blue-500"
+        className="absolute"
         style={{
           left: mapWidth - 64,
           top: 0,
           width: 64,
           height: mapHeight,
-          backgroundImage: 'url("/chastokol_side.png")',
+          backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: '64px auto',
+          backgroundSize: 'auto 64px',
           imageRendering: 'pixelated',
-          zIndex: 10,
-          border: '2px solid yellow'
+          transform: 'rotate(90deg)',
+          transformOrigin: '32px 32px',
+          zIndex: 10
         }}
-        onClick={() => console.log('Right fence clicked!', 'mapWidth:', mapWidth)}
       />
 
       {/* Merchant House */}

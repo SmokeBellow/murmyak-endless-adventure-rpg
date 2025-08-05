@@ -1092,9 +1092,6 @@ const RPGGame = () => {
       
       if (deltaX !== 0 || deltaY !== 0) {
         handleJoystickMove({ x: deltaX, y: deltaY });
-      } else {
-        // Stop animation when not moving
-        setPlayer(prev => ({ ...prev, isMoving: false }));
       }
     };
 

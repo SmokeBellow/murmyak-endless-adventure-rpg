@@ -288,8 +288,8 @@ const RPGGame = () => {
 
   // Battle system
   const handleBattleStart = useCallback((enemy: Enemy) => {
-    // Don't start battle if already in battle
-    if (battleState || gameScreen === 'battle') return;
+    // Don't start battle if already in battle or not in abandoned mines
+    if (battleState || gameScreen === 'battle' || currentLocation !== 'abandoned-mines') return;
     
     console.log('Starting battle with', enemy.name, 'health:', enemy.health);
     

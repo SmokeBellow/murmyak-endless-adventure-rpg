@@ -123,6 +123,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
 
   // Enemy AI update loop
   useEffect(() => {
+    if (isInBattle) return; // Don't update enemy AI during battle
+
     const updateInterval = setInterval(() => {
       setEnemies(prevEnemies => 
         prevEnemies.map(enemy => {
@@ -131,14 +133,14 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
           const distanceToPlayer = getDistance(enemy.position, player.position);
           const now = Date.now();
 
-          // Check if player is in attack range - start battle (only if not already in battle)
-          if (distanceToPlayer <= enemy.attackRange && !isInBattle) {
+          // Check if player is in attack range - start battle
+          if (distanceToPlayer <= enemy.attackRange) {
             onBattleStart(enemy);
             return enemy;
           }
           
-          // Check if player is in aggression range - chase player (continue even during battle)
-          if (distanceToPlayer <= enemy.aggressionRange && !isInBattle) {
+          // Check if player is in aggression range - chase player
+          if (distanceToPlayer <= enemy.aggressionRange) {
             const dx = player.position.x - enemy.position.x;
             const dy = player.position.y - enemy.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -218,7 +220,7 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
     }, 50); // Update every 50ms for smooth movement
 
     return () => clearInterval(updateInterval);
-  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart, isInBattle]);
+  }, [player.position, getDistance, getRandomWanderPosition, onBattleStart, isInBattle]);
 
   const attackEnemy = useCallback((enemyId: string, damage: number) => {
     setEnemies(prev => 

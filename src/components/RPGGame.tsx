@@ -25,6 +25,8 @@ const RPGGame = () => {
   const isMobile = useIsMobile();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+  const [damageTexts, setDamageTexts] = useState<any[]>([]);
+  const [battleLog, setBattleLog] = useState<string[]>([]);
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showVisualNovel, setShowVisualNovel] = useState(false);
@@ -291,11 +293,29 @@ const RPGGame = () => {
       turn: 'player'
     });
     setGameScreen('battle');
+    setBattleLog([`Бой с ${enemy.name} начинается!`]);
+    setDamageTexts([]);
   }, [player, currentLocation]);
 
   const handleBattleEnd = useCallback(() => {
     setBattleState(null);
     setGameScreen('game');
+    setBattleLog([]);
+    setDamageTexts([]);
+  }, []);
+
+  const addDamageText = useCallback((amount: number, target: 'player' | 'enemy', type: 'damage' | 'heal' | 'defend' = 'damage') => {
+    const id = Date.now().toString() + Math.random().toString();
+    setDamageTexts(prev => [...prev, { id, amount, target, type }]);
+    
+    // Remove damage text after animation
+    setTimeout(() => {
+      setDamageTexts(prev => prev.filter(dt => dt.id !== id));
+    }, 2000);
+  }, []);
+
+  const addBattleLog = useCallback((message: string) => {
+    setBattleLog(prev => [...prev, message]);
   }, []);
 
   const handleBattleAttack = useCallback(() => {
@@ -307,37 +327,40 @@ const RPGGame = () => {
     
     const newEnemyHealth = Math.max(0, battleState.enemy.health - totalDamage);
     
+    // Update battle state with new enemy health
+    const updatedBattleState = {
+      ...battleState,
+      enemy: { ...battleState.enemy, health: newEnemyHealth }
+    };
+    
+    setBattleState(updatedBattleState);
+    addDamageText(totalDamage, 'enemy', 'damage');
+    addBattleLog(`Вы атакуете ${battleState.enemy.name} и наносите ${totalDamage} урона!`);
+    
     if (newEnemyHealth <= 0) {
       // Enemy defeated
-      handleBattleEnd();
-      setPlayer(prev => ({
-        ...prev,
-        experience: prev.experience + 10,
-        coins: prev.coins + 5
-      }));
-      toast({
-        title: "Победа!",
-        description: `Вы победили ${battleState.enemy.name}!`,
-      });
+      addBattleLog(`${battleState.enemy.name} повержен!`);
+      setTimeout(() => {
+        handleBattleEnd();
+        setPlayer(prev => ({
+          ...prev,
+          experience: prev.experience + 10,
+          coins: prev.coins + 5
+        }));
+      }, 1500);
       return;
     }
     
     // Enemy's turn
     setBattleState(prev => prev ? {
       ...prev,
-      enemy: { ...prev.enemy, health: newEnemyHealth },
       turn: 'enemy'
     } : null);
     
-    toast({
-      title: "Атака!",
-      description: `Вы нанесли ${totalDamage} урона!`,
-    });
-    
     // Enemy attacks after delay
     setTimeout(() => {
-      if (battleState) {
-        const enemyDamage = battleState.enemy.damage;
+      if (updatedBattleState) {
+        const enemyDamage = updatedBattleState.enemy.damage;
         setPlayer(prev => ({
           ...prev,
           health: Math.max(0, prev.health - enemyDamage)
@@ -347,15 +370,12 @@ const RPGGame = () => {
           ...prev,
           turn: 'player'
         } : null);
-
-        toast({
-          title: "Противник атакует!",
-          description: `Вы получили ${enemyDamage} урона!`,
-          variant: "destructive"
-        });
+        
+        addDamageText(enemyDamage, 'player', 'damage');
+        addBattleLog(`${updatedBattleState.enemy.name} атакует вас и наносит ${enemyDamage} урона!`);
       }
     }, 1000);
-  }, [battleState, handleBattleEnd, player.equipment.weapon, toast]);
+  }, [battleState, handleBattleEnd, player.equipment.weapon, addDamageText, addBattleLog]);
 
   const handleBattleDefend = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
@@ -366,10 +386,8 @@ const RPGGame = () => {
       turn: 'enemy'
     } : null);
     
-    toast({
-      title: "Защита!",
-      description: "Вы принимаете защитную стойку!",
-    });
+    addDamageText(0, 'player', 'defend');
+    addBattleLog("Вы принимаете защитную стойку!");
     
     // Enemy attacks with reduced damage
     setTimeout(() => {
@@ -384,30 +402,27 @@ const RPGGame = () => {
           ...prev,
           turn: 'player'
         } : null);
-
-        toast({
-          title: "Заблокировано!",
-          description: `Вы заблокировали атаку! Получено ${enemyDamage} урона!`,
-        });
+        
+        addDamageText(enemyDamage, 'player', 'damage');
+        addBattleLog(`${battleState.enemy.name} атакует, но вы блокируете часть урона! Получено ${enemyDamage} урона!`);
       }
     }, 1000);
-  }, [battleState, toast]);
+  }, [battleState, addDamageText, addBattleLog]);
 
   const handleBattleUseItem = useCallback((item: Item) => {
     if (!battleState || battleState.turn !== 'player') return;
     
     // Use item logic
     if (item.name === 'Зелье здоровья') {
+      const healAmount = 50;
       setPlayer(prev => ({
         ...prev,
-        health: Math.min(prev.maxHealth, prev.health + 50),
+        health: Math.min(prev.maxHealth, prev.health + healAmount),
         inventory: prev.inventory.filter(invItem => invItem.id !== item.id)
       }));
       
-      toast({
-        title: "Предмет использован!",
-        description: "Вы восстановили 50 здоровья!",
-      });
+      addDamageText(healAmount, 'player', 'heal');
+      addBattleLog(`Вы используете ${item.name} и восстанавливаете ${healAmount} здоровья!`);
     }
     
     // Enemy's turn
@@ -428,15 +443,12 @@ const RPGGame = () => {
           ...prev,
           turn: 'player'
         } : null);
-
-        toast({
-          title: "Противник атакует!",
-          description: `Вы получили ${enemyDamage} урона!`,
-          variant: "destructive"
-        });
+        
+        addDamageText(enemyDamage, 'player', 'damage');
+        addBattleLog(`${battleState.enemy.name} атакует и наносит ${enemyDamage} урона!`);
       }
     }, 1000);
-  }, [battleState, toast]);
+  }, [battleState, addDamageText, addBattleLog]);
 
   // Enemy system (only in abandoned mines)
   const { enemies, attackEnemy } = useEnemySystem({
@@ -1106,6 +1118,8 @@ const RPGGame = () => {
         onDefend={handleBattleDefend}
         onUseItem={handleBattleUseItem}
         onBattleEnd={handleBattleEnd}
+        damageTexts={damageTexts}
+        battleLog={battleLog}
       />
     );
   }

@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BattleState, Item } from '@/types/gameTypes';
+
+interface DamageText {
+  id: string;
+  amount: number;
+  target: 'player' | 'enemy';
+  type: 'damage' | 'heal' | 'defend';
+}
 
 interface BattleScreenProps {
   battleState: BattleState;
@@ -10,6 +17,8 @@ interface BattleScreenProps {
   onDefend: () => void;
   onUseItem: (item: Item) => void;
   onBattleEnd: () => void;
+  damageTexts: DamageText[];
+  battleLog: string[];
 }
 
 export const BattleScreen = ({ 
@@ -17,7 +26,9 @@ export const BattleScreen = ({
   onAttack, 
   onDefend, 
   onUseItem, 
-  onBattleEnd 
+  onBattleEnd,
+  damageTexts,
+  battleLog
 }: BattleScreenProps) => {
   const { player, enemy, location } = battleState;
   
@@ -42,7 +53,7 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <img 
             src="/player_image.png" 
             alt="Player" 
@@ -61,10 +72,31 @@ export const BattleScreen = ({
               <div className="text-sm">{player.health}/{player.maxHealth} HP</div>
             </div>
           </div>
+          
+          {/* Player Damage Texts */}
+          {damageTexts
+            .filter(dt => dt.target === 'player')
+            .map(damageText => (
+              <div
+                key={damageText.id}
+                className={`absolute top-8 -right-16 text-2xl font-bold animate-bounce pointer-events-none z-10 ${
+                  damageText.type === 'damage' ? 'text-red-500' : 
+                  damageText.type === 'heal' ? 'text-green-500' : 'text-blue-500'
+                }`}
+                style={{
+                  animation: 'float-up 2s ease-out forwards'
+                }}
+              >
+                {damageText.type === 'damage' ? '-' : damageText.type === 'heal' ? '+' : ''}
+                {damageText.amount}
+                {damageText.type === 'defend' && ' DEF'}
+              </div>
+            ))
+          }
         </div>
 
         {/* Enemy Image - Right */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <div className="w-48 h-48 bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center">
             <span className="text-white text-sm">Enemy Image</span>
           </div>
@@ -78,13 +110,47 @@ export const BattleScreen = ({
               <div className="text-sm">{enemy.health}/{enemy.maxHealth} HP</div>
             </div>
           </div>
+          
+          {/* Enemy Damage Texts */}
+          {damageTexts
+            .filter(dt => dt.target === 'enemy')
+            .map(damageText => (
+              <div
+                key={damageText.id}
+                className={`absolute top-8 -left-16 text-2xl font-bold animate-bounce pointer-events-none z-10 ${
+                  damageText.type === 'damage' ? 'text-red-500' : 
+                  damageText.type === 'heal' ? 'text-green-500' : 'text-blue-500'
+                }`}
+                style={{
+                  animation: 'float-up 2s ease-out forwards'
+                }}
+              >
+                {damageText.type === 'damage' ? '-' : damageText.type === 'heal' ? '+' : ''}
+                {damageText.amount}
+              </div>
+            ))
+          }
         </div>
       </div>
 
+      {/* Custom CSS for floating animation */}
+      <style>{`
+        @keyframes float-up {
+          0% {
+            opacity: 1;
+            transform: translateY(0px);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-50px);
+          }
+        }
+      `}</style>
+
       {/* Battle UI - 1/3 of screen */}
-      <div className="h-1/3 bg-gray-800 p-4 flex">
-        {/* Action Buttons - Left half */}
-        <div className="w-1/2 pr-4">
+      <div className="h-1/3 bg-gray-800 p-4 flex gap-4">
+        {/* Action Buttons - Left 1/3 */}
+        <div className="w-1/3">
           <h3 className="text-white text-lg font-bold mb-4">Действия</h3>
           <div className="space-y-3">
             <Button 
@@ -113,10 +179,10 @@ export const BattleScreen = ({
           </div>
         </div>
 
-        {/* Inventory Items - Right half */}
-        <div className="w-1/2 pl-4">
+        {/* Inventory Items - Middle 1/3 */}
+        <div className="w-1/3">
           <h3 className="text-white text-lg font-bold mb-4">Предметы</h3>
-          <div className="grid grid-cols-4 gap-2 max-h-32 overflow-y-auto">
+          <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto">
             {consumableItems.map((item) => (
               <Card 
                 key={item.id}
@@ -126,17 +192,33 @@ export const BattleScreen = ({
                 <img 
                   src={item.icon} 
                   alt={item.name}
-                  className="w-8 h-8 object-contain mx-auto"
+                  className="w-6 h-6 object-contain mx-auto"
                 />
-                <div className="text-xs text-white text-center mt-1">
+                <div className="text-xs text-white text-center mt-1 truncate">
                   {item.name}
                 </div>
               </Card>
             ))}
           </div>
           {consumableItems.length === 0 && (
-            <div className="text-gray-400 text-sm">Нет доступных предметов</div>
+            <div className="text-gray-400 text-sm">Нет предметов</div>
           )}
+        </div>
+
+        {/* Battle Log - Right 1/3 */}
+        <div className="w-1/3">
+          <h3 className="text-white text-lg font-bold mb-4">Лог боя</h3>
+          <div className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm">
+            {battleLog.length === 0 ? (
+              <div className="text-gray-400">Бой начинается...</div>
+            ) : (
+              battleLog.slice(-10).map((log, index) => (
+                <div key={index} className="text-gray-300 mb-1">
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

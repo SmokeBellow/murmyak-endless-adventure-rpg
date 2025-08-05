@@ -555,6 +555,17 @@ const RPGGame = () => {
       addBattleLog("Вы успешно сбегаете из боя!");
       setTimeout(() => {
         console.log('Successfully fled, ending battle');
+        
+        // Move player to a safe position away from enemies
+        if (currentLocation === 'abandoned-mines') {
+          // Move to entrance area of mines (safe zone)
+          setPlayer(prev => ({
+            ...prev,
+            position: { x: 200, y: 200 },
+            targetPosition: { x: 200, y: 200 }
+          }));
+        }
+        
         handleBattleEnd();
       }, 1000);
     } else {

@@ -250,6 +250,24 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
     return distance < 80;
   };
 
+  // Check if player is near portal for interaction
+  const isNearPortal = () => {
+    if (currentLocation === 'village') {
+      const distance = Math.sqrt(
+        Math.pow(700 - player.position.x, 2) + 
+        Math.pow(300 - player.position.y, 2)
+      );
+      return distance < 80;
+    } else if (currentLocation === 'abandoned-mines') {
+      const distance = Math.sqrt(
+        Math.pow(200 - player.position.x, 2) + 
+        Math.pow(400 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
   // Get walking animation frame for down direction
   const getWalkDownFrame = () => {
     const frames = ['walk_down1.png', 'walk_down2.png', 'walk_down3.png'];
@@ -305,16 +323,29 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             
             {/* Portal to mines */}
             <div
-              className="absolute bg-purple-600 rounded-full border-4 border-purple-400 shadow-lg cursor-pointer hover:bg-purple-500 transition-colors animate-pulse"
+              className="absolute"
               style={{
                 left: 680,
                 top: 280,
-                width: 40,
-                height: 40,
               }}
-              title="Портал в заброшенные шахты"
             >
-              <div className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping" />
+              <div
+                className="bg-purple-600 rounded-full border-4 border-purple-400 shadow-lg cursor-pointer hover:bg-purple-500 transition-colors animate-pulse"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+                title="Портал в заброшенные шахты"
+              >
+                <div className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping" />
+              </div>
+              
+              {/* E prompt when player is near */}
+              {isNearPortal() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
             </div>
           </>
         )}
@@ -347,16 +378,29 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
             
             {/* Return portal */}
             <div
-              className="absolute bg-green-600 rounded-full border-4 border-green-400 shadow-lg cursor-pointer hover:bg-green-500 transition-colors animate-pulse"
+              className="absolute"
               style={{
                 left: 180,
                 top: 380,
-                width: 40,
-                height: 40,
               }}
-              title="Портал обратно в деревню"
             >
-              <div className="absolute inset-0 rounded-full bg-green-400/50 animate-ping" />
+              <div
+                className="bg-green-600 rounded-full border-4 border-green-400 shadow-lg cursor-pointer hover:bg-green-500 transition-colors animate-pulse"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+                title="Портал обратно в деревню"
+              >
+                <div className="absolute inset-0 rounded-full bg-green-400/50 animate-ping" />
+              </div>
+              
+              {/* E prompt when player is near */}
+              {isNearPortal() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
             </div>
           </>
         )}

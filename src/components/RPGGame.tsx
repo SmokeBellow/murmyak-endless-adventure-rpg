@@ -534,6 +534,7 @@ const RPGGame = () => {
       
       if (key === 'e' && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
+        
         // Check if player is near any NPC
         const nearbyNPC = npcsRef.current.find(npc => {
           const distance = Math.sqrt(
@@ -546,6 +547,28 @@ const RPGGame = () => {
         if (nearbyNPC) {
           setSelectedNPC(nearbyNPC);
           setShowVisualNovel(true);
+          return;
+        }
+        
+        // Check if player is near portal
+        if (currentLocation === 'village') {
+          const portalDistance = Math.sqrt(
+            Math.pow(700 - playerRef.current.position.x, 2) + 
+            Math.pow(300 - playerRef.current.position.y, 2)
+          );
+          if (portalDistance < 80) {
+            handlePortalUse();
+            return;
+          }
+        } else if (currentLocation === 'abandoned-mines') {
+          const portalDistance = Math.sqrt(
+            Math.pow(200 - playerRef.current.position.x, 2) + 
+            Math.pow(400 - playerRef.current.position.y, 2)
+          );
+          if (portalDistance < 80) {
+            handlePortalUse();
+            return;
+          }
         }
       }
     };

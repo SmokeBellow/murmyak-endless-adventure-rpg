@@ -4,9 +4,10 @@ import { Enemy, Player } from '@/types/gameTypes';
 interface EnemySystemProps {
   player: Player;
   onPlayerTakeDamage: (damage: number) => void;
+  onBattleStart: (enemy: Enemy) => void;
 }
 
-export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps) => {
+export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart }: EnemySystemProps) => {
   const [enemies, setEnemies] = useState<Enemy[]>([]);
 
   // Initialize enemies when component mounts
@@ -26,7 +27,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
         maxHealth: 30,
         damage: 8,
         speed: 1.5,
-        attackRange: 100,
+        attackRange: 50,
+        aggressionRange: 100,
         wanderRadius: 50,
         lastAttack: 0,
         attackCooldown: 2000,
@@ -46,7 +48,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
         maxHealth: 30,
         damage: 8,
         speed: 1.5,
-        attackRange: 100,
+        attackRange: 50,
+        aggressionRange: 100,
         wanderRadius: 50,
         lastAttack: 0,
         attackCooldown: 2000,
@@ -67,7 +70,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
         maxHealth: 25,
         damage: 5,
         speed: 1.2,
-        attackRange: 100,
+        attackRange: 40,
+        aggressionRange: 70,
         wanderRadius: 50,
         lastAttack: 0,
         attackCooldown: 1500,
@@ -87,7 +91,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
         maxHealth: 25,
         damage: 5,
         speed: 1.2,
-        attackRange: 100,
+        attackRange: 40,
+        aggressionRange: 70,
         wanderRadius: 50,
         lastAttack: 0,
         attackCooldown: 1500,
@@ -125,20 +130,14 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
           const distanceToPlayer = getDistance(enemy.position, player.position);
           const now = Date.now();
 
-          // Check if player is in attack range
+          // Check if player is in attack range - start battle
           if (distanceToPlayer <= enemy.attackRange) {
-            // Attack the player if cooldown is over
-            if (now - enemy.lastAttack >= enemy.attackCooldown) {
-              onPlayerTakeDamage(enemy.damage);
-              return {
-                ...enemy,
-                lastAttack: now,
-                isAttacking: true,
-                targetPosition: player.position
-              };
-            }
-            
-            // Chase the player
+            onBattleStart(enemy);
+            return enemy;
+          }
+          
+          // Check if player is in aggression range - chase player
+          if (distanceToPlayer <= enemy.aggressionRange) {
             const dx = player.position.x - enemy.position.x;
             const dy = player.position.y - enemy.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -218,7 +217,7 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage }: EnemySystemProps)
     }, 50); // Update every 50ms for smooth movement
 
     return () => clearInterval(updateInterval);
-  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage]);
+  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart]);
 
   const attackEnemy = useCallback((enemyId: string, damage: number) => {
     setEnemies(prev => 

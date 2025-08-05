@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType, Enemy } from '@/types/gameTypes';
+import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType, Enemy, BattleState } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,11 +18,13 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
+import { BattleScreen } from './BattleScreen';
 
 const RPGGame = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
+  const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [activeMenu, setActiveMenu] = useState<MenuType>('none');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showVisualNovel, setShowVisualNovel] = useState(false);
@@ -279,10 +281,168 @@ const RPGGame = () => {
     });
   }, [toast]);
 
+  // Battle system
+  const handleBattleStart = useCallback((enemy: Enemy) => {
+    setBattleState({
+      player,
+      enemy,
+      location: currentLocation,
+      playerAction: null,
+      turn: 'player'
+    });
+    setGameScreen('battle');
+  }, [player, currentLocation]);
+
+  const handleBattleEnd = useCallback(() => {
+    setBattleState(null);
+    setGameScreen('game');
+  }, []);
+
+  const handleBattleAttack = useCallback(() => {
+    if (!battleState || battleState.turn !== 'player') return;
+    
+    // Player attacks enemy
+    const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
+    const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4));
+    
+    const newEnemyHealth = Math.max(0, battleState.enemy.health - totalDamage);
+    
+    if (newEnemyHealth <= 0) {
+      // Enemy defeated
+      handleBattleEnd();
+      setPlayer(prev => ({
+        ...prev,
+        experience: prev.experience + 10,
+        coins: prev.coins + 5
+      }));
+      toast({
+        title: "Победа!",
+        description: `Вы победили ${battleState.enemy.name}!`,
+      });
+      return;
+    }
+    
+    // Enemy's turn
+    setBattleState(prev => prev ? {
+      ...prev,
+      enemy: { ...prev.enemy, health: newEnemyHealth },
+      turn: 'enemy'
+    } : null);
+    
+    toast({
+      title: "Атака!",
+      description: `Вы нанесли ${totalDamage} урона!`,
+    });
+    
+    // Enemy attacks after delay
+    setTimeout(() => {
+      if (battleState) {
+        const enemyDamage = battleState.enemy.damage;
+        setPlayer(prev => ({
+          ...prev,
+          health: Math.max(0, prev.health - enemyDamage)
+        }));
+        
+        setBattleState(prev => prev ? {
+          ...prev,
+          turn: 'player'
+        } : null);
+
+        toast({
+          title: "Противник атакует!",
+          description: `Вы получили ${enemyDamage} урона!`,
+          variant: "destructive"
+        });
+      }
+    }, 1000);
+  }, [battleState, handleBattleEnd, player.equipment.weapon, toast]);
+
+  const handleBattleDefend = useCallback(() => {
+    if (!battleState || battleState.turn !== 'player') return;
+    
+    // Player defends - reduced damage from enemy
+    setBattleState(prev => prev ? {
+      ...prev,
+      turn: 'enemy'
+    } : null);
+    
+    toast({
+      title: "Защита!",
+      description: "Вы принимаете защитную стойку!",
+    });
+    
+    // Enemy attacks with reduced damage
+    setTimeout(() => {
+      if (battleState) {
+        const enemyDamage = Math.floor(battleState.enemy.damage * 0.5);
+        setPlayer(prev => ({
+          ...prev,
+          health: Math.max(0, prev.health - enemyDamage)
+        }));
+        
+        setBattleState(prev => prev ? {
+          ...prev,
+          turn: 'player'
+        } : null);
+
+        toast({
+          title: "Заблокировано!",
+          description: `Вы заблокировали атаку! Получено ${enemyDamage} урона!`,
+        });
+      }
+    }, 1000);
+  }, [battleState, toast]);
+
+  const handleBattleUseItem = useCallback((item: Item) => {
+    if (!battleState || battleState.turn !== 'player') return;
+    
+    // Use item logic
+    if (item.name === 'Зелье здоровья') {
+      setPlayer(prev => ({
+        ...prev,
+        health: Math.min(prev.maxHealth, prev.health + 50),
+        inventory: prev.inventory.filter(invItem => invItem.id !== item.id)
+      }));
+      
+      toast({
+        title: "Предмет использован!",
+        description: "Вы восстановили 50 здоровья!",
+      });
+    }
+    
+    // Enemy's turn
+    setBattleState(prev => prev ? {
+      ...prev,
+      turn: 'enemy'
+    } : null);
+    
+    setTimeout(() => {
+      if (battleState) {
+        const enemyDamage = battleState.enemy.damage;
+        setPlayer(prev => ({
+          ...prev,
+          health: Math.max(0, prev.health - enemyDamage)
+        }));
+        
+        setBattleState(prev => prev ? {
+          ...prev,
+          turn: 'player'
+        } : null);
+
+        toast({
+          title: "Противник атакует!",
+          description: `Вы получили ${enemyDamage} урона!`,
+          variant: "destructive"
+        });
+      }
+    }, 1000);
+  }, [battleState, toast]);
+
   // Enemy system (only in abandoned mines)
   const { enemies, attackEnemy } = useEnemySystem({
     player,
-    onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {}
+    onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
+    onBattleStart: handleBattleStart
   });
 
   // Handle enemy attack
@@ -936,6 +1096,19 @@ const RPGGame = () => {
       description: "Вы добыли железную руду!",
     });
   }, [resourceNodes.ore.count, quests, player.inventory, toast]);
+
+  // Render battle screen if in battle mode
+  if (gameScreen === 'battle' && battleState) {
+    return (
+      <BattleScreen
+        battleState={battleState}
+        onAttack={handleBattleAttack}
+        onDefend={handleBattleDefend}
+        onUseItem={handleBattleUseItem}
+        onBattleEnd={handleBattleEnd}
+      />
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">

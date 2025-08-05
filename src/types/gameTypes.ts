@@ -87,6 +87,7 @@ export interface Enemy {
   damage: number;
   speed: number;
   attackRange: number;
+  aggressionRange: number;
   wanderRadius: number;
   lastAttack: number;
   attackCooldown: number;
@@ -94,6 +95,14 @@ export interface Enemy {
   isDead: boolean;
 }
 
-export type GameScreen = 'intro' | 'game';
+export type GameScreen = 'intro' | 'game' | 'battle';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';
 export type LocationType = 'village' | 'abandoned-mines';
+
+export interface BattleState {
+  player: Player;
+  enemy: Enemy;
+  location: LocationType;
+  playerAction: 'attack' | 'defend' | 'item' | null;
+  turn: 'player' | 'enemy';
+}

@@ -138,12 +138,7 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
         }
       }
 
-      // Auto-close if this is the end of the dialogue branch
-      if (!hasMoreOptions) {
-        setTimeout(() => {
-          onClose();
-        }, 2500);
-      }
+      // No auto-close, let user manually close via button
     }, 1500);
   };
 
@@ -211,20 +206,32 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
         {/* Player Text or Options - Bottom half */}
         <div className="h-1/2 flex flex-col justify-center space-y-2 pt-2">
           {dialogueState.showOptions && dialogueState.currentSpeaker === 'npc' ? (
-            // Show player options
+            // Show player options or end dialogue button
             <>
-              <div className="text-sm text-gray-400">Выберите ответ:</div>
+              <div className="text-sm text-gray-400">
+                {dialogueState.currentOptions.length > 0 ? 'Выберите ответ:' : ''}
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                {dialogueState.currentOptions.map((option, index) => (
+                {dialogueState.currentOptions.length > 0 ? (
+                  dialogueState.currentOptions.map((option, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
+                      onClick={() => handlePlayerChoice(option)}
+                    >
+                      {option.player}
+                    </Button>
+                  ))
+                ) : (
                   <Button
-                    key={index}
                     variant="outline"
-                    className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
-                    onClick={() => handlePlayerChoice(option)}
+                    className="col-span-2 bg-red-500/20 border-red-500/50 text-white hover:bg-red-500/30 transition-all duration-200"
+                    onClick={onClose}
                   >
-                    {option.player}
+                    Уйти
                   </Button>
-                ))}
+                )}
               </div>
             </>
           ) : displayedPlayerText ? (

@@ -123,8 +123,6 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
 
   // Enemy AI update loop
   useEffect(() => {
-    if (isInBattle) return; // Don't update enemy AI during battle
-
     const updateInterval = setInterval(() => {
       setEnemies(prevEnemies => 
         prevEnemies.map(enemy => {
@@ -133,8 +131,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
           const distanceToPlayer = getDistance(enemy.position, player.position);
           const now = Date.now();
 
-          // Check if player is in attack range - start battle
-          if (distanceToPlayer <= enemy.attackRange) {
+          // Check if player is in attack range - start battle (only if not already in battle)
+          if (distanceToPlayer <= enemy.attackRange && !isInBattle) {
             onBattleStart(enemy);
             return enemy;
           }
@@ -220,7 +218,7 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
     }, 50); // Update every 50ms for smooth movement
 
     return () => clearInterval(updateInterval);
-  }, [player.position, getDistance, getRandomWanderPosition, onBattleStart, isInBattle]);
+  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart, isInBattle]);
 
   const attackEnemy = useCallback((enemyId: string, damage: number) => {
     setEnemies(prev => 

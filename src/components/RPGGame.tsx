@@ -208,6 +208,30 @@ const RPGGame = () => {
               icon: '⚔️'
             }]
           }
+        },
+        {
+          id: 'ore-mining',
+          title: 'Добыть руду',
+          description: 'Найди 3 куска руды в заброшенных шахтах для кузнеца.',
+          status: 'available',
+          giver: 'blacksmith',
+          repeatable: false,
+          objectives: [
+            { description: 'Найти 3 куска руды в заброшенных шахтах (0/3)', completed: false },
+            { description: 'Вернись к кузнецу с рудой', completed: false }
+          ],
+          rewards: {
+            experience: 100,
+            items: [{
+              id: 'iron-sword',
+              name: 'Железный меч',
+              type: 'weapon',
+              slot: 'weapon',
+              stats: { damage: 15 },
+              description: 'Качественный железный меч',
+              icon: '/sword.png'
+            }]
+          }
         }
       ]
     }
@@ -364,6 +388,32 @@ const RPGGame = () => {
         );
         const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
         setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
+      }
+
+      // Handle ore quest completion
+      const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
+      const oreCount = player.inventory.filter(item => item.id === 'ore').length;
+      
+      if (oreQuest && oreCount >= 3) {
+        // Remove 3 ore from inventory
+        let removedOre = 0;
+        setPlayer(prev => ({
+          ...prev,
+          inventory: prev.inventory.filter(item => {
+            if (item.id === 'ore' && removedOre < 3) {
+              removedOre++;
+              return false;
+            }
+            return true;
+          })
+        }));
+        
+        // Update quest objective
+        const updatedObjectives = oreQuest.objectives.map(obj => 
+          obj.description === 'Вернись к кузнецу с рудой' ? { ...obj, completed: true } : obj
+        );
+        const updatedQuest = { ...oreQuest, objectives: updatedObjectives };
+        setQuests(prev => [...prev.filter(q => q.id !== oreQuest.id), updatedQuest]);
       }
     }
     
@@ -648,10 +698,41 @@ const RPGGame = () => {
 
   const handleMineCoal = useCallback(() => {
     const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
+    const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
     const hasCoal = player.inventory.some(item => item.id === 'coal');
+    const oreCount = player.inventory.filter(item => item.id === 'ore').length;
     
-    if (coalQuest && !hasCoal) {
-      // Add coal to inventory
+    // Check which mine the player clicked based on location and position
+    const isNearOreMine = Math.sqrt(Math.pow(600 - player.position.x, 2) + Math.pow(500 - player.position.y, 2)) < 80;
+    
+    if (oreQuest && isNearOreMine && oreCount < 3) {
+      // Add ore to inventory
+      const ore = {
+        id: 'ore',
+        name: 'Железная руда',
+        type: 'misc' as const,
+        description: 'Кусок железной руды высокого качества',
+        icon: '⛏️'
+      };
+      
+      setPlayer(prev => ({
+        ...prev,
+        inventory: [...prev.inventory, ore]
+      }));
+      
+      // Update quest objective
+      const newOreCount = oreCount + 1;
+      const updatedObjectives = oreQuest.objectives.map(obj => 
+        obj.description.includes('Найти 3 куска руды') 
+          ? { ...obj, description: `Найти 3 куска руды в заброшенных шахтах (${newOreCount}/3)`, completed: newOreCount >= 3 }
+          : obj
+      );
+      const updatedQuest = { ...oreQuest, objectives: updatedObjectives };
+      setQuests(prev => [...prev.filter(q => q.id !== oreQuest.id), updatedQuest]);
+      
+      setShowCoalMining(false);
+    } else if (coalQuest && !hasCoal && !isNearOreMine) {
+      // Add coal to inventory (original coal mining logic)
       const coal = {
         id: 'coal',
         name: 'Уголь',
@@ -672,13 +753,9 @@ const RPGGame = () => {
       const updatedQuest = { ...coalQuest, objectives: updatedObjectives };
       setQuests(prev => [...prev.filter(q => q.id !== coalQuest.id), updatedQuest]);
       
-      // Coal mined silently
-      
       setShowCoalMining(false);
-    } else {
-      // Cannot mine coal silently
     }
-  }, [quests, player.inventory]);
+  }, [quests, player.inventory, player.position]);
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
@@ -910,7 +987,10 @@ const RPGGame = () => {
         <CoalMining
           onClose={() => setShowCoalMining(false)}
           onMineCoal={handleMineCoal}
-          canMine={quests.some(q => q.id === 'find-coal' && q.status === 'active') && !player.inventory.some(item => item.id === 'coal')}
+          canMine={
+            (quests.some(q => q.id === 'find-coal' && q.status === 'active') && !player.inventory.some(item => item.id === 'coal')) ||
+            (quests.some(q => q.id === 'ore-mining' && q.status === 'active') && player.inventory.filter(item => item.id === 'ore').length < 3)
+          }
         />
       )}
 

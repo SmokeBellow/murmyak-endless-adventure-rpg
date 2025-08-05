@@ -67,6 +67,15 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
         return;
       }
       
+      // Check if clicking on ore mine in abandoned mines
+      const oreMineDistance = Math.sqrt(Math.pow(600 - clickX, 2) + Math.pow(500 - clickY, 2));
+      const playerToOreMineDistance = Math.sqrt(Math.pow(600 - player.position.x, 2) + Math.pow(500 - player.position.y, 2));
+      if (oreMineDistance < 40 && playerToOreMineDistance < 80) {
+        console.log('Ore mine clicked!');
+        onCoalMineInteract(); // Reuse coal mining interface for ore
+        return;
+      }
+      
       // Check if clicking on return portal
       const portalDistance = Math.sqrt(Math.pow(200 - clickX, 2) + Math.pow(400 - clickY, 2));
       const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
@@ -278,6 +287,79 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
       >
         {/* Render location-specific content */}
         {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
+        
+        {/* Special objects */}
+        {currentLocation === 'village' && (
+          <>
+            {/* Fountain */}
+            <div
+              className="absolute bg-blue-500 rounded-full border-4 border-blue-400 shadow-lg cursor-pointer hover:bg-blue-400 transition-colors"
+              style={{
+                left: 380,
+                top: 380,
+                width: 40,
+                height: 40,
+              }}
+              title="Фонтан исцеления"
+            />
+            
+            {/* Portal to mines */}
+            <div
+              className="absolute bg-purple-600 rounded-full border-4 border-purple-400 shadow-lg cursor-pointer hover:bg-purple-500 transition-colors animate-pulse"
+              style={{
+                left: 680,
+                top: 280,
+                width: 40,
+                height: 40,
+              }}
+              title="Портал в заброшенные шахты"
+            >
+              <div className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping" />
+            </div>
+          </>
+        )}
+        
+        {currentLocation === 'abandoned-mines' && (
+          <>
+            {/* Coal mine */}
+            <div
+              className="absolute bg-gray-700 rounded-lg border-2 border-gray-600 shadow-lg cursor-pointer hover:bg-gray-600 transition-colors"
+              style={{
+                left: 380,
+                top: 380,
+                width: 40,
+                height: 40,
+              }}
+              title="Угольная шахта"
+            />
+            
+            {/* Ore mine */}
+            <div
+              className="absolute bg-amber-600 rounded-lg border-2 border-amber-500 shadow-lg cursor-pointer hover:bg-amber-500 transition-colors"
+              style={{
+                left: 580,
+                top: 480,
+                width: 40,
+                height: 40,
+              }}
+              title="Рудная жила"
+            />
+            
+            {/* Return portal */}
+            <div
+              className="absolute bg-green-600 rounded-full border-4 border-green-400 shadow-lg cursor-pointer hover:bg-green-500 transition-colors animate-pulse"
+              style={{
+                left: 180,
+                top: 380,
+                width: 40,
+                height: 40,
+              }}
+              title="Портал обратно в деревню"
+            >
+              <div className="absolute inset-0 rounded-full bg-green-400/50 animate-ping" />
+            </div>
+          </>
+        )}
         
         {/* Render NPCs */}
         {npcs.map(npc => (

@@ -327,15 +327,18 @@ const RPGGame = () => {
     
     console.log('Battle attack started, enemy health:', battleState.enemy.health);
     
-    // Store enemy name and damage before state update
-    const enemyName = battleState.enemy.name;
-    const enemyDamage = battleState.enemy.damage;
+    // Store all battle data before any state updates
+    const currentBattleState = battleState;
+    const enemyName = currentBattleState.enemy.name;
+    const enemyDamage = currentBattleState.enemy.damage;
+    const currentEnemyHealth = currentBattleState.enemy.health;
+    const currentPlayerHealth = player.health;
     
     // Player attacks enemy
     const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
     const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4));
     
-    const newEnemyHealth = Math.max(0, battleState.enemy.health - totalDamage);
+    const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
     
     console.log('Damage dealt:', totalDamage, 'New enemy health:', newEnemyHealth);
     
@@ -381,17 +384,20 @@ const RPGGame = () => {
       return;
     }
     
-    // Update battle state with new enemy health
-    setBattleState(prev => prev ? {
-      ...prev,
-      enemy: { ...prev.enemy, health: newEnemyHealth },
-      turn: 'enemy'
-    } : null);
+    // Update battle state with new enemy health IMMEDIATELY
+    setBattleState(prev => {
+      const newState = prev ? {
+        ...prev,
+        enemy: { ...prev.enemy, health: newEnemyHealth },
+        turn: 'enemy' as const
+      } : null;
+      console.log('Updated battle state, new enemy health:', newState?.enemy.health);
+      return newState;
+    });
     
     // Enemy attacks after delay
     setTimeout(() => {
       console.log('Enemy counterattack');
-      const currentPlayerHealth = player.health;
       const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamage);
       
       setPlayer(prev => ({
@@ -413,7 +419,7 @@ const RPGGame = () => {
       
       setBattleState(prev => prev ? {
         ...prev,
-        turn: 'player'
+        turn: 'player' as const
       } : null);
     }, 1000);
   }, [battleState, player.equipment.weapon, player.health, addDamageText, addBattleLog]);
@@ -516,8 +522,10 @@ const RPGGame = () => {
     }, 1000);
   }, [battleState, addDamageText, addBattleLog, player.health]);
 
-  // Handle battle flee
+  // Handle battle flee - can be used at any time
   const handleBattleFlee = useCallback(() => {
+    if (!battleState) return;
+    
     console.log('Attempting to flee from battle');
     addBattleLog("Вы пытаетесь сбежать...");
     
@@ -531,29 +539,21 @@ const RPGGame = () => {
     } else {
       addBattleLog("Побег не удался! Враг атакует!");
       
-      // Store enemy info
-      const enemyName = battleState?.enemy.name || 'Враг';
-      const enemyDamage = battleState?.enemy.damage || 5;
+      // Store enemy info before state updates
+      const currentBattleState = battleState;
+      const enemyName = currentBattleState.enemy.name;
+      const enemyDamage = currentBattleState.enemy.damage;
+      const currentPlayerHealth = player.health;
       
       // Enemy gets a free attack
-      setBattleState(prev => prev ? {
-        ...prev,
-        turn: 'enemy'
-      } : null);
-      
       setTimeout(() => {
         console.log('Failed flee, enemy attacks');
-        const newPlayerHealth = Math.max(0, player.health - enemyDamage);
+        const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamage);
         
         setPlayer(prev => ({
           ...prev,
           health: newPlayerHealth
         }));
-        
-        setBattleState(prev => prev ? {
-          ...prev,
-          turn: 'player'
-        } : null);
         
         addDamageText(enemyDamage, 'player', 'damage');
         addBattleLog(`${enemyName} атакует и наносит ${enemyDamage} урона!`);
@@ -564,7 +564,14 @@ const RPGGame = () => {
           setTimeout(() => {
             setGameScreen('battle-defeat');
           }, 1500);
+          return;
         }
+        
+        // Set turn back to player
+        setBattleState(prev => prev ? {
+          ...prev,
+          turn: 'player'
+        } : null);
       }, 1000);
     }
   }, [battleState, handleBattleEnd, addBattleLog, addDamageText, player.health]);

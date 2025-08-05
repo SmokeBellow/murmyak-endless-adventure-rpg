@@ -405,8 +405,8 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           </>
         )}
         
-        {/* Render NPCs */}
-        {npcs.map(npc => (
+        {/* Render NPCs only in village */}
+        {currentLocation === 'village' && npcs.map(npc => (
           <div
             key={npc.id}
             className="absolute"

@@ -151,7 +151,7 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
 
       {/* Left village boundary - fence */}
       <div 
-        className="absolute"
+        className="absolute bg-red-500"
         style={{
           left: 0,
           top: 0,
@@ -161,13 +161,15 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
           imageRendering: 'pixelated',
-          zIndex: 10
+          zIndex: 10,
+          border: '2px solid yellow'
         }}
+        onClick={() => console.log('Left fence clicked!')}
       />
 
       {/* Right village boundary - fence */}
       <div 
-        className="absolute"
+        className="absolute bg-blue-500"
         style={{
           left: mapWidth - 64,
           top: 0,
@@ -177,8 +179,10 @@ const GameMap = ({ player, npcs, onNPCInteract, onFountainUse, onCoalMineInterac
           backgroundRepeat: 'repeat-y',
           backgroundSize: '64px auto',
           imageRendering: 'pixelated',
-          zIndex: 10
+          zIndex: 10,
+          border: '2px solid yellow'
         }}
+        onClick={() => console.log('Right fence clicked!', 'mapWidth:', mapWidth)}
       />
 
       {/* Merchant House */}

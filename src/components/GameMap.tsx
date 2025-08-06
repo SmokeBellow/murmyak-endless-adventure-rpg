@@ -652,8 +652,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                : player.direction === 'up' ? `/${getWalkUpFrame()}`
                : player.direction === 'left' ? `/${getWalkSideFrame()}`
                : player.direction === 'right' ? `/${getWalkSideFrame()}`
-               : "/walk_up2.png")
-            : "/walk_up2.png"
+               : "/player.png")
+            : (player.direction === 'down' ? "/walk_down2.png"
+               : player.direction === 'up' ? "/walk_up2.png"
+               : player.direction === 'left' ? "/walk_side2.png"
+               : player.direction === 'right' ? "/walk_side2.png"
+               : "/player.png")
         }
         alt="Player"
         className="fixed w-8 h-8 shadow-glow z-30 transition-[left,top] duration-150 ease-out"

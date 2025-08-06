@@ -3,6 +3,7 @@ import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { addItemsToInventory, removeItemFromInventory, getTotalItemQuantity } from '@/utils/inventory';
 import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
@@ -76,7 +77,10 @@ const RPGGame = () => {
       name: 'Зелье здоровья',
       type: 'consumable',
       description: 'Восстанавливает 50 единиц здоровья',
-      icon: '/healthpotion.png'
+      icon: '/healthpotion.png',
+      stackable: true,
+      maxStack: 10,
+      quantity: 1
     }
   ];
 
@@ -362,11 +366,13 @@ const RPGGame = () => {
       // Random loot chance
       if (Math.random() < 0.3) { // 30% chance for loot
         lootItems.push({
-          id: 'health-potion-' + Date.now(),
+          id: 'health-potion',
           name: 'Зелье здоровья',
           type: 'consumable',
           description: 'Восстанавливает 50 единиц здоровья',
-          icon: '/healthpotion.png'
+          icon: '/healthpotion.png',
+          stackable: true,
+          maxStack: 10
         });
       }
       
@@ -383,7 +389,7 @@ const RPGGame = () => {
           ...prev,
           experience: prev.experience + experienceGained,
           coins: prev.coins + coinsGained,
-          inventory: [...prev.inventory, ...lootItems]
+          inventory: addItemsToInventory(prev.inventory, lootItems)
         }));
       }, 1500);
       return;
@@ -494,7 +500,7 @@ const RPGGame = () => {
       setPlayer(prev => ({
         ...prev,
         health: Math.min(prev.maxHealth, prev.health + healAmount),
-        inventory: prev.inventory.filter(invItem => invItem.id !== item.id)
+        inventory: removeItemFromInventory(prev.inventory, item.id, 1)
       }));
       
       addDamageText(healAmount, 'player', 'heal');
@@ -825,13 +831,13 @@ const RPGGame = () => {
       
       // Handle coal quest completion
       const coalQuest = quests.find(q => q.id === 'find-coal' && q.status === 'active');
-      const hasCoal = player.inventory.some(item => item.id === 'coal');
+      const hasCoal = getTotalItemQuantity(player.inventory, 'Уголь') > 0;
       
       if (coalQuest && hasCoal) {
         // Remove coal from inventory
         setPlayer(prev => ({
           ...prev,
-          inventory: prev.inventory.filter(item => item.id !== 'coal')
+          inventory: removeItemFromInventory(prev.inventory, 'coal', 1)
         }));
         
         // Update quest objective
@@ -844,20 +850,13 @@ const RPGGame = () => {
 
       // Handle ore quest completion
       const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
-      const oreCount = player.inventory.filter(item => item.id === 'ore').length;
+      const oreCount = getTotalItemQuantity(player.inventory, 'Железная руда');
       
       if (oreQuest && oreCount >= 3) {
         // Remove 3 ore from inventory
-        let removedOre = 0;
         setPlayer(prev => ({
           ...prev,
-          inventory: prev.inventory.filter(item => {
-            if (item.id === 'ore' && removedOre < 3) {
-              removedOre++;
-              return false;
-            }
-            return true;
-          })
+          inventory: removeItemFromInventory(prev.inventory, 'ore', 3)
         }));
         
         // Update quest objective
@@ -877,14 +876,14 @@ const RPGGame = () => {
 
     setPlayer(prev => {
       const newEquipment = { ...prev.equipment };
-      const newInventory = prev.inventory.filter(invItem => invItem.id !== item.id);
+      let newInventory = removeItemFromInventory(prev.inventory, item.id, 1);
       
       // If there's already an item in this slot, move it to inventory
       if (newEquipment[item.slot]) {
-        newInventory.push(newEquipment[item.slot]!);
+        newInventory = addItemsToInventory(newInventory, [newEquipment[item.slot]!]);
       }
       
-      newEquipment[item.slot] = item;
+      newEquipment[item.slot] = { ...item, quantity: 1 };
 
       return {
         ...prev,
@@ -925,7 +924,7 @@ const RPGGame = () => {
       ...prev,
       experience: prev.experience + quest.rewards.experience,
       coins: prev.coins + (quest.rewards.coins || 0),
-      inventory: [...prev.inventory, ...(quest.rewards.items || [])]
+      inventory: addItemsToInventory(prev.inventory, quest.rewards.items || [])
     }));
     
     // Show quest reward modal
@@ -1219,12 +1218,14 @@ const RPGGame = () => {
       name: 'Уголь',
       type: 'misc' as const,
       description: 'Высококачественный уголь для кузнечных работ',
-      icon: '🪨'
+      icon: '🪨',
+      stackable: true,
+      maxStack: 10
     };
-    
+
     setPlayer(prev => ({
       ...prev,
-      inventory: [...prev.inventory, coal]
+      inventory: addItemsToInventory(prev.inventory, [coal])
     }));
 
     // Decrease resource count
@@ -1263,12 +1264,14 @@ const RPGGame = () => {
       name: 'Железная руда',
       type: 'misc' as const,
       description: 'Кусок железной руды высокого качества',
-      icon: '⛏️'
+      icon: '⛏️',
+      stackable: true,
+      maxStack: 10
     };
-    
+
     setPlayer(prev => ({
       ...prev,
-      inventory: [...prev.inventory, ore]
+      inventory: addItemsToInventory(prev.inventory, [ore])
     }));
 
     // Decrease resource count
@@ -1283,7 +1286,7 @@ const RPGGame = () => {
     // Update quest objective if exists
     const oreQuest = quests.find(q => q.id === 'ore-mining' && q.status === 'active');
     if (oreQuest) {
-      const oreCount = player.inventory.filter(item => item.id === 'ore').length + 1; // +1 for the one we just added
+      const oreCount = getTotalItemQuantity(player.inventory, 'Железная руда') + 1; // +1 for the one we just added
       const updatedObjectives = oreQuest.objectives.map(obj => 
         obj.description.includes('Найти 3 куска руды') 
           ? { ...obj, description: `Найти 3 куска руды в заброшенных шахтах (${oreCount}/3)`, completed: oreCount >= 3 }

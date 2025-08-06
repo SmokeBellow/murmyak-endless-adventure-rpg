@@ -10,18 +10,28 @@ interface InventoryMenuProps {
 }
 
 const InventoryMenu = ({ player, onClose, onEquipItem }: InventoryMenuProps) => {
-  const renderInventoryItem = (item: Item) => (
+const renderInventoryItem = (item: Item) => (
     <div key={item.id} className="flex items-center justify-between p-3 bg-card/80 border border-border rounded-lg hover:bg-card transition-colors">
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 flex items-center justify-center">
+        <div className="w-8 h-8 flex items-center justify-center relative">
           {item.icon.startsWith('/') ? (
             <img src={item.icon} alt={item.name} className="w-full h-full object-contain" />
           ) : (
             <span className="text-2xl">{item.icon}</span>
           )}
+          {item.quantity && item.quantity > 1 && (
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              {item.quantity}
+            </span>
+          )}
         </div>
         <div className="flex-1">
-          <h4 className="font-medium text-foreground">{item.name}</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium text-foreground">{item.name}</h4>
+            {item.quantity && item.quantity > 1 && (
+              <span className="text-xs text-muted-foreground">x{item.quantity}</span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">{item.description}</p>
           {item.stats && (
             <div className="text-xs text-accent mt-1">

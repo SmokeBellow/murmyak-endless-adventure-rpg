@@ -35,6 +35,9 @@ export interface Item {
   description: string;
   icon: string;
   price?: number;
+  quantity?: number;
+  stackable?: boolean;
+  maxStack?: number;
 }
 
 export interface Equipment {

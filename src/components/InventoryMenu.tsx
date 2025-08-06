@@ -26,12 +26,7 @@ const renderInventoryItem = (item: Item) => (
           )}
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h4 className="font-medium text-foreground">{item.name}</h4>
-            {item.quantity && item.quantity > 1 && (
-              <span className="text-xs text-muted-foreground">x{item.quantity}</span>
-            )}
-          </div>
+          <h4 className="font-medium text-foreground">{item.name}</h4>
           <p className="text-xs text-muted-foreground">{item.description}</p>
           {item.stats && (
             <div className="text-xs text-accent mt-1">

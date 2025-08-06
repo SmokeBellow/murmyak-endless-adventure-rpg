@@ -196,7 +196,7 @@ export const BattleScreen = ({
             {consumableItems.map((item) => (
               <Card 
                 key={item.id}
-                className="p-2 cursor-pointer hover:bg-gray-600 transition-colors"
+                className="p-2 cursor-pointer hover:bg-gray-600 transition-colors relative"
                 onClick={() => onUseItem(item)}
               >
                 <img 
@@ -204,6 +204,11 @@ export const BattleScreen = ({
                   alt={item.name}
                   className="w-6 h-6 object-contain mx-auto"
                 />
+                {item.quantity && item.quantity > 1 && (
+                  <span className="absolute bottom-0 right-0 text-xs font-bold text-primary transform translate-x-1 translate-y-1">
+                    x{item.quantity}
+                  </span>
+                )}
                 <div className="text-xs text-white text-center mt-1 truncate">
                   {item.name}
                 </div>

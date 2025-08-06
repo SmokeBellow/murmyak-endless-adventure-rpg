@@ -20,8 +20,8 @@ const renderInventoryItem = (item: Item) => (
             <span className="text-2xl">{item.icon}</span>
           )}
           {item.quantity && item.quantity > 1 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-              {item.quantity}
+            <span className="absolute bottom-0 right-0 text-xs font-bold text-primary bg-background border border-primary rounded px-1 transform translate-x-1 translate-y-1">
+              x{item.quantity}
             </span>
           )}
         </div>

@@ -242,22 +242,6 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
       />
 
-      {/* Merchant House */}
-      <div
-        className="absolute bg-amber-800 border-2 border-amber-900 rounded shadow-lg"
-        style={{
-          left: 300,
-          top: 300,
-          width: 200,
-          height: 150,
-        }}
-      >
-        <div className="w-full h-full bg-gradient-to-b from-amber-700 to-amber-800 rounded">
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-12 bg-amber-900 rounded-t-full"></div>
-          <div className="absolute bottom-4 left-4 w-6 h-8 bg-amber-900 rounded"></div>
-          <div className="absolute bottom-4 right-4 w-6 h-8 bg-amber-900 rounded"></div>
-        </div>
-      </div>
     </>
   );
 

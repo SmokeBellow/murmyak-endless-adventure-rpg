@@ -10,6 +10,7 @@ import PlayerStats from './PlayerStats';
 import InventoryMenu from './InventoryMenu';
 import EquipmentMenu from './EquipmentMenu';
 import QuestMenu from './QuestMenu';
+import StatsMenu from './StatsMenu';
 import NPCDialogue from './NPCDialogue';
 import VisualNovelDialogue from './VisualNovelDialogue';
 import TradeMenu from './TradeMenu';
@@ -84,6 +85,13 @@ const RPGGame = () => {
     }
   ];
 
+  // Calculate unallocated points based on level
+  const calculateUnallocatedPoints = (level: number): number => {
+    let points = level - 1; // 1 point per level after level 1
+    points += Math.floor(level / 10) * 5; // 5 bonus points every 10 levels
+    return points;
+  };
+
   // Player state
   const [player, setPlayer] = useState<Player>({
     name: 'Герой',
@@ -106,6 +114,14 @@ const RPGGame = () => {
       weapon: null,
       shield: null
     },
+    stats: {
+      strength: 5,
+      agility: 5,
+      intelligence: 5,
+      constitution: 5,
+      luck: 5
+    },
+    unallocatedPoints: 0,
     questProgress: {
       visitedMerchant: false,
       usedFountain: false,
@@ -683,6 +699,53 @@ const RPGGame = () => {
 
     return () => clearInterval(regenInterval);
   }, []);
+
+  // Handle stat point allocation
+  const handleAllocatePoint = useCallback((stat: keyof Player['stats']) => {
+    if (player.unallocatedPoints <= 0) return;
+
+    setPlayer(prev => ({
+      ...prev,
+      stats: {
+        ...prev.stats,
+        [stat]: prev.stats[stat] + 1
+      },
+      unallocatedPoints: prev.unallocatedPoints - 1
+    }));
+
+    toast({
+      title: "Характеристика улучшена!",
+      description: `Увеличена характеристика: ${stat === 'strength' ? 'Сила' : stat === 'agility' ? 'Ловкость' : stat === 'intelligence' ? 'Интеллект' : stat === 'constitution' ? 'Телосложение' : 'Удача'}`,
+    });
+  }, [player.unallocatedPoints, toast]);
+
+  // Update player stats when leveling up
+  useEffect(() => {
+    const experienceForLevel = player.level * 100;
+    if (player.experience >= experienceForLevel) {
+      const newLevel = Math.floor(player.experience / 100) + 1;
+      const levelGained = newLevel - player.level;
+      
+      if (levelGained > 0) {
+        const basePoints = levelGained; // 1 point per level
+        const bonusPoints = Math.floor(newLevel / 10) * 5 - Math.floor(player.level / 10) * 5; // Bonus points for reaching level milestones
+        const totalPoints = basePoints + bonusPoints;
+        
+        setPlayer(prev => ({
+          ...prev,
+          level: newLevel,
+          unallocatedPoints: prev.unallocatedPoints + totalPoints,
+          maxHealth: prev.maxHealth + (prev.stats.constitution * 2), // Constitution affects health
+          maxMana: prev.maxMana + (prev.stats.intelligence * 1), // Intelligence affects mana
+        }));
+
+        toast({
+          title: "Повышение уровня!",
+          description: `Уровень ${newLevel}! Получено ${totalPoints} очков характеристик.`,
+        });
+      }
+    }
+  }, [player.experience, player.level, player.stats.constitution, player.stats.intelligence, toast]);
 
   // Resource nodes regeneration
   useEffect(() => {
@@ -1436,6 +1499,21 @@ const RPGGame = () => {
                 <span className="text-lg mr-3">📜</span>
                 Журнал квестов
               </Button>
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  setActiveMenu('stats');
+                }}
+              >
+                <span className="text-lg mr-3">💪</span>
+                Характеристики
+                {player.unallocatedPoints > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {player.unallocatedPoints}
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
           
@@ -1563,6 +1641,14 @@ const RPGGame = () => {
           merchant={npcs.find(npc => npc.type === 'merchant')!}
           onClose={() => setActiveMenu('none')}
           onBuyItem={handleBuyItem}
+        />
+      )}
+
+      {activeMenu === 'stats' && (
+        <StatsMenu
+          player={player}
+          onClose={() => setActiveMenu('none')}
+          onAllocatePoint={handleAllocatePoint}
         />
       )}
 

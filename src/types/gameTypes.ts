@@ -1,3 +1,11 @@
+export interface PlayerStats {
+  strength: number;
+  agility: number;
+  intelligence: number;
+  constitution: number;
+  luck: number;
+}
+
 export interface Player {
   name: string;
   position: { x: number; y: number };
@@ -13,6 +21,8 @@ export interface Player {
   coins: number;
   inventory: Item[];
   equipment: Equipment;
+  stats: PlayerStats;
+  unallocatedPoints: number;
   questProgress: {
     visitedMerchant: boolean;
     usedFountain: boolean;
@@ -99,7 +109,7 @@ export interface Enemy {
 }
 
 export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';
-export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar';
+export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar' | 'stats';
 export type LocationType = 'village' | 'abandoned-mines';
 
 export interface BattleState {

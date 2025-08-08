@@ -426,15 +426,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 380,
-                top: 380,
+                left: 360,
+                top: 360,
               }}
             >
-              <div
-                className="bg-blue-500 rounded-full border-4 border-blue-400 shadow-lg cursor-pointer hover:bg-blue-400 transition-colors"
+              <img
+                src="/fountain.png"
+                alt="Фонтан исцеления"
+                className="cursor-pointer hover:brightness-110 transition-all"
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated'
                 }}
                 title="Фонтан исцеления"
               />

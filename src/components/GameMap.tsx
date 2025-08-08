@@ -451,20 +451,21 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 680,
-                top: 280,
+                left: 660,
+                top: 260,
               }}
             >
-              <div
-                className="bg-purple-600 rounded-full border-4 border-purple-400 shadow-lg cursor-pointer hover:bg-purple-500 transition-colors animate-pulse"
+              <img
+                src="/mines_entrance.png"
+                alt="Вход в шахты"
+                className="cursor-pointer hover:brightness-110 transition-all"
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated'
                 }}
-                title="Портал в заброшенные шахты"
-              >
-                <div className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping" />
-              </div>
+                title="Вход в заброшенные шахты"
+              />
               
               {/* E prompt when player is near */}
               {isNearPortal() && (

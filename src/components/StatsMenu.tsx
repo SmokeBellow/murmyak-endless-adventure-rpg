@@ -67,24 +67,25 @@ const StatsMenu = ({ player, onClose, onAllocatePoint }: StatsMenuProps) => {
               <div key={stat} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <h4 className="font-medium">{getStatName(stat)}</h4>
-                    <span className="text-lg font-bold text-primary">
-                      {player.stats[stat]}
-                    </span>
+                    <h4 className="font-medium w-28">{getStatName(stat)}</h4>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     {getStatDescription(stat)}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={player.unallocatedPoints === 0}
-                  onClick={() => onAllocatePoint(stat)}
-                  className="ml-4"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-primary w-8 text-center">
+                    {player.stats[stat]}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={player.unallocatedPoints === 0}
+                    onClick={() => onAllocatePoint(stat)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

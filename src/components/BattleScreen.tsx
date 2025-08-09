@@ -8,14 +8,14 @@ interface DamageText {
   id: string;
   amount: number;
   target: 'player' | 'enemy';
-  type: 'damage' | 'heal' | 'defend';
+  type: 'damage' | 'heal' | 'defend' | 'skill';
 }
 
 interface BattleScreenProps {
   battleState: BattleState;
   currentPlayer: Player;
   onAttack: () => void;
-  onDefend: () => void;
+  onUseSkill: () => void;
   onUseItem: (item: Item) => void;
   onBattleEnd: () => void;
   damageTexts: DamageText[];
@@ -26,7 +26,7 @@ export const BattleScreen = ({
   battleState, 
   currentPlayer,
   onAttack, 
-  onDefend, 
+  onUseSkill, 
   onUseItem, 
   onBattleEnd,
   damageTexts,
@@ -54,6 +54,7 @@ export const BattleScreen = ({
 
   // Filter consumable items from inventory
   const consumableItems = currentPlayer.inventory.filter(item => item.type === 'consumable');
+  const SKILL_MANA_COST = 15;
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -140,6 +141,22 @@ export const BattleScreen = ({
               </div>
             ))
           }
+          {/* Skill slash animation overlay */}
+          {damageTexts.some(dt => dt.target === 'enemy' && dt.type === 'skill') && (
+            <div
+              className="absolute z-20"
+              style={{
+                left: '-20px',
+                top: '40px',
+                width: '180px',
+                height: '4px',
+                background: 'linear-gradient(90deg, rgba(59,130,246,1), rgba(59,130,246,0))',
+                boxShadow: '0 0 12px rgba(59,130,246,0.9)',
+                transform: 'rotate(45deg)',
+                animation: 'skill-slash 500ms ease-out forwards'
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -153,6 +170,16 @@ export const BattleScreen = ({
           100% {
             opacity: 0;
             transform: translateY(-50px);
+          }
+        }
+        @keyframes skill-slash {
+          0% {
+            opacity: 0.9;
+            transform: translate(-60px, 0) rotate(45deg);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(100px, -30px) rotate(45deg);
           }
         }
       `}</style>
@@ -172,12 +199,12 @@ export const BattleScreen = ({
               Атака
             </Button>
             <Button 
-              onClick={onDefend}
+              onClick={onUseSkill}
               className="w-full"
               variant="secondary"
-              disabled={battleState.turn !== 'player'}
+              disabled={battleState.turn !== 'player' || battleState.skillCooldown > 0 || currentPlayer.mana < SKILL_MANA_COST}
             >
-              Защита
+              Умение
             </Button>
             <Button 
               onClick={onBattleEnd}

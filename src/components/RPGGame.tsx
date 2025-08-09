@@ -318,7 +318,8 @@ const RPGGame = () => {
       enemy,
       location: currentLocation,
       playerAction: null,
-      turn: 'player'
+      turn: 'player',
+      skillCooldown: 0
     });
     setGameScreen('battle');
     setBattleLog([`Бой с ${enemy.name} начинается!`]);
@@ -333,7 +334,7 @@ const RPGGame = () => {
     setDamageTexts([]);
   }, []);
 
-  const addDamageText = useCallback((amount: number, target: 'player' | 'enemy', type: 'damage' | 'heal' | 'defend' = 'damage') => {
+  const addDamageText = useCallback((amount: number, target: 'player' | 'enemy', type: 'damage' | 'heal' | 'defend' | 'skill' = 'damage') => {
     const id = Date.now().toString() + Math.random().toString();
     setDamageTexts(prev => [...prev, { id, amount, target, type }]);
     
@@ -416,7 +417,8 @@ const RPGGame = () => {
       const newState = prev ? {
         ...prev,
         enemy: { ...prev.enemy, health: newEnemyHealth },
-        turn: 'enemy' as const
+        turn: 'enemy' as const,
+        skillCooldown: Math.max(0, (prev.skillCooldown || 0) - 1)
       } : null;
       console.log('Updated battle state, new enemy health:', newState?.enemy.health);
       return newState;
@@ -458,54 +460,94 @@ const RPGGame = () => {
     }, 1000);
   }, [battleState, player.equipment.weapon, player.health, addDamageText, addBattleLog]);
 
-  const handleBattleDefend = useCallback(() => {
+  const handleBattleSkill = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
-    
-    console.log('Battle defend started');
-    
-    // Store enemy info before state updates
+
+    const SKILL_MANA_COST = 15;
+    if (player.mana < SKILL_MANA_COST) {
+      addBattleLog('Недостаточно маны для использования умения!');
+      return;
+    }
+    if ((battleState.skillCooldown || 0) > 0) {
+      addBattleLog(`Умение недоступно. Откат: ${battleState.skillCooldown} атак(и).`);
+      return;
+    }
+
+    const currentEnemyHealth = battleState.enemy.health;
     const enemyName = battleState.enemy.name;
     const enemyDamage = battleState.enemy.damage;
-    
-    addDamageText(0, 'player', 'defend');
-    addBattleLog("Вы принимаете защитную стойку!");
-    
-    // Player defends - reduced damage from enemy
+
+    // Consume mana
+    setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - SKILL_MANA_COST) }));
+
+    // Skill damage: stronger than basic attack
+    const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
+    const totalDamage = Math.floor(weaponDamage * 1.8 * (0.9 + Math.random() * 0.2));
+
+    const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
+    addDamageText(totalDamage, 'enemy', 'skill');
+    addBattleLog(`Вы используете особое умение и наносите ${totalDamage} урона ${enemyName}!`);
+
+    if (newEnemyHealth <= 0) {
+      addBattleLog(`${enemyName} повержен!`);
+      const experienceGained = Math.floor(Math.random() * 20) + 15;
+      const coinsGained = Math.floor(Math.random() * 10) + 5;
+      const lootItems: Item[] = [];
+      if (Math.random() < 0.3) {
+        lootItems.push({
+          id: 'health-potion',
+          name: 'Зелье здоровья',
+          type: 'consumable',
+          description: 'Восстанавливает 50 единиц здоровья',
+          icon: '/healthpotion.png',
+          stackable: true,
+          maxStack: 10
+        });
+      }
+      setBattleResult({ victory: true, experienceGained, coinsGained, lootItems });
+      setTimeout(() => {
+        setGameScreen('battle-victory');
+        setPlayer(prev => ({
+          ...prev,
+          experience: prev.experience + experienceGained,
+          coins: prev.coins + coinsGained,
+          inventory: addItemsToInventory(prev.inventory, lootItems)
+        }));
+      }, 1500);
+      return;
+    }
+
+    // Update enemy health, set cooldown to 3, turn to enemy
     setBattleState(prev => prev ? {
       ...prev,
-      turn: 'enemy'
+      enemy: { ...prev.enemy, health: newEnemyHealth },
+      playerAction: 'skill',
+      turn: 'enemy',
+      skillCooldown: 3
     } : null);
-    
-    // Enemy attacks with reduced damage
+
+    // Enemy counterattack
     setTimeout(() => {
-      console.log('Enemy attacks with reduced damage');
-      const currentPlayerHealth = player.health;
-      const reducedDamage = Math.floor(enemyDamage * 0.5);
-      const newPlayerHealth = Math.max(0, currentPlayerHealth - reducedDamage);
-      
-      setPlayer(prev => ({
-        ...prev,
-        health: newPlayerHealth
-      }));
-      
-      addDamageText(reducedDamage, 'player', 'damage');
-      addBattleLog(`${enemyName} атакует, но вы блокируете часть урона! Получено ${reducedDamage} урона!`);
-      
-      // Check if player is defeated
-      if (newPlayerHealth <= 0) {
-        addBattleLog("Вы падаете без сознания...");
-        setTimeout(() => {
-          setGameScreen('battle-defeat');
-        }, 1500);
-        return;
-      }
-      
-      setBattleState(prev => prev ? {
-        ...prev,
-        turn: 'player'
-      } : null);
+      setPlayer(prev => {
+        const newPlayerHealth = Math.max(0, prev.health - enemyDamage);
+        return { ...prev, health: newPlayerHealth };
+      });
+      addDamageText(enemyDamage, 'player', 'damage');
+      addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
+
+      setTimeout(() => {
+        setPlayer(current => {
+          if (current.health <= 0) {
+            addBattleLog('Вы падаете без сознания...');
+            setTimeout(() => setGameScreen('battle-defeat'), 1500);
+          }
+          return current;
+        });
+      }, 100);
+
+      setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
     }, 1000);
-  }, [battleState, addDamageText, addBattleLog, player.health]);
+  }, [battleState, player.equipment.weapon, player.mana, addDamageText, addBattleLog]);
 
   const handleBattleUseItem = useCallback((item: Item) => {
     if (!battleState || battleState.turn !== 'player') return;
@@ -1374,7 +1416,7 @@ const RPGGame = () => {
         battleState={battleState}
         currentPlayer={player}
         onAttack={handleBattleAttack}
-        onDefend={handleBattleDefend}
+        onUseSkill={handleBattleSkill}
         onUseItem={handleBattleUseItem}
         onBattleEnd={handleBattleFlee}
         damageTexts={damageTexts}

@@ -116,8 +116,9 @@ export interface BattleState {
   player: Player;
   enemy: Enemy;
   location: LocationType;
-  playerAction: 'attack' | 'defend' | 'item' | 'fleeing' | null;
+  playerAction: 'attack' | 'skill' | 'item' | 'fleeing' | null;
   turn: 'player' | 'enemy';
+  skillCooldown: number;
 }
 
 export interface BattleResult {

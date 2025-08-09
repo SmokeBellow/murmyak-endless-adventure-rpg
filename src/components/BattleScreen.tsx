@@ -204,7 +204,10 @@ export const BattleScreen = ({
               variant="secondary"
               disabled={battleState.turn !== 'player' || battleState.skillCooldown > 0 || currentPlayer.mana < SKILL_MANA_COST}
             >
-              Умение
+              {battleState.skillCooldown > 0 
+                ? `Умение (${battleState.skillCooldown})` 
+                : `Умение (${SKILL_MANA_COST} маны)`
+              }
             </Button>
             <Button 
               onClick={onBattleEnd}

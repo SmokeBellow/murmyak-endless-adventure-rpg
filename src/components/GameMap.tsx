@@ -1,5 +1,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
+import { MinesMap } from '@/components/MinesMap';
+import { AnimatedRat } from '@/components/AnimatedRat';
 
 interface GameMapProps {
   player: Player;
@@ -247,7 +249,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   const renderAbandonedMines = () => (
     <>
-      {/* All mine objects removed */}
+      {/* Labyrinth maze layout */}
+      <MinesMap mapWidth={mapWidth} mapHeight={mapHeight} />
     </>
   );
 
@@ -616,19 +619,34 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
               
               {/* Enemy sprite */}
               <div className="relative cursor-pointer">
-                <img 
-                  src={enemy.type === 'bat' ? '/bat.png' : '/rat.png'} 
-                  alt={enemy.name} 
-                  className={`w-8 h-8 transition-all duration-200 ${
-                    enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
-                  } ${
-                    enemy.direction === 'left' ? 'scale-x-[-1]' : ''
-                  }`}
-                  style={{
-                    imageRendering: 'pixelated',
-                    filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
-                  }}
-                />
+                {enemy.type === 'bat' ? (
+                  <img 
+                    src="/bat.png"
+                    alt={enemy.name} 
+                    className={`w-8 h-8 transition-all duration-200 ${
+                      enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
+                    } ${
+                      enemy.direction === 'left' ? 'scale-x-[-1]' : ''
+                    }`}
+                    style={{
+                      imageRendering: 'pixelated',
+                      filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
+                    }}
+                  />
+                ) : (
+                  <AnimatedRat
+                    alt={enemy.name}
+                    className={`w-8 h-8 transition-all duration-200 ${
+                      enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
+                    } ${
+                      enemy.direction === 'left' ? 'scale-x-[-1]' : ''
+                    }`}
+                    style={{
+                      imageRendering: 'pixelated',
+                      filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
+                    }}
+                  />
+                )}
                 
                 {/* Attack indicator */}
                 {enemy.isAttacking && (

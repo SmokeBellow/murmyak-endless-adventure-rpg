@@ -414,6 +414,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: 360,
               }}
             >
+              {/* Label */}
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-blue-400 text-xs whitespace-nowrap font-bold">
+                Фонтан исцеления
+              </div>
               <img
                 src="/fountain.png"
                 alt="Фонтан исцеления"
@@ -442,6 +446,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: 260,
               }}
             >
+              {/* Label */}
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-blue-400 text-xs whitespace-nowrap font-bold">
+                Вход в шахты
+              </div>
               <img
                 src="/mines_entrance.png"
                 alt="Вход в шахты"

@@ -10,7 +10,6 @@ export const MinesMap = ({ mapWidth, mapHeight }: MinesMapProps) => {
   const wallStyle = {
     backgroundColor: '#8B7355', // earthy wall color
     position: 'absolute' as const,
-    border: '2px solid #6B5B47',
     boxShadow: 'inset 0 0 4px rgba(0,0,0,0.35)'
   } as const;
 

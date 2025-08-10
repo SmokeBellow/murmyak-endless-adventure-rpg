@@ -20,6 +20,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
+import { minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
 import { BattleDefeat } from './BattleDefeat';
@@ -830,6 +831,13 @@ const RPGGame = () => {
       // Merchant house collision - exact match with visual house (300,300 -> 500,450)
       if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
         return true;
+      }
+    } else if (currentLocation === 'abandoned-mines') {
+      // Mines labyrinth collision: points inside any wall rectangle are blocked
+      for (const r of minesObstacles) {
+        if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+          return true;
+        }
       }
     }
     return false;

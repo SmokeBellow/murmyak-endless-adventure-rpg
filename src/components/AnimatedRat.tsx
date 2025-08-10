@@ -5,10 +5,12 @@ interface AnimatedRatProps {
   alt?: string;
   style?: React.CSSProperties;
   onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  direction?: 'up' | 'down' | 'left' | 'right';
 }
 
-export const AnimatedRat = ({ className, alt = "Rat", style, onError }: AnimatedRatProps) => {
+export const AnimatedRat = ({ className, alt = "Rat", style, onError, direction = 'right' }: AnimatedRatProps) => {
   const [currentFrame, setCurrentFrame] = useState(1);
+  const [useUppercaseExt, setUseUppercaseExt] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,13 +20,26 @@ export const AnimatedRat = ({ className, alt = "Rat", style, onError }: Animated
     return () => clearInterval(interval);
   }, []);
 
+  const directionTransform =
+    direction === 'left' ? 'scaleX(-1)' :
+    direction === 'up' ? 'rotate(-90deg)' :
+    direction === 'down' ? 'rotate(90deg)' : '';
+
+  const combinedStyle: React.CSSProperties = {
+    ...(style || {}),
+    transform: `${style?.transform ?? ''} ${directionTransform}`.trim()
+  };
+
   return (
     <img 
-      src={`/rat${currentFrame}.png`}
+      src={`/rat${currentFrame}.${useUppercaseExt ? 'PNG' : 'png'}`}
       alt={alt}
       className={className}
-      style={style}
-      onError={onError}
+      style={combinedStyle}
+      onError={(e) => {
+        onError?.(e);
+        setUseUppercaseExt(true);
+      }}
     />
   );
 };

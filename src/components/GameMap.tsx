@@ -463,6 +463,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                   imageRendering: 'pixelated'
                 }}
                 title="Вход в заброшенные шахты"
+                onClick={() => {
+                  if (isNearPortal()) onPortalUse();
+                }}
               />
               
               {/* E prompt when player is near */}
@@ -572,7 +575,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             </div>
             
             {/* NPC sprite */}
-            <div className="relative cursor-pointer">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => {
+                if (isNearNPC(npc)) onNPCInteract(npc);
+              }}
+            >
               <img 
                 src={
                   npc.type === 'elder' ? '/headman.png' :
@@ -636,10 +644,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 ) : (
                   <AnimatedRat
                     alt={enemy.name}
+                    direction={enemy.direction}
                     className={`w-8 h-8 transition-all duration-200 ${
                       enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
-                    } ${
-                      enemy.direction === 'left' ? 'scale-x-[-1]' : ''
                     }`}
                     style={{
                       imageRendering: 'pixelated',

@@ -1587,17 +1587,17 @@ const handleBuyItem = useCallback((item: Item) => {
       )}
 
       {/* Visual Novel Dialogue */}
-      {selectedNPC && showVisualNovel && (
-        <VisualNovelDialogue
-          npc={selectedNPC}
-          hasActiveVillageQuest={quests.some(q => q.id === 'village-introduction' && q.status === 'active')}
-          hasCompletedVillageQuest={completedQuestIds.includes('village-introduction')}
-          onClose={() => {
-            setSelectedNPC(null);
-            setShowVisualNovel(false);
-          }}
-          onQuestAccept={(questId) => {
-            // Create simple quest objects based on quest ID
+{selectedNPC && showVisualNovel && (
+  <VisualNovelDialogue
+    npc={selectedNPC}
+    hasActiveVillageQuest={quests.some(q => q.id === 'village-introduction' && q.status === 'active')}
+    hasCompletedVillageQuest={completedQuestIds.includes('village-introduction')}
+    onClose={() => {
+      setSelectedNPC(null);
+      setShowVisualNovel(false);
+    }}
+    onQuestAccept={(questId) => {
+      // Create simple quest objects based on quest ID
             const questTemplates = {
               'village-defense': {
                 id: 'village-defense',
@@ -1654,7 +1654,8 @@ const handleBuyItem = useCallback((item: Item) => {
                 description: `Принят квест: ${newQuest.title}`,
               });
             }
-          }}
+}}
+          onTrade={handleTrade}
         />
       )}
 

@@ -10,9 +10,10 @@ interface VisualNovelDialogueProps {
   onQuestAccept?: (questId: string) => void;
   hasActiveVillageQuest?: boolean;
   hasCompletedVillageQuest?: boolean;
+  onTrade?: () => void;
 }
 
-const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
@@ -41,9 +42,10 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
     dialogueStack: []
   });
 
-  const [displayedNPCText, setDisplayedNPCText] = useState('');
-  const [displayedPlayerText, setDisplayedPlayerText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+const [displayedNPCText, setDisplayedNPCText] = useState('');
+const [displayedPlayerText, setDisplayedPlayerText] = useState('');
+const [isTyping, setIsTyping] = useState(false);
+const [pendingTrade, setPendingTrade] = useState(false);
 
   // Typing effect for NPC text
   useEffect(() => {
@@ -54,26 +56,35 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
       const text = dialogueState.currentText;
       let currentIndex = 0;
       
-      const typeTimer = setInterval(() => {
-        if (currentIndex < text.length) {
-          setDisplayedNPCText(text.substring(0, currentIndex + 1));
-          currentIndex++;
-        } else {
-          clearInterval(typeTimer);
-          setIsTyping(false);
-          // Show options after typing is complete
-          setTimeout(() => {
-            setDialogueState(prev => ({
-              ...prev,
-              showOptions: true
-            }));
-          }, 500);
-        }
-      }, 50); // 50ms per character
+const typeTimer = setInterval(() => {
+  if (currentIndex < text.length) {
+    setDisplayedNPCText(text.substring(0, currentIndex + 1));
+    currentIndex++;
+  } else {
+    clearInterval(typeTimer);
+    setIsTyping(false);
+
+    // If trade is pending (merchant dialogue), open trade after short pause
+    if (pendingTrade && onTrade) {
+      setTimeout(() => {
+        setPendingTrade(false);
+        onTrade();
+      }, 400);
+    }
+
+    // Show options after typing is complete
+    setTimeout(() => {
+      setDialogueState(prev => ({
+        ...prev,
+        showOptions: true
+      }));
+    }, 500);
+  }
+}, 50); // 50ms per character
 
       return () => clearInterval(typeTimer);
     }
-  }, [dialogueState.currentSpeaker, dialogueState.currentText]);
+}, [dialogueState.currentSpeaker, dialogueState.currentText, pendingTrade, onTrade]);
 
   // Update player text when player speaks
   useEffect(() => {
@@ -106,12 +117,20 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
       dialogueStack: [...dialogueState.dialogueStack, option]
     });
 
-    // Check for quest-triggering responses
-    const isQuestTrigger = (
-      (npc.type === 'elder' && option.player === 'Конечно, помогу.') ||
-      (npc.type === 'merchant' && option.player === 'Договорились.') ||
-      (npc.type === 'blacksmith' && option.player === 'Согласен помочь!')
-    );
+// Check for quest-triggering responses
+const isQuestTrigger = (
+  (npc.type === 'elder' && option.player === 'Конечно, помогу.') ||
+  (npc.type === 'merchant' && option.player === 'Договорились.') ||
+  (npc.type === 'blacksmith' && option.player === 'Согласен помочь!')
+);
+
+// Check for trade-triggering responses (merchant)
+const isTradeTrigger = (
+  npc.type === 'merchant' && (
+    option.player === 'Покажи свои товары.' ||
+    option.player === 'Просто хотел посмотреть товары.'
+  )
+);
 
     // After player speaks, NPC responds
     setTimeout(() => {
@@ -126,19 +145,24 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
         dialogueStack: [...dialogueState.dialogueStack, option]
       });
 
-      // If quest should be triggered, call the callback
-      if (isQuestTrigger && onQuestAccept) {
-        let questId = '';
-        if (npc.type === 'elder') questId = 'village-defense';
-        else if (npc.type === 'merchant') questId = 'wolf-pelts';
-        else if (npc.type === 'blacksmith') questId = 'ore-mining';
-        
-        if (questId) {
-          onQuestAccept(questId);
-        }
-      }
+// If quest should be triggered, call the callback
+if (isQuestTrigger && onQuestAccept) {
+  let questId = '';
+  if (npc.type === 'elder') questId = 'village-defense';
+  else if (npc.type === 'merchant') questId = 'wolf-pelts';
+  else if (npc.type === 'blacksmith') questId = 'ore-mining';
+  
+  if (questId) {
+    onQuestAccept(questId);
+  }
+}
 
-      // No auto-close, let user manually close via button
+// If trade should be triggered, mark pending to open after NPC response is typed
+if (isTradeTrigger) {
+  setPendingTrade(true);
+}
+
+// No auto-close, let user manually close via button
     }, 1500);
   };
 

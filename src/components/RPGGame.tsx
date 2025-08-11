@@ -3,7 +3,7 @@ import { Player, NPC, Item, Equipment, Quest, GameScreen, MenuType, LocationType
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { addItemsToInventory, removeItemFromInventory, getTotalItemQuantity } from '@/utils/inventory';
+import { addItemsToInventory, removeItemFromInventory, getTotalItemQuantity, getSellPrice } from '@/utils/inventory';
 import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
@@ -1235,7 +1235,7 @@ const RPGGame = () => {
     // Item unequipped silently
   }, [player.equipment]);
 
-  const handleBuyItem = useCallback((item: Item) => {
+const handleBuyItem = useCallback((item: Item) => {
     if (!item.price || player.coins < item.price) {
       return;
     }
@@ -1248,6 +1248,17 @@ const RPGGame = () => {
 
     // Item purchased silently
   }, [player.coins]);
+
+  const handleSellItem = useCallback((item: Item) => {
+    const price = getSellPrice(item);
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins + price,
+      inventory: removeItemFromInventory(prev.inventory, item.id, 1)
+    }));
+
+    // Item sold silently
+  }, []);
 
   const handleTrade = useCallback(() => {
     setActiveMenu('trade');
@@ -1685,12 +1696,13 @@ const RPGGame = () => {
         />
       )}
 
-      {activeMenu === 'trade' && (
+{activeMenu === 'trade' && (
         <TradeMenu
           player={player}
           merchant={npcs.find(npc => npc.type === 'merchant')!}
           onClose={() => setActiveMenu('none')}
           onBuyItem={handleBuyItem}
+          onSellItem={handleSellItem}
         />
       )}
 

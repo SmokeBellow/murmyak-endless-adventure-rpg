@@ -87,3 +87,7 @@ export const getTotalItemQuantity = (inventory: Item[], itemName: string): numbe
     .filter(item => item.name === itemName)
     .reduce((total, item) => total + (item.quantity || 1), 0);
 };
+
+export const getSellPrice = (item: Item): number => {
+  return item.price ? Math.max(1, Math.floor(item.price * 0.5)) : 1;
+};

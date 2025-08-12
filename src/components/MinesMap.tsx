@@ -3,12 +3,16 @@ interface MinesMapProps {
   mapHeight: number;
 }
 
-import { minesObstacles } from '@/maps/minesLayout';
+import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
+import stoneTexture from '@/assets/stone-texture.png';
 
 export const MinesMap = ({ mapWidth, mapHeight }: MinesMapProps) => {
   // Visual style for walls
   const wallStyle = {
-    backgroundColor: '#8B7355', // earthy wall color
+    backgroundImage: `url(${stoneTexture})`,
+    backgroundRepeat: 'repeat',
+    backgroundSize: '64px 64px',
+    imageRendering: 'pixelated' as const,
     position: 'absolute' as const,
     boxShadow: 'inset 0 0 4px rgba(0,0,0,0.35)'
   } as const;

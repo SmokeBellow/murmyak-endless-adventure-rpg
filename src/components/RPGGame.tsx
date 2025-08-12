@@ -20,7 +20,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
-import { minesObstacles } from '@/maps/minesLayout';
+import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
 import { BattleDefeat } from './BattleDefeat';
@@ -626,8 +626,8 @@ const RPGGame = () => {
           // Move to entrance area of mines (safe zone)
           setPlayer(prev => ({
             ...prev,
-            position: { x: 150, y: 150 },
-            targetPosition: { x: 150, y: 150 }
+            position: { x: 50, y: 100 },
+            targetPosition: { x: 50, y: 100 }
           }));
         }
         
@@ -1339,7 +1339,7 @@ const handleBuyItem = useCallback((item: Item) => {
     setTimeout(() => {
       if (currentLocation === 'village') {
         setCurrentLocation('abandoned-mines');
-        const safePos = findSafePositionNear(150, 150);
+        const safePos = findSafePositionNear(50, 100);
         setPlayer(prev => ({
           ...prev,
           position: safePos,

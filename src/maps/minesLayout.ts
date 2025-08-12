@@ -4,7 +4,7 @@ export const level = {
   width: 2000,
   height: 2000,
   cell: 100,
-  wall_thickness: 8,
+  wall_thickness: 24,
 };
 
 export const WALL_THICKNESS = level.wall_thickness;
@@ -451,4 +451,11 @@ export const minesObstacles: Rect[] = [
   { x: 1700, y: 0, w: 100, h: 8 },
   { x: 1800, y: 0, w: 100, h: 8 },
   { x: 1900, y: 0, w: 100, h: 8 },
-];
+]; 
+
+export const THICK_FACTOR = 3;
+export const minesObstaclesThick: Rect[] = minesObstacles.map(r => {
+  if (r.w === WALL_THICKNESS) return { ...r, w: WALL_THICKNESS * THICK_FACTOR };
+  if (r.h === WALL_THICKNESS) return { ...r, h: WALL_THICKNESS * THICK_FACTOR };
+  return r;
+});

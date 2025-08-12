@@ -114,8 +114,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
       
       // Check if clicking on return portal
-      const portalDistance = Math.sqrt(Math.pow(200 - clickX, 2) + Math.pow(400 - clickY, 2));
-      const playerToPortalDistance = Math.sqrt(Math.pow(200 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+      const portalDistance = Math.sqrt(Math.pow(50 - clickX, 2) + Math.pow(50 - clickY, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(50 - player.position.x, 2) + Math.pow(50 - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
         console.log('Return portal clicked!');
         onPortalUse();
@@ -299,8 +299,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       return distance < 80;
     } else if (currentLocation === 'abandoned-mines') {
       const distance = Math.sqrt(
-        Math.pow(200 - player.position.x, 2) + 
-        Math.pow(400 - player.position.y, 2)
+        Math.pow(50 - player.position.x, 2) + 
+        Math.pow(50 - player.position.y, 2)
       );
       return distance < 80;
     }
@@ -534,8 +534,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 180,
-                top: 380,
+                left: 30,
+                top: 30,
               }}
             >
               <div

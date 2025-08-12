@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Enemy, Player } from '@/types/gameTypes';
-import { minesObstacles } from '@/maps/minesLayout';
+import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 interface EnemySystemProps {
   player: Player;
   onPlayerTakeDamage: (damage: number) => void;

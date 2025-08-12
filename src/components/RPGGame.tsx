@@ -843,6 +843,29 @@ const RPGGame = () => {
     return false;
   }, [currentLocation]);
 
+  // Find nearest safe position not inside walls (mines)
+  const findSafePositionNear = useCallback((x: number, y: number) => {
+    if (currentLocation !== 'abandoned-mines') return { x, y };
+    const step = 10;
+    const maxRadius = 300;
+    const inWall = (px: number, py: number) => {
+      for (const r of minesObstacles) {
+        if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
+      }
+      return false;
+    };
+    if (!inWall(x, y)) return { x, y };
+    for (let radius = step; radius <= maxRadius; radius += step) {
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+        const px = Math.max(40, Math.min(1960, Math.round(x + Math.cos(angle) * radius)));
+        const py = Math.max(40, Math.min(1960, Math.round(y + Math.sin(angle) * radius)));
+        if (!inWall(px, py)) return { x: px, y: py };
+      }
+    }
+    // Fallback to a known open tile near entrance
+    return { x: 140, y: 140 };
+  }, [currentLocation]);
+
   const handleJoystickMove = useCallback((direction: { x: number; y: number } | null) => {
     if (!direction) {
       setPlayer(prev => ({ ...prev, isMoving: false }));
@@ -1316,10 +1339,11 @@ const handleBuyItem = useCallback((item: Item) => {
     setTimeout(() => {
       if (currentLocation === 'village') {
         setCurrentLocation('abandoned-mines');
+        const safePos = findSafePositionNear(200, 200);
         setPlayer(prev => ({
           ...prev,
-          position: { x: 200, y: 200 },
-          targetPosition: { x: 200, y: 200 }
+          position: safePos,
+          targetPosition: safePos
         }));
       } else {
         setCurrentLocation('village');

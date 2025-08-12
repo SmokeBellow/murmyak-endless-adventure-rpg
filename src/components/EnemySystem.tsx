@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Enemy, Player } from '@/types/gameTypes';
-
+import { minesObstacles } from '@/maps/minesLayout';
 interface EnemySystemProps {
   player: Player;
   onPlayerTakeDamage: (damage: number) => void;
@@ -10,6 +10,29 @@ interface EnemySystemProps {
 
 export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isInBattle = false }: EnemySystemProps) => {
   const [enemies, setEnemies] = useState<Enemy[]>([]);
+
+  // Helper: check if a point is inside any wall (mines)
+  const isPointInWall = (px: number, py: number) => {
+    for (const r of minesObstacles) {
+      if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
+    }
+    return false;
+  };
+
+  // Helper: find nearest safe position near a point
+  const findSafePositionNear = (x: number, y: number) => {
+    if (!isPointInWall(x, y)) return { x, y };
+    const step = 10;
+    const maxRadius = 300;
+    for (let radius = step; radius <= maxRadius; radius += step) {
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+        const px = Math.max(40, Math.min(1960, Math.round(x + Math.cos(angle) * radius)));
+        const py = Math.max(40, Math.min(1960, Math.round(y + Math.sin(angle) * radius)));
+        if (!isPointInWall(px, py)) return { x: px, y: py };
+      }
+    }
+    return { x: 140, y: 140 };
+  };
 
   // Initialize enemies when component mounts
   useEffect(() => {
@@ -102,7 +125,12 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
       }
     ];
 
-    setEnemies(initialEnemies);
+    setEnemies(initialEnemies.map(e => ({
+      ...e,
+      position: findSafePositionNear(e.position.x, e.position.y),
+      spawnPosition: findSafePositionNear(e.spawnPosition.x, e.spawnPosition.y),
+      targetPosition: findSafePositionNear(e.targetPosition.x, e.targetPosition.y)
+    })));
   }, []);
 
   // Calculate distance between two points
@@ -336,7 +364,13 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         const enemyToRespawn = originalEnemies.find(e => e.id === enemyId);
         if (enemyToRespawn) {
           console.log(`Respawning enemy ${enemyId}`);
-          return [...prev, enemyToRespawn];
+          const adjusted = {
+            ...enemyToRespawn,
+            position: findSafePositionNear(enemyToRespawn.position.x, enemyToRespawn.position.y),
+            spawnPosition: findSafePositionNear(enemyToRespawn.spawnPosition.x, enemyToRespawn.spawnPosition.y),
+            targetPosition: findSafePositionNear(enemyToRespawn.targetPosition.x, enemyToRespawn.targetPosition.y)
+          } as Enemy;
+          return [...prev, adjusted];
         }
         
         return prev;

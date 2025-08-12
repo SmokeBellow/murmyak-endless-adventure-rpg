@@ -626,8 +626,8 @@ const RPGGame = () => {
           // Move to entrance area of mines (safe zone)
           setPlayer(prev => ({
             ...prev,
-            position: { x: 200, y: 200 },
-            targetPosition: { x: 200, y: 200 }
+            position: { x: 150, y: 150 },
+            targetPosition: { x: 150, y: 150 }
           }));
         }
         
@@ -1339,7 +1339,7 @@ const handleBuyItem = useCallback((item: Item) => {
     setTimeout(() => {
       if (currentLocation === 'village') {
         setCurrentLocation('abandoned-mines');
-        const safePos = findSafePositionNear(200, 200);
+        const safePos = findSafePositionNear(150, 150);
         setPlayer(prev => ({
           ...prev,
           position: safePos,

@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 import { MinesMap } from '@/components/MinesMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
+import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 
 interface GameMapProps {
   player: Player;
@@ -52,6 +53,44 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const mapWidth = 2000;
   const mapHeight = 2000;
 
+  // Mines collision helpers
+  const isPointInWall = useCallback((px: number, py: number) => {
+    for (const r of minesObstacles) {
+      if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
+    }
+    return false;
+  }, []);
+
+  const findSafePositionNear = useCallback((x: number, y: number) => {
+    if (!isPointInWall(x, y)) return { x, y };
+    const step = 10;
+    const maxRadius = 300;
+    for (let radius = step; radius <= maxRadius; radius += step) {
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+        const px = Math.max(40, Math.min(mapWidth - 40, Math.round(x + Math.cos(angle) * radius)));
+        const py = Math.max(40, Math.min(mapHeight - 40, Math.round(y + Math.sin(angle) * radius)));
+        if (!isPointInWall(px, py)) return { x: px, y: py };
+      }
+    }
+    return { x: 140, y: 140 };
+  }, [isPointInWall]);
+
+  const [mineCenters, setMineCenters] = useState({
+    coal: { x: 400, y: 400 },
+    ore: { x: 600, y: 500 },
+    portal: { x: 50, y: 50 },
+  });
+
+  useEffect(() => {
+    if (currentLocation === 'abandoned-mines') {
+      setMineCenters({
+        coal: findSafePositionNear(400, 400),
+        ore: findSafePositionNear(600, 500),
+        portal: findSafePositionNear(50, 50),
+      });
+    }
+  }, [currentLocation, findSafePositionNear]);
+
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
@@ -96,8 +135,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
     } else if (currentLocation === 'abandoned-mines') {
       // Check if clicking on coal mine in abandoned mines
-      const coalMineDistance = Math.sqrt(Math.pow(400 - clickX, 2) + Math.pow(400 - clickY, 2));
-      const playerToCoalMineDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+      const coalMineDistance = Math.sqrt(Math.pow(mineCenters.coal.x - clickX, 2) + Math.pow(mineCenters.coal.y - clickY, 2));
+      const playerToCoalMineDistance = Math.sqrt(Math.pow(mineCenters.coal.x - player.position.x, 2) + Math.pow(mineCenters.coal.y - player.position.y, 2));
       if (coalMineDistance < 40 && playerToCoalMineDistance < 80) {
         console.log('Coal mine clicked!');
         onCoalMineInteract();
@@ -105,8 +144,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
       
       // Check if clicking on ore mine in abandoned mines
-      const oreMineDistance = Math.sqrt(Math.pow(600 - clickX, 2) + Math.pow(500 - clickY, 2));
-      const playerToOreMineDistance = Math.sqrt(Math.pow(600 - player.position.x, 2) + Math.pow(500 - player.position.y, 2));
+      const oreMineDistance = Math.sqrt(Math.pow(mineCenters.ore.x - clickX, 2) + Math.pow(mineCenters.ore.y - clickY, 2));
+      const playerToOreMineDistance = Math.sqrt(Math.pow(mineCenters.ore.x - player.position.x, 2) + Math.pow(mineCenters.ore.y - player.position.y, 2));
       if (oreMineDistance < 40 && playerToOreMineDistance < 80) {
         console.log('Ore mine clicked!');
         onCoalMineInteract(); // Reuse coal mining interface for ore
@@ -114,8 +153,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
       
       // Check if clicking on return portal
-      const portalDistance = Math.sqrt(Math.pow(50 - clickX, 2) + Math.pow(50 - clickY, 2));
-      const playerToPortalDistance = Math.sqrt(Math.pow(50 - player.position.x, 2) + Math.pow(50 - player.position.y, 2));
+      const portalDistance = Math.sqrt(Math.pow(mineCenters.portal.x - clickX, 2) + Math.pow(mineCenters.portal.y - clickY, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(mineCenters.portal.x - player.position.x, 2) + Math.pow(mineCenters.portal.y - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
         console.log('Return portal clicked!');
         onPortalUse();
@@ -299,8 +338,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       return distance < 80;
     } else if (currentLocation === 'abandoned-mines') {
       const distance = Math.sqrt(
-        Math.pow(50 - player.position.x, 2) + 
-        Math.pow(50 - player.position.y, 2)
+        Math.pow(mineCenters.portal.x - player.position.x, 2) + 
+        Math.pow(mineCenters.portal.y - player.position.y, 2)
       );
       return distance < 80;
     }
@@ -323,8 +362,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const isNearCoalMine = () => {
     if (currentLocation === 'abandoned-mines') {
       const distance = Math.sqrt(
-        Math.pow(400 - player.position.x, 2) + 
-        Math.pow(400 - player.position.y, 2)
+        Math.pow(mineCenters.coal.x - player.position.x, 2) + 
+        Math.pow(mineCenters.coal.y - player.position.y, 2)
       );
       return distance < 80;
     }
@@ -335,8 +374,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const isNearOreMine = () => {
     if (currentLocation === 'abandoned-mines') {
       const distance = Math.sqrt(
-        Math.pow(600 - player.position.x, 2) + 
-        Math.pow(500 - player.position.y, 2)
+        Math.pow(mineCenters.ore.x - player.position.x, 2) + 
+        Math.pow(mineCenters.ore.y - player.position.y, 2)
       );
       return distance < 80;
     }
@@ -484,8 +523,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 380,
-                top: 380,
+                left: mineCenters.coal.x - 20,
+                top: mineCenters.coal.y - 20,
               }}
             >
               <div
@@ -509,8 +548,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 580,
-                top: 480,
+                left: mineCenters.ore.x - 20,
+                top: mineCenters.ore.y - 20,
               }}
             >
               <div
@@ -534,8 +573,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 30,
-                top: 30,
+                left: mineCenters.portal.x - 20,
+                top: mineCenters.portal.y - 20,
               }}
             >
               <div

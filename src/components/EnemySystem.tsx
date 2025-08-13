@@ -171,36 +171,45 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             const dy = player.position.y - enemy.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance > 0) {
-              const moveX = (dx / distance) * enemy.speed;
-              const moveY = (dy / distance) * enemy.speed;
-              
-              // Update direction based on movement
-              let direction = enemy.direction;
-              if (Math.abs(moveX) > Math.abs(moveY)) {
-                direction = moveX > 0 ? 'right' : 'left';
-              } else {
-                direction = moveY > 0 ? 'down' : 'up';
+              if (distance > 0) {
+                const moveX = (dx / distance) * enemy.speed;
+                const moveY = (dy / distance) * enemy.speed;
+                
+                // Collision-aware movement (axis separated)
+                let nextX = enemy.position.x;
+                let nextY = enemy.position.y;
+                const tryX = nextX + moveX;
+                if (!isPointInWall(tryX, nextY)) nextX = tryX;
+                const tryY = nextY + moveY;
+                if (!isPointInWall(nextX, tryY)) nextY = tryY;
+                
+                // Update direction based on movement
+                let direction = enemy.direction;
+                if (Math.abs(moveX) > Math.abs(moveY)) {
+                  direction = moveX > 0 ? 'right' : 'left';
+                } else {
+                  direction = moveY > 0 ? 'down' : 'up';
+                }
+                
+                return {
+                  ...enemy,
+                  position: {
+                    x: nextX,
+                    y: nextY
+                  },
+                  direction,
+                  isMoving: true,
+                  isAttacking: false
+                };
               }
-              
-              return {
-                ...enemy,
-                position: {
-                  x: enemy.position.x + moveX,
-                  y: enemy.position.y + moveY
-                },
-                direction,
-                isMoving: true,
-                isAttacking: false
-              };
-            }
           } else {
             // Wander around spawn point
             const distanceToTarget = getDistance(enemy.position, enemy.targetPosition);
             
             // If reached target or no target, pick new wander position
             if (distanceToTarget < 5 || (!enemy.isMoving && Math.random() < 0.01)) {
-              const newTarget = getRandomWanderPosition(enemy);
+              const rnd = getRandomWanderPosition(enemy);
+              const newTarget = findSafePositionNear(rnd.x, rnd.y);
               return {
                 ...enemy,
                 targetPosition: newTarget,
@@ -219,6 +228,14 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
                 const moveX = (dx / distance) * (enemy.speed * 0.5); // Slower wandering
                 const moveY = (dy / distance) * (enemy.speed * 0.5);
                 
+                // Collision-aware movement (axis separated)
+                let nextX = enemy.position.x;
+                let nextY = enemy.position.y;
+                const tryX = nextX + moveX;
+                if (!isPointInWall(tryX, nextY)) nextX = tryX;
+                const tryY = nextY + moveY;
+                if (!isPointInWall(nextX, tryY)) nextY = tryY;
+                
                 // Update direction based on movement
                 let direction = enemy.direction;
                 if (Math.abs(moveX) > Math.abs(moveY)) {
@@ -230,8 +247,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
                 return {
                   ...enemy,
                   position: {
-                    x: enemy.position.x + moveX,
-                    y: enemy.position.y + moveY
+                    x: nextX,
+                    y: nextY
                   },
                   direction,
                   isAttacking: false

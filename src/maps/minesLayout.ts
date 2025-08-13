@@ -4,7 +4,7 @@ export const level = {
   width: 2000,
   height: 2000,
   cell: 100,
-  wall_thickness: 24,
+  wall_thickness: 8,
 };
 
 export const WALL_THICKNESS = level.wall_thickness;

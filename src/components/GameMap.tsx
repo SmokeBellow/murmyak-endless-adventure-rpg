@@ -410,7 +410,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       {/* Mine darkness overlay - only for abandoned-mines location */}
       {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
         <div 
-          className="absolute pointer-events-none z-25"
+          className="absolute pointer-events-none z-50"
           style={{
             left: 0,
             top: 0,

@@ -522,12 +522,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.coal.y - 20,
               }}
             >
-              <div
-                className="bg-gray-700 rounded-lg border-2 border-gray-600 shadow-lg cursor-pointer hover:bg-gray-600 transition-colors"
-                style={{
-                  width: 40,
-                  height: 40,
-                }}
+              <img 
+                src="/coal.png" 
+                alt="Coal Mine" 
+                className="w-10 h-10 pixelated cursor-pointer hover:brightness-110 transition-all"
                 title="Угольная шахта"
               />
               
@@ -547,12 +545,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.ore.y - 20,
               }}
             >
-              <div
-                className="bg-amber-600 rounded-lg border-2 border-amber-500 shadow-lg cursor-pointer hover:bg-amber-500 transition-colors"
-                style={{
-                  width: 40,
-                  height: 40,
-                }}
+              <img 
+                src="/ore_iron.png" 
+                alt="Iron Ore Mine" 
+                className="w-10 h-10 pixelated cursor-pointer hover:brightness-110 transition-all"
                 title="Рудная жила"
               />
               

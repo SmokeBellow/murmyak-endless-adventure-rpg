@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 import { MinesMap } from '@/components/MinesMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
+import AnimatedBat from '@/components/AnimatedBat';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 
 interface GameMapProps {
@@ -571,16 +572,20 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.portal.y - 20,
               }}
             >
-              <div
-                className="bg-green-600 rounded-full border-4 border-green-400 shadow-lg cursor-pointer hover:bg-green-500 transition-colors animate-pulse"
+              <img
+                src="/mines_to_village.png"
+                alt="Портал обратно в деревню"
+                className="cursor-pointer hover:opacity-80 transition-opacity"
                 style={{
                   width: 40,
                   height: 40,
+                  imageRendering: 'pixelated'
                 }}
                 title="Портал обратно в деревню"
-              >
-                <div className="absolute inset-0 rounded-full bg-green-400/50 animate-ping" />
-              </div>
+                onClick={() => {
+                  if (isNearPortal()) onPortalUse();
+                }}
+              />
               
               {/* E prompt when player is near */}
               {isNearPortal() && (
@@ -661,18 +666,11 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
               {/* Enemy sprite */}
               <div className="relative cursor-pointer">
                 {enemy.type === 'bat' ? (
-                  <img 
-                    src="/bat.png"
-                    alt={enemy.name} 
-                    className={`w-8 h-8 transition-all duration-200 ${
-                      enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
-                    } ${
-                      enemy.direction === 'left' ? 'scale-x-[-1]' : ''
-                    }`}
-                    style={{
-                      imageRendering: 'pixelated',
-                      filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
-                    }}
+                  <AnimatedBat
+                    className="w-8 h-8 transition-all duration-200"
+                    alt={enemy.name}
+                    isAttacking={enemy.isAttacking}
+                    direction={enemy.direction}
                   />
                 ) : (
                   <AnimatedRat

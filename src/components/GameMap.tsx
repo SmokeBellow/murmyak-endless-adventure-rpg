@@ -2,7 +2,6 @@ import { useCallback, useState, useEffect } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 import { MinesMap } from '@/components/MinesMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
-import AnimatedBat from '@/components/AnimatedBat';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 
 interface GameMapProps {
@@ -411,7 +410,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       {/* Mine darkness overlay - only for abandoned-mines location */}
       {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
         <div 
-          className="absolute pointer-events-none z-50"
+          className="absolute pointer-events-none z-20"
           style={{
             left: 0,
             top: 0,
@@ -522,10 +521,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.coal.y - 20,
               }}
             >
-              <img 
-                src="/coal.png" 
-                alt="Coal Mine" 
-                className="w-10 h-10 pixelated cursor-pointer hover:brightness-110 transition-all"
+              <div
+                className="bg-gray-700 rounded-lg border-2 border-gray-600 shadow-lg cursor-pointer hover:bg-gray-600 transition-colors"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
                 title="Угольная шахта"
               />
               
@@ -545,10 +546,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.ore.y - 20,
               }}
             >
-              <img 
-                src="/ore_iron.png" 
-                alt="Iron Ore Mine" 
-                className="w-10 h-10 pixelated cursor-pointer hover:brightness-110 transition-all"
+              <div
+                className="bg-amber-600 rounded-lg border-2 border-amber-500 shadow-lg cursor-pointer hover:bg-amber-500 transition-colors"
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
                 title="Рудная жила"
               />
               
@@ -568,20 +571,16 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 top: mineCenters.portal.y - 20,
               }}
             >
-              <img
-                src="/mines_to_village.png"
-                alt="Портал обратно в деревню"
-                className="cursor-pointer hover:opacity-80 transition-opacity"
+              <div
+                className="bg-green-600 rounded-full border-4 border-green-400 shadow-lg cursor-pointer hover:bg-green-500 transition-colors animate-pulse"
                 style={{
                   width: 40,
                   height: 40,
-                  imageRendering: 'pixelated'
                 }}
                 title="Портал обратно в деревню"
-                onClick={() => {
-                  if (isNearPortal()) onPortalUse();
-                }}
-              />
+              >
+                <div className="absolute inset-0 rounded-full bg-green-400/50 animate-ping" />
+              </div>
               
               {/* E prompt when player is near */}
               {isNearPortal() && (
@@ -662,11 +661,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
               {/* Enemy sprite */}
               <div className="relative cursor-pointer">
                 {enemy.type === 'bat' ? (
-                  <AnimatedBat
-                    className="w-8 h-8 transition-all duration-200"
-                    alt={enemy.name}
-                    isAttacking={enemy.isAttacking}
-                    direction={enemy.direction}
+                  <img 
+                    src="/bat.png"
+                    alt={enemy.name} 
+                    className={`w-8 h-8 transition-all duration-200 ${
+                      enemy.isAttacking ? 'filter brightness-150 scale-110' : ''
+                    } ${
+                      enemy.direction === 'left' ? 'scale-x-[-1]' : ''
+                    }`}
+                    style={{
+                      imageRendering: 'pixelated',
+                      filter: enemy.isAttacking ? 'brightness(1.5) saturate(1.2)' : 'none'
+                    }}
                   />
                 ) : (
                   <AnimatedRat

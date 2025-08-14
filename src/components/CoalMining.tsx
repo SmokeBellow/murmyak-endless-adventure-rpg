@@ -23,11 +23,7 @@ const CoalMining = ({ onClose, onMineCoal, resourceCount }: CoalMiningProps) => 
         
         <CardContent className="p-6">
           <div className="text-center space-y-4">
-            <img 
-              src="/coal.png" 
-              alt="Coal" 
-              className="w-16 h-16 mx-auto pixelated"
-            />
+            <div className="text-6xl">⛏️</div>
             <p className="text-foreground">
               Вы нашли старую угольную шахту. Здесь можно добыть уголь для кузнеца.
             </p>

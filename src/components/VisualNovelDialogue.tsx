@@ -119,7 +119,7 @@ const typeTimer = setInterval(() => {
 
 // Check for quest-triggering responses
 const isQuestTrigger = (
-  (npc.type === 'elder' && option.player === 'С кем мне стоит поговорить?') ||
+  (npc.type === 'elder' && option.player === 'Конечно, помогу.') ||
   (npc.type === 'merchant' && option.player === 'Договорились.') ||
   (npc.type === 'blacksmith' && option.player === 'Согласен помочь!')
 );

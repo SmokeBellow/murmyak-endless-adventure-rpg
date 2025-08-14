@@ -187,7 +187,7 @@ const RPGGame = () => {
       quests: [
         {
           id: 'village-introduction',
-          title: 'Знакомство с деревней',
+          title: 'Знакомство с деревенскими',
           description: 'Поговори со всеми жителями деревни, чтобы познакомиться с ними.',
           status: 'available',
           giver: 'elder',
@@ -1366,7 +1366,7 @@ const handleBuyItem = useCallback((item: Item) => {
       name: 'Уголь',
       type: 'misc' as const,
       description: 'Высококачественный уголь для кузнечных работ',
-      icon: '🪨',
+      icon: '/coal.png',
       stackable: true,
       maxStack: 10
     };
@@ -1412,7 +1412,7 @@ const handleBuyItem = useCallback((item: Item) => {
       name: 'Железная руда',
       type: 'misc' as const,
       description: 'Кусок железной руды высокого качества',
-      icon: '⛏️',
+      icon: '/ore_iron.png',
       stackable: true,
       maxStack: 10
     };

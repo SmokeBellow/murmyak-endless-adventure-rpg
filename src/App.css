@@ -1,0 +1,85 @@
+/* Medieval Fantasy RPG Game Styles */
+
+/* Remove default App.css and use CSS custom properties from index.css */
+@import url('./index.css');
+
+/* Touch-friendly mobile optimizations */
+@media (max-width: 768px) {
+  /* Ensure touch targets are at least 44px */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling for mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Custom scrollbar for medieval theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+/* Game-specific animations */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6);
+  }
+}
+
+.shadow-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Disable text selection for game UI */
+.game-ui {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 20%;
+    --primary: 45 100% 60%;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .shadow-glow {
+    animation: none;
+    box-shadow: 0 0 10px hsl(var(--primary) / 0.5);
+  }
+}

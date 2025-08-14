@@ -23,7 +23,11 @@ const OreMining = ({ onClose, onMineOre, resourceCount }: OreMiningProps) => {
         
         <CardContent className="p-6">
           <div className="text-center space-y-4">
-            <div className="text-6xl">⛏️</div>
+            <img 
+              src="/ore_iron.png" 
+              alt="Iron Ore" 
+              className="w-16 h-16 mx-auto pixelated"
+            />
             <p className="text-foreground">
               Вы нашли богатую рудную жилу. Здесь можно добыть железную руду.
             </p>

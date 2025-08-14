@@ -187,7 +187,7 @@ const RPGGame = () => {
       quests: [
         {
           id: 'village-introduction',
-          title: 'Знакомство с деревней',
+          title: 'Знакомство с деревенскими',
           description: 'Поговори со всеми жителями деревни, чтобы познакомиться с ними.',
           status: 'available',
           giver: 'elder',

@@ -127,7 +127,9 @@ const RPGGame = () => {
       visitedMerchant: false,
       usedFountain: false,
       talkedToMerchant: false,
-      talkedToBlacksmith: false
+      talkedToBlacksmith: false,
+      firstMerchantTalk: true,
+      firstBlacksmithTalk: true
     }
   });
 
@@ -1616,6 +1618,18 @@ const handleBuyItem = useCallback((item: Item) => {
     npc={selectedNPC}
     hasActiveVillageQuest={quests.some(q => q.id === 'village-introduction' && q.status === 'active')}
     hasCompletedVillageQuest={completedQuestIds.includes('village-introduction')}
+    firstMerchantTalk={player.questProgress.firstMerchantTalk}
+    firstBlacksmithTalk={player.questProgress.firstBlacksmithTalk}
+    onMarkConversation={(npcType) => {
+      setPlayer(prev => ({
+        ...prev,
+        questProgress: {
+          ...prev.questProgress,
+          firstMerchantTalk: npcType === 'merchant' ? false : prev.questProgress.firstMerchantTalk,
+          firstBlacksmithTalk: npcType === 'blacksmith' ? false : prev.questProgress.firstBlacksmithTalk
+        }
+      }));
+    }}
     onClose={() => {
       setSelectedNPC(null);
       setShowVisualNovel(false);
@@ -1625,13 +1639,14 @@ const handleBuyItem = useCallback((item: Item) => {
             const questTemplates = {
               'village-defense': {
                 id: 'village-defense',
-                title: 'Защита деревни',
-                description: 'Помочь старосте справиться с угрозой.',
+                title: 'Знакомство с деревенскими',
+                description: 'Познакомиться с жителями деревни.',
                 status: 'active' as const,
                 giver: 'elder',
                 repeatable: false,
                 objectives: [
-                  { description: 'Защитить деревню от зверей', completed: false }
+                  { description: 'Поговорить с торговцем', completed: false },
+                  { description: 'Поговорить с кузнецом', completed: false }
                 ],
                 rewards: {
                   experience: 100,

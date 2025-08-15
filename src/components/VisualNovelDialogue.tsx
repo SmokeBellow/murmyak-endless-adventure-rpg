@@ -11,9 +11,12 @@ interface VisualNovelDialogueProps {
   hasActiveVillageQuest?: boolean;
   hasCompletedVillageQuest?: boolean;
   onTrade?: () => void;
+  firstMerchantTalk?: boolean;
+  firstBlacksmithTalk?: boolean;
+  onMarkConversation?: (npcType: 'merchant' | 'blacksmith') => void;
 }
 
-const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade, firstMerchantTalk, firstBlacksmithTalk, onMarkConversation }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
@@ -24,9 +27,21 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
         }
         return 'starosta';
       case 'merchant':
-        return 'torgovec';
+        if (!firstMerchantTalk) {
+          return 'torgovec_return';
+        } else if (hasActiveVillageQuest) {
+          return 'torgovec';
+        } else {
+          return 'torgovec_no_quest';
+        }
       case 'blacksmith':
-        return 'kuznec';
+        if (!firstBlacksmithTalk) {
+          return 'kuznec_return';
+        } else if (hasActiveVillageQuest) {
+          return 'kuznec';
+        } else {
+          return 'kuznec_no_quest';
+        }
       default:
         return 'starosta';
     }
@@ -116,6 +131,14 @@ const typeTimer = setInterval(() => {
       showOptions: false,
       dialogueStack: [...dialogueState.dialogueStack, option]
     });
+
+    // Mark first conversation as done
+    if (firstMerchantTalk && npc.type === 'merchant' && onMarkConversation) {
+      onMarkConversation('merchant');
+    }
+    if (firstBlacksmithTalk && npc.type === 'blacksmith' && onMarkConversation) {
+      onMarkConversation('blacksmith');
+    }
 
 // Check for quest-triggering responses
 const isQuestTrigger = (

@@ -28,6 +28,8 @@ export interface Player {
     usedFountain: boolean;
     talkedToMerchant: boolean;
     talkedToBlacksmith: boolean;
+    firstMerchantTalk: boolean;
+    firstBlacksmithTalk: boolean;
   };
 }
 

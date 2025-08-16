@@ -418,27 +418,6 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
     }`}>
-      {/* Mine darkness overlay - only for abandoned-mines location */}
-      {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
-        <div 
-          className="absolute pointer-events-none z-10"
-          style={{
-            left: 0,
-            top: 0,
-            width: mapWidth,
-            height: mapHeight,
-            background: `
-              radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 200px, rgba(0,0,0,0.95) 220px, rgba(0,0,0,0.95) 100%),
-              ${torchPositions.map(torch => 
-                `radial-gradient(circle 100px at ${torch.x}px ${torch.y}px, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 100px, rgba(0,0,0,0.95) 120px, rgba(0,0,0,0.95) 100%)`
-              ).join(', ')},
-              linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%)
-            `,
-            transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
-          }}
-        />
-      )}
-      
       <div 
         className="absolute w-full h-full"
         style={{
@@ -449,6 +428,26 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
         onClick={handleMapClick}
       >
+        {/* Mine darkness with light areas */}
+        {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
+          <div 
+            className="absolute pointer-events-none z-30"
+            style={{
+              left: 0,
+              top: 0,
+              width: mapWidth,
+              height: mapHeight,
+              background: `
+                radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px, transparent 0%, transparent 180px, rgba(0,0,0,0.95) 220px),
+                ${torchPositions.map(torch => 
+                  `radial-gradient(circle 100px at ${torch.x}px ${torch.y}px, transparent 0%, transparent 80px, rgba(0,0,0,0.95) 120px)`
+                ).join(', ')},
+                rgba(0,0,0,0.95)
+              `
+            }}
+          />
+        )}
+
         {/* Render location-specific content */}
         {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
         
@@ -530,7 +529,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             {torchPositions.map((torch, index) => (
               <div
                 key={`torch-${index}`}
-                className="absolute"
+                className="absolute z-40"
                 style={{
                   left: torch.x - 8,
                   top: torch.y - 16,
@@ -539,15 +538,16 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 <div className="relative">
                   {/* Torch flame effect */}
                   <div 
-                    className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full animate-pulse"
+                    className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full animate-pulse"
                     style={{
-                      background: 'radial-gradient(circle, #ff6b35 0%, #f7931e 30%, transparent 70%)',
-                      animation: 'pulse 1.5s ease-in-out infinite alternate'
+                      background: 'radial-gradient(circle, #ff6b35 0%, #f7931e 50%, transparent 100%)',
+                      animation: 'pulse 1.5s ease-in-out infinite alternate',
+                      boxShadow: '0 0 10px #ff6b35'
                     }}
                   />
                   {/* Torch base */}
                   <div 
-                    className="w-4 h-8 bg-amber-800 rounded-sm"
+                    className="w-4 h-8 rounded-sm border border-amber-900"
                     style={{
                       background: 'linear-gradient(to bottom, #8b4513 0%, #654321 100%)'
                     }}

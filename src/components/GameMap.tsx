@@ -417,11 +417,11 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             top: 0,
             width: mapWidth,
             height: mapHeight,
-            background: `radial-gradient(circle 800px at ${player.position.x}px ${player.position.y}px,
+            background: `radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px,
               rgba(0,0,0,0) 0px,
-              rgba(0,0,0,0) 800px,
-              rgba(0,0,0,0.9) 820px,
-              rgba(0,0,0,1) 100%)`,
+              rgba(0,0,0,0) 200px,
+              rgba(0,0,0,0.95) 220px,
+              rgba(0,0,0,0.95) 100%)`,
             transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           }}
         />

@@ -11,7 +11,7 @@ const PlayerStats = ({ player }: PlayerStatsProps) => {
   const experiencePercentage = (player.experience / experienceForNextLevel) * 100;
 
   return (
-    <div className="fixed top-4 right-4 w-1/5 z-40 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-medieval">
+    <div className="fixed top-4 right-4 w-1/5 z-50 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-medieval">
       <div className="flex flex-col space-y-2">
         {/* Health Bar */}
         <div className="flex items-center space-x-3">

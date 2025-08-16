@@ -82,6 +82,16 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     portal: { x: 50, y: 50 },
   });
 
+  // Torch positions in mines
+  const torchPositions = [
+    { x: 800, y: 200 },
+    { x: 1200, y: 600 },
+    { x: 300, y: 800 },
+    { x: 1500, y: 400 },
+    { x: 500, y: 1200 },
+    { x: 1000, y: 1000 }
+  ];
+
   useEffect(() => {
     if (currentLocation === 'abandoned-mines') {
       setMineCenters({
@@ -411,17 +421,19 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       {/* Mine darkness overlay - only for abandoned-mines location */}
       {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
         <div 
-          className="absolute pointer-events-none z-50"
+          className="absolute pointer-events-none z-40"
           style={{
             left: 0,
             top: 0,
             width: mapWidth,
             height: mapHeight,
-            background: `radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px,
-              rgba(0,0,0,0) 0px,
-              rgba(0,0,0,0) 200px,
-              rgba(0,0,0,0.95) 220px,
-              rgba(0,0,0,0.95) 100%)`,
+            background: `
+              radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 200px, rgba(0,0,0,0.95) 220px, rgba(0,0,0,0.95) 100%),
+              ${torchPositions.map(torch => 
+                `radial-gradient(circle 100px at ${torch.x}px ${torch.y}px, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 100px, rgba(0,0,0,0.95) 120px, rgba(0,0,0,0.95) 100%)`
+              ).join(', ')},
+              linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%)
+            `,
             transform: `translate(${cameraOffsetX}px, ${cameraOffsetY}px) scale(${zoomLevel})`,
           }}
         />
@@ -514,6 +526,36 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         
         {currentLocation === 'abandoned-mines' && (
           <>
+            {/* Torches in mines */}
+            {torchPositions.map((torch, index) => (
+              <div
+                key={`torch-${index}`}
+                className="absolute"
+                style={{
+                  left: torch.x - 8,
+                  top: torch.y - 16,
+                }}
+              >
+                <div className="relative">
+                  {/* Torch flame effect */}
+                  <div 
+                    className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full animate-pulse"
+                    style={{
+                      background: 'radial-gradient(circle, #ff6b35 0%, #f7931e 30%, transparent 70%)',
+                      animation: 'pulse 1.5s ease-in-out infinite alternate'
+                    }}
+                  />
+                  {/* Torch base */}
+                  <div 
+                    className="w-4 h-8 bg-amber-800 rounded-sm"
+                    style={{
+                      background: 'linear-gradient(to bottom, #8b4513 0%, #654321 100%)'
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            
             {/* Coal mine */}
             <div
               className="absolute"

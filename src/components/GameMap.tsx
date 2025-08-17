@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 import { MinesMap } from '@/components/MinesMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
@@ -20,6 +20,7 @@ interface GameMapProps {
 const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const lightCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Handle cheat code for light (123 keys)
   useEffect(() => {
@@ -215,6 +216,44 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   // Center player exactly in the middle of the screen
   const cameraOffsetX = -player.position.x * zoomLevel + (screenWidth / 2);
   const cameraOffsetY = -player.position.y * zoomLevel + (screenHeight / 2);
+
+  // Draw dynamic darkness overlay with light holes using canvas
+  useEffect(() => {
+    const canvas = lightCanvasRef.current;
+    if (!canvas) return;
+    canvas.width = mapWidth;
+    canvas.height = mapHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // If not in mines or cheat enabled, do nothing (no darkness)
+    if (currentLocation !== 'abandoned-mines' || isLightCheatEnabled) return;
+
+    // Fill darkness
+    ctx.fillStyle = 'rgba(0,0,0,0.95)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Cut light areas
+    ctx.globalCompositeOperation = 'destination-out';
+
+    // Player light (150px radius)
+    ctx.beginPath();
+    ctx.arc(player.position.x, player.position.y, 150, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Torch lights (50px radius)
+    torchPositions.forEach(t => {
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 50, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Reset composite for safety
+    ctx.globalCompositeOperation = 'source-over';
+  }, [currentLocation, isLightCheatEnabled, player.position.x, player.position.y]);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {
@@ -428,23 +467,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
         onClick={handleMapClick}
       >
-        {/* Mine darkness with light areas */}
+        {/* Darkness overlay canvas with light holes */}
         {currentLocation === 'abandoned-mines' && !isLightCheatEnabled && (
-          <div 
-            className="absolute pointer-events-none z-30"
-            style={{
-              left: 0,
-              top: 0,
-              width: mapWidth,
-              height: mapHeight,
-              background: `
-                radial-gradient(circle 150px at ${player.position.x}px ${player.position.y}px, transparent 0%, transparent 130px, rgba(0,0,0,0.95) 150px),
-                ${torchPositions.map(torch => 
-                  `radial-gradient(circle 50px at ${torch.x}px ${torch.y}px, transparent 0%, transparent 30px, rgba(0,0,0,0.95) 50px)`
-                ).join(', ')},
-                rgba(0,0,0,0.95)
-              `
-            }}
+          <canvas
+            ref={lightCanvasRef}
+            className="absolute pointer-events-none z-20"
+            style={{ left: 0, top: 0, width: mapWidth, height: mapHeight }}
           />
         )}
 

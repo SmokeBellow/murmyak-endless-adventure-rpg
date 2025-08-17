@@ -438,9 +438,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
               width: mapWidth,
               height: mapHeight,
               background: `
-                radial-gradient(circle 200px at ${player.position.x}px ${player.position.y}px, transparent 0%, transparent 180px, rgba(0,0,0,0.95) 220px),
+                radial-gradient(circle 150px at ${player.position.x}px ${player.position.y}px, transparent 0%, transparent 130px, rgba(0,0,0,0.95) 150px),
                 ${torchPositions.map(torch => 
-                  `radial-gradient(circle 100px at ${torch.x}px ${torch.y}px, transparent 0%, transparent 80px, rgba(0,0,0,0.95) 120px)`
+                  `radial-gradient(circle 50px at ${torch.x}px ${torch.y}px, transparent 0%, transparent 30px, rgba(0,0,0,0.95) 50px)`
                 ).join(', ')},
                 rgba(0,0,0,0.95)
               `

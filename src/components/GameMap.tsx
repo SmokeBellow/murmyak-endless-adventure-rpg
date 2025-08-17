@@ -217,7 +217,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const cameraOffsetX = -player.position.x * zoomLevel + (screenWidth / 2);
   const cameraOffsetY = -player.position.y * zoomLevel + (screenHeight / 2);
 
-  // Draw dynamic darkness overlay with light holes using canvas
+  // Draw dynamic darkness overlay with gradient light areas using canvas
   useEffect(() => {
     const canvas = lightCanvasRef.current;
     if (!canvas) return;
@@ -232,20 +232,38 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     // If not in mines or cheat enabled, do nothing (no darkness)
     if (currentLocation !== 'abandoned-mines' || isLightCheatEnabled) return;
 
-    // Fill darkness
-    ctx.fillStyle = 'rgba(0,0,0,0.95)';
+    // Fill with complete darkness
+    ctx.fillStyle = 'rgba(0,0,0,1.0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Cut light areas
+    // Create gradient light areas using destination-out
     ctx.globalCompositeOperation = 'destination-out';
 
-    // Player light (150px radius)
+    // Player light (150px radius with gradient)
+    const playerGradient = ctx.createRadialGradient(
+      player.position.x, player.position.y, 0,
+      player.position.x, player.position.y, 150
+    );
+    playerGradient.addColorStop(0, 'rgba(255,255,255,1.0)'); // Full transparency at center
+    playerGradient.addColorStop(0.7, 'rgba(255,255,255,0.8)'); // Gradual fade
+    playerGradient.addColorStop(1, 'rgba(255,255,255,0.0)'); // No transparency at edge
+
+    ctx.fillStyle = playerGradient;
     ctx.beginPath();
     ctx.arc(player.position.x, player.position.y, 150, 0, Math.PI * 2);
     ctx.fill();
 
-    // Torch lights (50px radius)
+    // Torch lights (50px radius with gradient)
     torchPositions.forEach(t => {
+      const torchGradient = ctx.createRadialGradient(
+        t.x, t.y, 0,
+        t.x, t.y, 50
+      );
+      torchGradient.addColorStop(0, 'rgba(255,255,255,0.9)'); // Slightly less bright than player
+      torchGradient.addColorStop(0.6, 'rgba(255,255,255,0.6)'); // Gradual fade
+      torchGradient.addColorStop(1, 'rgba(255,255,255,0.0)'); // No transparency at edge
+
+      ctx.fillStyle = torchGradient;
       ctx.beginPath();
       ctx.arc(t.x, t.y, 50, 0, Math.PI * 2);
       ctx.fill();

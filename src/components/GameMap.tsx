@@ -253,11 +253,11 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     ctx.arc(player.position.x, player.position.y, 150, 0, Math.PI * 2);
     ctx.fill();
 
-    // Torch lights (50px radius with gradient)
+    // Torch lights (100px radius with gradient)
     torchPositions.forEach(t => {
       const torchGradient = ctx.createRadialGradient(
         t.x, t.y, 0,
-        t.x, t.y, 50
+        t.x, t.y, 100
       );
       torchGradient.addColorStop(0, 'rgba(255,255,255,0.9)'); // Slightly less bright than player
       torchGradient.addColorStop(0.6, 'rgba(255,255,255,0.6)'); // Gradual fade
@@ -265,7 +265,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
       ctx.fillStyle = torchGradient;
       ctx.beginPath();
-      ctx.arc(t.x, t.y, 50, 0, Math.PI * 2);
+      ctx.arc(t.x, t.y, 100, 0, Math.PI * 2);
       ctx.fill();
     });
 

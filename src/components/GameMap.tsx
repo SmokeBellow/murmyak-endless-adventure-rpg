@@ -217,34 +217,6 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const cameraOffsetX = -player.position.x * zoomLevel + (screenWidth / 2);
   const cameraOffsetY = -player.position.y * zoomLevel + (screenHeight / 2);
 
-  // Line of sight check - returns true if point is visible from light source
-  const hasLineOfSight = useCallback((lightX: number, lightY: number, targetX: number, targetY: number) => {
-    const dx = targetX - lightX;
-    const dy = targetY - lightY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const steps = Math.ceil(distance / 2); // Check every 2 pixels
-    
-    if (steps === 0) return true;
-    
-    const stepX = dx / steps;
-    const stepY = dy / steps;
-    
-    for (let i = 1; i < steps; i++) {
-      const checkX = lightX + stepX * i;
-      const checkY = lightY + stepY * i;
-      
-      // Check if this point intersects with any wall
-      for (const wall of minesObstacles) {
-        if (checkX >= wall.x && checkX <= wall.x + wall.w && 
-            checkY >= wall.y && checkY <= wall.y + wall.h) {
-          return false;
-        }
-      }
-    }
-    
-    return true;
-  }, []);
-
   // Draw dynamic darkness overlay with gradient light areas using canvas
   useEffect(() => {
     const canvas = lightCanvasRef.current;
@@ -264,59 +236,42 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     ctx.fillStyle = 'rgba(0,0,0,1.0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Create image data for pixel-level manipulation
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
+    // Create gradient light areas using destination-out
+    ctx.globalCompositeOperation = 'destination-out';
 
-    // Helper function to set pixel transparency
-    const setPixelAlpha = (x: number, y: number, alpha: number) => {
-      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
-      const index = (y * canvas.width + x) * 4;
-      data[index + 3] = Math.min(255, Math.max(0, 255 - alpha * 255)); // Invert alpha for darkness overlay
-    };
+    // Player light (150px radius with gradient)
+    const playerGradient = ctx.createRadialGradient(
+      player.position.x, player.position.y, 0,
+      player.position.x, player.position.y, 150
+    );
+    playerGradient.addColorStop(0, 'rgba(255,255,255,1.0)'); // Full transparency at center
+    playerGradient.addColorStop(0.7, 'rgba(255,255,255,0.8)'); // Gradual fade
+    playerGradient.addColorStop(1, 'rgba(255,255,255,0.0)'); // No transparency at edge
 
-    // Light sources: player + torches
-    const lightSources = [
-      { x: player.position.x, y: player.position.y, radius: 150, intensity: 1.0 },
-      ...torchPositions.map(t => ({ x: t.x, y: t.y, radius: 100, intensity: 0.9 }))
-    ];
+    ctx.fillStyle = playerGradient;
+    ctx.beginPath();
+    ctx.arc(player.position.x, player.position.y, 150, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Process each light source
-    lightSources.forEach(light => {
-      const radius = light.radius;
-      const startX = Math.max(0, Math.floor(light.x - radius));
-      const endX = Math.min(canvas.width - 1, Math.ceil(light.x + radius));
-      const startY = Math.max(0, Math.floor(light.y - radius));
-      const endY = Math.min(canvas.height - 1, Math.ceil(light.y + radius));
+    // Torch lights (100px radius with gradient)
+    torchPositions.forEach(t => {
+      const torchGradient = ctx.createRadialGradient(
+        t.x, t.y, 0,
+        t.x, t.y, 100
+      );
+      torchGradient.addColorStop(0, 'rgba(255,255,255,0.9)'); // Slightly less bright than player
+      torchGradient.addColorStop(0.6, 'rgba(255,255,255,0.6)'); // Gradual fade
+      torchGradient.addColorStop(1, 'rgba(255,255,255,0.0)'); // No transparency at edge
 
-      // Check each pixel in the light radius
-      for (let x = startX; x <= endX; x += 2) { // Step by 2 for performance
-        for (let y = startY; y <= endY; y += 2) { // Step by 2 for performance
-          const dx = x - light.x;
-          const dy = y - light.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance <= radius) {
-            // Check line of sight
-            if (hasLineOfSight(light.x, light.y, x, y)) {
-              // Calculate gradient intensity based on distance
-              const gradientFactor = Math.max(0, 1 - (distance / radius));
-              const alpha = light.intensity * gradientFactor * gradientFactor; // Squared for smoother falloff
-              
-              // Set this pixel and neighboring pixels for smoother look
-              setPixelAlpha(x, y, alpha);
-              setPixelAlpha(x + 1, y, alpha);
-              setPixelAlpha(x, y + 1, alpha);
-              setPixelAlpha(x + 1, y + 1, alpha);
-            }
-          }
-        }
-      }
+      ctx.fillStyle = torchGradient;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 100, 0, Math.PI * 2);
+      ctx.fill();
     });
 
-    // Apply the modified image data
-    ctx.putImageData(imageData, 0, 0);
-  }, [currentLocation, isLightCheatEnabled, player.position.x, player.position.y, hasLineOfSight]);
+    // Reset composite for safety
+    ctx.globalCompositeOperation = 'source-over';
+  }, [currentLocation, isLightCheatEnabled, player.position.x, player.position.y]);
 
   // Generate background pattern
   const getBackgroundTile = (x: number, y: number) => {

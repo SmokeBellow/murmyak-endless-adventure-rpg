@@ -329,6 +329,116 @@ const RPGGame = () => {
     setDamageTexts([]);
   }, [player, currentLocation, battleState, gameScreen]);
 
+  // Loot generation function
+  const generateLoot = useCallback(() => {
+    const lootItems: Item[] = [];
+    
+    // 1. Always drop health potion
+    lootItems.push({
+      id: `health-potion-${Date.now()}`,
+      name: 'Зелье здоровья',
+      type: 'consumable',
+      description: 'Восстанавливает 50 единиц здоровья',
+      icon: '/healthpotion.png',
+      stackable: true,
+      maxStack: 10
+    });
+    
+    // 2. Random trash loot for selling (different rarities and prices)
+    const trashItems = [
+      { name: 'Обломок кристалла', price: 15, icon: '/healthpotion.png', chance: 0.4 },
+      { name: 'Старая монета', price: 8, icon: '/healthpotion.png', chance: 0.6 },
+      { name: 'Блестящий камешек', price: 25, icon: '/healthpotion.png', chance: 0.3 },
+      { name: 'Кусок руды', price: 12, icon: '/healthpotion.png', chance: 0.5 },
+      { name: 'Ржавый гвоздь', price: 3, icon: '/healthpotion.png', chance: 0.7 },
+      { name: 'Редкий самоцвет', price: 50, icon: '/healthpotion.png', chance: 0.15 }
+    ];
+    
+    trashItems.forEach((trash, index) => {
+      if (Math.random() < trash.chance) {
+        lootItems.push({
+          id: `trash-${index}-${Date.now()}`,
+          name: trash.name,
+          type: 'misc',
+          description: 'Можно продать торговцу',
+          icon: trash.icon,
+          price: trash.price,
+          stackable: true,
+          maxStack: 20
+        });
+      }
+    });
+    
+    // 3. Equipment drop (chance for mining equipment)
+    const equipmentItems = [
+      { 
+        id: 'miners-helmet',
+        name: 'Шлем шахтёра', 
+        type: 'armor', 
+        slot: 'head',
+        stats: { armor: 3, health: 10 },
+        description: 'Защитный шлем для работы в шахтах',
+        icon: '/helmet_empty.png',
+        price: 45,
+        chance: 0.25 
+      },
+      { 
+        id: 'mining-gloves',
+        name: 'Рабочие перчатки', 
+        type: 'armor', 
+        slot: 'weapon',
+        stats: { damage: 2 },
+        description: 'Прочные перчатки для физической работы',
+        icon: '/weapon_empty.png',
+        price: 30,
+        chance: 0.3 
+      },
+      { 
+        id: 'reinforced-boots',
+        name: 'Укреплённые сапоги', 
+        type: 'armor', 
+        slot: 'legs',
+        stats: { armor: 2, health: 5 },
+        description: 'Сапоги со стальными носками',
+        icon: '/boots_empty.png',
+        price: 35,
+        chance: 0.2 
+      }
+    ];
+    
+    equipmentItems.forEach((equip, index) => {
+      if (Math.random() < equip.chance) {
+        lootItems.push({
+          id: `equipment-${index}-${Date.now()}`,
+          name: equip.name,
+          type: equip.type as 'weapon' | 'armor',
+          slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+          stats: equip.stats,
+          description: equip.description,
+          icon: equip.icon,
+          price: equip.price,
+          stackable: false
+        });
+      }
+    });
+    
+    // Ensure we have at least 2 items total (health potion + at least 1 more)
+    if (lootItems.length < 2) {
+      lootItems.push({
+        id: `fallback-${Date.now()}`,
+        name: 'Кусок руды',
+        type: 'misc',
+        description: 'Можно продать торговцу',
+        icon: '/healthpotion.png',
+        price: 12,
+        stackable: true,
+        maxStack: 20
+      });
+    }
+    
+    return lootItems;
+  }, []);
+
   const handleBattleEnd = useCallback(() => {
     setBattleState(null);
     setBattleResult(null);
@@ -381,20 +491,7 @@ const RPGGame = () => {
       // Generate battle result
       const experienceGained = Math.floor(Math.random() * 20) + 10;
       const coinsGained = Math.floor(Math.random() * 10) + 5;
-      const lootItems: Item[] = [];
-      
-      // Random loot chance
-      if (Math.random() < 0.3) { // 30% chance for loot
-        lootItems.push({
-          id: 'health-potion',
-          name: 'Зелье здоровья',
-          type: 'consumable',
-          description: 'Восстанавливает 50 единиц здоровья',
-          icon: '/healthpotion.png',
-          stackable: true,
-          maxStack: 10
-        });
-      }
+      const lootItems = generateLoot();
       
       setBattleResult({
         victory: true,
@@ -495,18 +592,7 @@ const RPGGame = () => {
       addBattleLog(`${enemyName} повержен!`);
       const experienceGained = Math.floor(Math.random() * 20) + 15;
       const coinsGained = Math.floor(Math.random() * 10) + 5;
-      const lootItems: Item[] = [];
-      if (Math.random() < 0.3) {
-        lootItems.push({
-          id: 'health-potion',
-          name: 'Зелье здоровья',
-          type: 'consumable',
-          description: 'Восстанавливает 50 единиц здоровья',
-          icon: '/healthpotion.png',
-          stackable: true,
-          maxStack: 10
-        });
-      }
+      const lootItems = generateLoot();
       setBattleResult({ victory: true, experienceGained, coinsGained, lootItems });
       setTimeout(() => {
         setGameScreen('battle-victory');

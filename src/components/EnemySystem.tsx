@@ -57,7 +57,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 2000,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 3
       },
       {
         id: 'bat-2',
@@ -78,7 +79,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 2000,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 3
       },
       {
         id: 'bat-3',
@@ -99,7 +101,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 2000,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 3
       },
       {
         id: 'bat-4',
@@ -120,7 +123,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 2000,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 3
       },
       {
         id: 'bat-5',
@@ -141,7 +145,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 2000,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 3
       },
       // Крысы
       {
@@ -163,7 +168,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       },
       {
         id: 'rat-2',
@@ -184,7 +190,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       },
       {
         id: 'rat-3',
@@ -205,7 +212,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       },
       {
         id: 'rat-4',
@@ -226,7 +234,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       },
       {
         id: 'rat-5',
@@ -247,7 +256,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       },
       {
         id: 'rat-6',
@@ -268,7 +278,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
         lastAttack: 0,
         attackCooldown: 1500,
         isAttacking: false,
-        isDead: false
+        isDead: false,
+        damageReduction: 0
       }
     ];
 
@@ -458,7 +469,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 2000,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 3
           },
           {
             id: 'bat-2',
@@ -479,7 +491,10 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 2000,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 3
+          // ... keep existing bat-3, bat-4, bat-5 enemies
+          // Replace all with damageReduction: 3 for bats, 0 for rats
           },
           {
             id: 'bat-3',
@@ -500,7 +515,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 2000,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 3
           },
           {
             id: 'bat-4',
@@ -521,7 +537,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 2000,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 3
           },
           {
             id: 'bat-5',
@@ -542,7 +559,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 2000,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 3
           },
           {
             id: 'rat-1',
@@ -563,7 +581,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           },
           {
             id: 'rat-2',
@@ -584,7 +603,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           },
           {
             id: 'rat-3',
@@ -605,7 +625,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           },
           {
             id: 'rat-4',
@@ -626,7 +647,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           },
           {
             id: 'rat-5',
@@ -647,7 +669,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           },
           {
             id: 'rat-6',
@@ -668,7 +691,8 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
             lastAttack: 0,
             attackCooldown: 1500,
             isAttacking: false,
-            isDead: false
+            isDead: false,
+            damageReduction: 0
           }
         ];
         

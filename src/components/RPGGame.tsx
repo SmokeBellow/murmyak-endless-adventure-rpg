@@ -473,9 +473,19 @@ const RPGGame = () => {
     const currentEnemyHealth = currentBattleState.enemy.health;
     const currentPlayerHealth = player.health;
     
-    // Player attacks enemy
-    const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
-    const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4));
+    // Calculate damage with new formula
+    const baseDamage = 5 + player.stats.strength * 0.5; // Base damage from strength
+    const weaponModifier = player.equipment.weapon?.stats?.damage || 0; // Weapon adds damage
+    const randomModifier = 0.8 + Math.random() * 0.4; // 80-120% variance
+    const rawDamage = Math.floor((baseDamage + weaponModifier) * randomModifier);
+    
+    // Apply enemy damage reduction
+    const enemyReduction = battleState.enemy.damageReduction || 0;
+    const afterEnemyReduction = rawDamage * (1 - enemyReduction / 100);
+    
+    // Apply location modifier (mines reduce damage by 2%)
+    const locationModifier = currentLocation === 'abandoned-mines' ? 0.98 : 1;
+    const totalDamage = Math.max(1, Math.floor(afterEnemyReduction * locationModifier));
     
     const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
     
@@ -581,8 +591,19 @@ const RPGGame = () => {
     setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - SKILL_MANA_COST) }));
 
     // Skill damage: stronger than basic attack
-    const weaponDamage = player.equipment.weapon?.stats?.damage || 10;
-    const totalDamage = Math.floor(weaponDamage * 1.8 * (0.9 + Math.random() * 0.2));
+    const baseDamage = 5 + player.stats.strength * 0.5; // Base damage from strength
+    const weaponModifier = player.equipment.weapon?.stats?.damage || 0; // Weapon adds damage
+    const skillMultiplier = 1.8; // Skills are stronger
+    const randomModifier = 0.9 + Math.random() * 0.2; // 90-110% variance for skills
+    const rawDamage = Math.floor((baseDamage + weaponModifier) * skillMultiplier * randomModifier);
+    
+    // Apply enemy damage reduction
+    const enemyReduction = battleState.enemy.damageReduction || 0;
+    const afterEnemyReduction = rawDamage * (1 - enemyReduction / 100);
+    
+    // Apply location modifier (mines reduce damage by 2%)
+    const locationModifier = currentLocation === 'abandoned-mines' ? 0.98 : 1;
+    const totalDamage = Math.max(1, Math.floor(afterEnemyReduction * locationModifier));
 
     const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
     addDamageText(totalDamage, 'enemy', 'skill');
@@ -802,21 +823,7 @@ const RPGGame = () => {
     handleBattleEnd();
   }, [handleBattleEnd, battleState, removeEnemy]);
 
-  // Handle enemy attack
-  const handleEnemyClick = useCallback((enemy: Enemy) => {
-    if (enemy.isDead) return;
-    
-    // Calculate player's total damage
-    const weaponDamage = player.equipment.weapon?.stats?.damage || 5;
-    const totalDamage = Math.floor(weaponDamage * (0.8 + Math.random() * 0.4)); // Random variance
-    
-    attackEnemy(enemy.id, totalDamage);
-    
-    toast({
-      title: "Атака!",
-      description: `Вы нанесли ${totalDamage} урона ${enemy.name}`,
-    });
-  }, [player.equipment.weapon, attackEnemy, toast]);
+  // Enemy click removed - no attacks outside battle
 
   // Regeneration effect
   useEffect(() => {
@@ -1592,7 +1599,7 @@ const handleBuyItem = useCallback((item: Item) => {
             npcs={npcs}
             enemies={currentLocation === 'abandoned-mines' ? enemies : []}
             onNPCInteract={handleNPCInteract}
-            onEnemyClick={handleEnemyClick}
+            onEnemyClick={() => {}} // No attacks outside battle
             onFountainUse={handleFountainUse}
             onCoalMineInteract={handleCoalMineInteract}
             currentLocation={currentLocation}

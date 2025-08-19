@@ -108,6 +108,7 @@ export interface Enemy {
   attackCooldown: number;
   isAttacking: boolean;
   isDead: boolean;
+  damageReduction: number; // Снижение урона в процентах (0-100)
 }
 
 export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';

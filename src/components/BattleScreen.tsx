@@ -64,7 +64,7 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="flex flex-col items-center relative">
+        <div className="flex flex-col items-center relative mb-20">
           <img 
             src="/player_fight.png" 
             alt="Player" 
@@ -73,7 +73,7 @@ export const BattleScreen = ({
               e.currentTarget.src = '/player.png'; // fallback
             }}
           />
-          <div className="mt-4 text-white text-center">
+          <div className="mb-24 text-white text-center">
             <div className="text-lg font-bold">{currentPlayer.name}</div>
             <div className="w-32">
               <Progress 
@@ -81,6 +81,11 @@ export const BattleScreen = ({
                 className="h-3 bg-red-900"
               />
               <div className="text-sm">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
+              <Progress 
+                value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
+                className="h-3 bg-blue-900 mt-1"
+              />
+              <div className="text-sm">{currentPlayer.mana}/{currentPlayer.maxMana} MP</div>
             </div>
           </div>
           

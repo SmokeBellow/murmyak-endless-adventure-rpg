@@ -584,7 +584,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 <img 
                   src="/torch.png" 
                   alt="Torch" 
-                  className="w-4 h-8 object-contain animate-pulse"
+                  className="w-8 h-16 object-contain"
                 />
               </div>
             ))}

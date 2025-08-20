@@ -330,109 +330,153 @@ const RPGGame = () => {
   }, [player, currentLocation, battleState, gameScreen]);
 
   // Loot generation function
-  const generateLoot = useCallback(() => {
+  const generateLoot = useCallback((enemyType: 'rat' | 'bat') => {
     const lootItems: Item[] = [];
     
-    // 1. Always drop health potion
-    lootItems.push({
-      id: `health-potion-${Date.now()}`,
-      name: 'Зелье здоровья',
-      type: 'consumable',
-      description: 'Восстанавливает 50 единиц здоровья',
-      icon: '/healthpotion.png',
-      stackable: true,
-      maxStack: 10
-    });
-    
-    // 2. Random trash loot for selling (different rarities and prices)
-    const trashItems = [
-      { name: 'Обломок кристалла', price: 15, icon: '/healthpotion.png', chance: 0.4 },
-      { name: 'Старая монета', price: 8, icon: '/healthpotion.png', chance: 0.6 },
-      { name: 'Блестящий камешек', price: 25, icon: '/healthpotion.png', chance: 0.3 },
-      { name: 'Кусок руды', price: 12, icon: '/healthpotion.png', chance: 0.5 },
-      { name: 'Ржавый гвоздь', price: 3, icon: '/healthpotion.png', chance: 0.7 },
-      { name: 'Редкий самоцвет', price: 50, icon: '/healthpotion.png', chance: 0.15 }
-    ];
-    
-    trashItems.forEach((trash, index) => {
-      if (Math.random() < trash.chance) {
-        lootItems.push({
-          id: `trash-${index}-${Date.now()}`,
-          name: trash.name,
-          type: 'misc',
-          description: 'Можно продать торговцу',
-          icon: trash.icon,
-          price: trash.price,
-          stackable: true,
-          maxStack: 20
-        });
-      }
-    });
-    
-    // 3. Equipment drop (chance for mining equipment)
-    const equipmentItems = [
-      { 
-        id: 'miners-helmet',
-        name: 'Шлем шахтёра', 
-        type: 'armor', 
-        slot: 'head',
-        stats: { armor: 3, health: 10 },
-        description: 'Защитный шлем для работы в шахтах',
-        icon: '/helmet_empty.png',
-        price: 45,
-        chance: 0.25 
-      },
-      { 
-        id: 'mining-gloves',
-        name: 'Рабочие перчатки', 
-        type: 'armor', 
-        slot: 'weapon',
-        stats: { damage: 2 },
-        description: 'Прочные перчатки для физической работы',
-        icon: '/weapon_empty.png',
-        price: 30,
-        chance: 0.3 
-      },
-      { 
-        id: 'reinforced-boots',
-        name: 'Укреплённые сапоги', 
-        type: 'armor', 
-        slot: 'legs',
-        stats: { armor: 2, health: 5 },
-        description: 'Сапоги со стальными носками',
-        icon: '/boots_empty.png',
-        price: 35,
-        chance: 0.2 
-      }
-    ];
-    
-    equipmentItems.forEach((equip, index) => {
-      if (Math.random() < equip.chance) {
-        lootItems.push({
-          id: `equipment-${index}-${Date.now()}`,
-          name: equip.name,
-          type: equip.type as 'weapon' | 'armor',
-          slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
-          stats: equip.stats,
-          description: equip.description,
-          icon: equip.icon,
-          price: equip.price,
-          stackable: false
-        });
-      }
-    });
-    
-    // Ensure we have at least 2 items total (health potion + at least 1 more)
-    if (lootItems.length < 2) {
-      lootItems.push({
-        id: `fallback-${Date.now()}`,
-        name: 'Кусок руды',
-        type: 'misc',
-        description: 'Можно продать торговцу',
-        icon: '/healthpotion.png',
-        price: 12,
-        stackable: true,
-        maxStack: 20
+    if (enemyType === 'rat') {
+      // Крыса лут
+      const ratTrashItems = [
+        { name: 'Ржавый гвоздь', sellPrice: 1, basePrice: 3, icon: '/trash_nail.png', chance: 0.2 },
+        { name: 'Старая монета', sellPrice: 4, basePrice: 8, icon: '/healthpotion.png', chance: 0.1 },
+        { name: 'Кусок руды', sellPrice: 6, basePrice: 12, icon: '/healthpotion.png', chance: 0.05 },
+        { name: 'Обломок кристалла', sellPrice: 7, basePrice: 15, icon: '/healthpotion.png', chance: 0.03 },
+        { name: 'Блестящий камешек', sellPrice: 12, basePrice: 25, icon: '/healthpotion.png', chance: 0.01 },
+        { name: 'Редкий самоцвет', sellPrice: 25, basePrice: 50, icon: '/trash_gem.png', chance: 0.005 }
+      ];
+
+      const ratEquipmentItems = [
+        { 
+          name: 'Рабочие перчатки', 
+          sellPrice: 15, 
+          basePrice: 30, 
+          type: 'armor', 
+          slot: 'weapon',
+          stats: { damage: 2 },
+          description: 'Прочные перчатки для физической работы',
+          icon: '/weapon_empty.png',
+          chance: 0.05 
+        },
+        { 
+          name: 'Шлем шахтёра', 
+          sellPrice: 22, 
+          basePrice: 45, 
+          type: 'armor', 
+          slot: 'head',
+          stats: { armor: 3, health: 10 },
+          description: 'Защитный шлем для работы в шахтах',
+          icon: '/helmet_empty.png',
+          chance: 0.05 
+        },
+        { 
+          name: 'Укреплённые сапоги', 
+          sellPrice: 17, 
+          basePrice: 35, 
+          type: 'armor', 
+          slot: 'legs',
+          stats: { armor: 2, health: 5 },
+          description: 'Сапоги со стальными носками',
+          icon: '/boots_empty.png',
+          chance: 0.05 
+        }
+      ];
+
+      // Генерируем мусорный лут
+      ratTrashItems.forEach((trash, index) => {
+        if (Math.random() < trash.chance) {
+          lootItems.push({
+            id: `rat-trash-${index}-${Date.now()}`,
+            name: trash.name,
+            type: 'misc',
+            description: 'Можно продать торговцу',
+            icon: trash.icon,
+            price: trash.basePrice,
+            stackable: true,
+            maxStack: 20
+          });
+        }
+      });
+
+      // Генерируем экипировку
+      ratEquipmentItems.forEach((equip, index) => {
+        if (Math.random() < equip.chance) {
+          lootItems.push({
+            id: `rat-equipment-${index}-${Date.now()}`,
+            name: equip.name,
+            type: equip.type as 'weapon' | 'armor',
+            slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+            stats: equip.stats,
+            description: equip.description,
+            icon: equip.icon,
+            price: equip.basePrice,
+            stackable: false
+          });
+        }
+      });
+
+    } else if (enemyType === 'bat') {
+      // Летучая мышь лут
+      const batTrashItems = [
+        { name: 'Порванное крыло', sellPrice: 1, basePrice: 3, icon: '/healthpotion.png', chance: 0.25 },
+        { name: 'Осколок кости', sellPrice: 3, basePrice: 6, icon: '/healthpotion.png', chance: 0.15 },
+        { name: 'Капля тёмной смолы', sellPrice: 5, basePrice: 10, icon: '/healthpotion.png', chance: 0.08 },
+        { name: 'Фрагмент чёрного кристалла', sellPrice: 9, basePrice: 18, icon: '/healthpotion.png', chance: 0.03 },
+        { name: 'Зачарованное перо', sellPrice: 18, basePrice: 40, icon: '/healthpotion.png', chance: 0.01 }
+      ];
+
+      const batEquipmentItems = [
+        { 
+          name: 'Кожаный плащ', 
+          sellPrice: 20, 
+          basePrice: 45, 
+          type: 'armor', 
+          slot: 'chest',
+          stats: { armor: 4, health: 8 },
+          description: 'Лёгкий плащ из кожи летучей мыши',
+          icon: '/armor_empty.png',
+          chance: 0.04 
+        },
+        { 
+          name: 'Амулет ночного зрения', 
+          sellPrice: 40, 
+          basePrice: 80, 
+          type: 'misc', 
+          description: 'Магический амулет, улучшающий зрение в темноте',
+          icon: '/amulet_empty.png',
+          chance: 0.02 
+        }
+      ];
+
+      // Генерируем мусорный лут
+      batTrashItems.forEach((trash, index) => {
+        if (Math.random() < trash.chance) {
+          lootItems.push({
+            id: `bat-trash-${index}-${Date.now()}`,
+            name: trash.name,
+            type: 'misc',
+            description: 'Можно продать торговцу',
+            icon: trash.icon,
+            price: trash.basePrice,
+            stackable: true,
+            maxStack: 20
+          });
+        }
+      });
+
+      // Генерируем экипировку
+      batEquipmentItems.forEach((equip, index) => {
+        if (Math.random() < equip.chance) {
+          lootItems.push({
+            id: `bat-equipment-${index}-${Date.now()}`,
+            name: equip.name,
+            type: equip.type as 'weapon' | 'armor' | 'misc',
+            slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+            stats: equip.stats,
+            description: equip.description,
+            icon: equip.icon,
+            price: equip.basePrice,
+            stackable: false
+          });
+        }
       });
     }
     
@@ -501,7 +545,7 @@ const RPGGame = () => {
       // Generate battle result
       const experienceGained = Math.floor(Math.random() * 20) + 10;
       const coinsGained = Math.floor(Math.random() * 10) + 5;
-      const lootItems = generateLoot();
+      const lootItems = generateLoot(battleState.enemy.type);
       
       setBattleResult({
         victory: true,
@@ -613,7 +657,7 @@ const RPGGame = () => {
       addBattleLog(`${enemyName} повержен!`);
       const experienceGained = Math.floor(Math.random() * 20) + 15;
       const coinsGained = Math.floor(Math.random() * 10) + 5;
-      const lootItems = generateLoot();
+      const lootItems = generateLoot(battleState.enemy.type);
       setBattleResult({ victory: true, experienceGained, coinsGained, lootItems });
       setTimeout(() => {
         setGameScreen('battle-victory');

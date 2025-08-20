@@ -89,5 +89,29 @@ export const getTotalItemQuantity = (inventory: Item[], itemName: string): numbe
 };
 
 export const getSellPrice = (item: Item): number => {
+  // Специальные цены продажи для определённых предметов
+  const specialPrices: { [key: string]: number } = {
+    'Ржавый гвоздь': 1,
+    'Старая монета': 4,
+    'Кусок руды': 6,
+    'Обломок кристалла': 7,
+    'Блестящий камешек': 12,
+    'Редкий самоцвет': 25,
+    'Рабочие перчатки': 15,
+    'Шлем шахтёра': 22,
+    'Укреплённые сапоги': 17,
+    'Порванное крыло': 1,
+    'Осколок кости': 3,
+    'Капля тёмной смолы': 5,
+    'Фрагмент чёрного кристалла': 9,
+    'Зачарованное перо': 18,
+    'Кожаный плащ': 20,
+    'Амулет ночного зрения': 40
+  };
+
+  if (specialPrices[item.name]) {
+    return specialPrices[item.name];
+  }
+
   return item.price ? Math.max(1, Math.floor(item.price * 0.5)) : 1;
 };

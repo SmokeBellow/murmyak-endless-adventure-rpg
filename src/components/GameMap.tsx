@@ -581,24 +581,11 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                   top: torch.y - 16,
                 }}
               >
-                <div className="relative">
-                  {/* Torch flame effect */}
-                  <div 
-                    className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full animate-pulse"
-                    style={{
-                      background: 'radial-gradient(circle, #ff6b35 0%, #f7931e 50%, transparent 100%)',
-                      animation: 'pulse 1.5s ease-in-out infinite alternate',
-                      boxShadow: '0 0 10px #ff6b35'
-                    }}
-                  />
-                  {/* Torch base */}
-                  <div 
-                    className="w-4 h-8 rounded-sm border border-amber-900"
-                    style={{
-                      background: 'linear-gradient(to bottom, #8b4513 0%, #654321 100%)'
-                    }}
-                  />
-                </div>
+                <img 
+                  src="/torch.png" 
+                  alt="Torch" 
+                  className="w-4 h-8 object-contain animate-pulse"
+                />
               </div>
             ))}
             

@@ -63,7 +63,7 @@ const RPGGame = () => {
       slot: 'weapon',
       stats: { damage: 5 },
       description: 'Старый ржавый меч начинающего воина',
-      icon: '⚔️'
+      icon: '/old_sword.png'
     },
     {
       id: 'leather-armor',
@@ -337,11 +337,11 @@ const RPGGame = () => {
       // Крыса лут
       const ratTrashItems = [
         { name: 'Ржавый гвоздь', sellPrice: 1, basePrice: 3, icon: '/trash_nail.png', chance: 0.2 },
-        { name: 'Старая монета', sellPrice: 4, basePrice: 8, icon: '/healthpotion.png', chance: 0.1 },
+        { name: 'Старая монета', sellPrice: 4, basePrice: 8, icon: '/trash_old_coin.png', chance: 0.1 },
         { name: 'Кусок руды', sellPrice: 6, basePrice: 12, icon: '/healthpotion.png', chance: 0.05 },
         { name: 'Обломок кристалла', sellPrice: 7, basePrice: 15, icon: '/healthpotion.png', chance: 0.03 },
         { name: 'Блестящий камешек', sellPrice: 12, basePrice: 25, icon: '/healthpotion.png', chance: 0.01 },
-        { name: 'Редкий самоцвет', sellPrice: 25, basePrice: 50, icon: '/trash_gem.png', chance: 0.005 }
+        { name: 'Редкий самоцвет', sellPrice: 25, basePrice: 50, icon: '/trash_rare_gem.png', chance: 0.005 }
       ];
 
       const ratEquipmentItems = [

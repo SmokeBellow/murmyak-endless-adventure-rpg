@@ -66,7 +66,7 @@ export const BattleScreen = ({
         {/* Player Image - Left */}
         <div className="flex flex-col items-center relative">
           <img 
-            src="/player_image.png" 
+            src="/player_fight.png" 
             alt="Player" 
             className="w-48 h-48 object-contain"
             onError={(e) => {

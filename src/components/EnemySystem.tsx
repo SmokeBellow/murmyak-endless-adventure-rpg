@@ -291,6 +291,43 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
     })));
   }, []);
 
+  // Helper: check line of sight between two points (no walls blocking)
+  const hasLineOfSight = useCallback((from: { x: number; y: number }, to: { x: number; y: number }) => {
+    const dx = Math.abs(to.x - from.x);
+    const dy = Math.abs(to.y - from.y);
+    const sx = from.x < to.x ? 1 : -1;
+    const sy = from.y < to.y ? 1 : -1;
+    let err = dx - dy;
+
+    let x = from.x;
+    let y = from.y;
+
+    const maxSteps = Math.max(dx, dy);
+    for (let i = 0; i <= maxSteps; i++) {
+      // Check if current point is in a wall
+      if (isPointInWall(x, y)) {
+        return false; // Line of sight blocked
+      }
+
+      // If we reached the target, line of sight is clear
+      if (x === to.x && y === to.y) {
+        return true;
+      }
+
+      const e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        x += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        y += sy;
+      }
+    }
+
+    return true; // No walls found on the line
+  }, []);
+
   // Calculate distance between two points
   const getDistance = useCallback((pos1: { x: number; y: number }, pos2: { x: number; y: number }) => {
     return Math.sqrt(Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2));
@@ -317,14 +354,14 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
           const distanceToPlayer = getDistance(enemy.position, player.position);
           const now = Date.now();
 
-          // Check if player is in attack range - start battle (only if not already in battle)
-          if (distanceToPlayer <= enemy.attackRange && !isInBattle) {
+          // Check if player is in attack range AND has line of sight - start battle (only if not already in battle)
+          if (distanceToPlayer <= enemy.attackRange && !isInBattle && hasLineOfSight(enemy.position, player.position)) {
             onBattleStart(enemy);
             return enemy;
           }
           
-          // Check if player is in aggression range - chase player
-          if (distanceToPlayer <= enemy.aggressionRange) {
+          // Check if player is in aggression range AND has line of sight - chase player
+          if (distanceToPlayer <= enemy.aggressionRange && hasLineOfSight(enemy.position, player.position)) {
             const dx = player.position.x - enemy.position.x;
             const dy = player.position.y - enemy.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -421,7 +458,7 @@ export const useEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isIn
     }, 50); // Update every 50ms for smooth movement
 
     return () => clearInterval(updateInterval);
-  }, [player.position, getDistance, getRandomWanderPosition, onPlayerTakeDamage, onBattleStart, isInBattle]);
+  }, [player.position, getDistance, getRandomWanderPosition, hasLineOfSight, onPlayerTakeDamage, onBattleStart, isInBattle]);
 
   const attackEnemy = useCallback((enemyId: string, damage: number) => {
     setEnemies(prev => 

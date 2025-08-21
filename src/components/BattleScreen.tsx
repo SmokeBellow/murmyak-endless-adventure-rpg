@@ -78,12 +78,12 @@ export const BattleScreen = ({
             <div className="w-32">
               <Progress 
                 value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-                className="h-3 bg-red-900"
+                className="h-3 bg-gray-700 [&>div]:bg-red-500"
               />
               <div className="text-sm">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
               <Progress 
                 value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-                className="h-3 bg-blue-900 mt-1"
+                className="h-3 bg-gray-700 mt-1 [&>div]:bg-blue-500"
               />
               <div className="text-sm">{currentPlayer.mana}/{currentPlayer.maxMana} MP</div>
             </div>

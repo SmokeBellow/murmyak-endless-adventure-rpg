@@ -4,6 +4,12 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { addItemsToInventory, removeItemFromInventory, getTotalItemQuantity, getSellPrice } from '@/utils/inventory';
+import { 
+  calculateMovementSpeed, 
+  calculateHealthRegen, 
+  calculateManaRegen, 
+  calculateDamage 
+} from '@/utils/playerStats';
 import { X } from 'lucide-react';
 import GameMap from './GameMap';
 import PlayerStats from './PlayerStats';
@@ -517,7 +523,7 @@ const RPGGame = () => {
     const currentEnemyHealth = currentBattleState.enemy.health;
     const currentPlayerHealth = player.health;
     
-    // Calculate damage with new formula
+    // Calculate damage with new stat system
     const baseDamage = 5 + player.stats.strength * 0.5; // Base damage from strength
     const weaponModifier = player.equipment.weapon?.stats?.damage || 0; // Weapon adds damage
     const randomModifier = 0.8 + Math.random() * 0.4; // 80-120% variance
@@ -529,14 +535,19 @@ const RPGGame = () => {
     
     // Apply location modifier (mines reduce damage by 2%)
     const locationModifier = currentLocation === 'abandoned-mines' ? 0.98 : 1;
-    const totalDamage = Math.max(1, Math.floor(afterEnemyReduction * locationModifier));
+    const finalBaseDamage = Math.floor(afterEnemyReduction * locationModifier);
+    
+    // Apply new stat effects (luck for crit, enemy has no stats so no dodge/block)
+    const damageResult = calculateDamage(finalBaseDamage, player.stats.luck, 0, 0);
+    const totalDamage = damageResult.damage;
     
     const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
     
     console.log('Damage dealt:', totalDamage, 'New enemy health:', newEnemyHealth);
     
     addDamageText(totalDamage, 'enemy', 'damage');
-    addBattleLog(`Вы атакуете ${enemyName} и наносите ${totalDamage} урона!`);
+    const critText = damageResult.isCrit ? ' КРИТИЧЕСКИЙ УРОН!' : '';
+    addBattleLog(`Вы атакуете ${enemyName} и наносите ${totalDamage} урона!${critText}`);
     
     if (newEnemyHealth <= 0) {
       // Enemy defeated
@@ -582,17 +593,29 @@ const RPGGame = () => {
     setTimeout(() => {
       console.log('Enemy counterattack');
       
+      // Calculate enemy damage with player defensive stats
+      const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
+      
       setPlayer(prev => {
-        const newPlayerHealth = Math.max(0, prev.health - enemyDamage);
-        console.log('Player health before:', prev.health, 'damage:', enemyDamage, 'after:', newPlayerHealth);
+        const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
+        console.log('Player health before:', prev.health, 'damage:', enemyDamageResult.damage, 'after:', newPlayerHealth);
         return {
           ...prev,
           health: newPlayerHealth
         };
       });
       
-      addDamageText(enemyDamage, 'player', 'damage');
-      addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
+      addDamageText(enemyDamageResult.damage, 'player', 'damage');
+      
+      let battleMessage = '';
+      if (enemyDamageResult.isDodged) {
+        battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
+      } else if (enemyDamageResult.isBlocked) {
+        battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
+      } else {
+        battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
+      }
+      addBattleLog(battleMessage);
       
       // Check if player is defeated using a ref to get current health
       setTimeout(() => {
@@ -647,11 +670,16 @@ const RPGGame = () => {
     
     // Apply location modifier (mines reduce damage by 2%)
     const locationModifier = currentLocation === 'abandoned-mines' ? 0.98 : 1;
-    const totalDamage = Math.max(1, Math.floor(afterEnemyReduction * locationModifier));
+    const finalBaseDamage = Math.floor(afterEnemyReduction * locationModifier);
+    
+    // Apply new stat effects for skill
+    const skillDamageResult = calculateDamage(finalBaseDamage, player.stats.luck, 0, 0);
+    const totalDamage = skillDamageResult.damage;
 
     const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
     addDamageText(totalDamage, 'enemy', 'skill');
-    addBattleLog(`Вы используете особое умение и наносите ${totalDamage} урона ${enemyName}!`);
+    const skillCritText = skillDamageResult.isCrit ? ' КРИТИЧЕСКИЙ УРОН!' : '';
+    addBattleLog(`Вы используете особое умение и наносите ${totalDamage} урона ${enemyName}!${skillCritText}`);
 
     if (newEnemyHealth <= 0) {
       addBattleLog(`${enemyName} повержен!`);
@@ -682,12 +710,25 @@ const RPGGame = () => {
 
     // Enemy counterattack
     setTimeout(() => {
+      // Calculate enemy damage with player defensive stats
+      const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
+      
       setPlayer(prev => {
-        const newPlayerHealth = Math.max(0, prev.health - enemyDamage);
+        const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
         return { ...prev, health: newPlayerHealth };
       });
-      addDamageText(enemyDamage, 'player', 'damage');
-      addBattleLog(`${enemyName} атакует вас и наносит ${enemyDamage} урона!`);
+      
+      addDamageText(enemyDamageResult.damage, 'player', 'damage');
+      
+      let battleMessage = '';
+      if (enemyDamageResult.isDodged) {
+        battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
+      } else if (enemyDamageResult.isBlocked) {
+        battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
+      } else {
+        battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
+      }
+      addBattleLog(battleMessage);
 
       setTimeout(() => {
         setPlayer(current => {
@@ -798,15 +839,27 @@ const RPGGame = () => {
       // Enemy gets a free attack
       setTimeout(() => {
         console.log('Failed flee, enemy attacks');
-        const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamage);
+        
+        // Calculate enemy damage with player defensive stats
+        const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
+        const newPlayerHealth = Math.max(0, currentPlayerHealth - enemyDamageResult.damage);
         
         setPlayer(prev => ({
           ...prev,
           health: newPlayerHealth
         }));
         
-        addDamageText(enemyDamage, 'player', 'damage');
-        addBattleLog(`${enemyName} атакует и наносит ${enemyDamage} урона!`);
+        addDamageText(enemyDamageResult.damage, 'player', 'damage');
+        
+        let fleeMessage = '';
+        if (enemyDamageResult.isDodged) {
+          fleeMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
+        } else if (enemyDamageResult.isBlocked) {
+          fleeMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
+        } else {
+          fleeMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона!`;
+        }
+        addBattleLog(fleeMessage);
         
         // Check if player is defeated
         if (newPlayerHealth <= 0) {
@@ -869,18 +922,23 @@ const RPGGame = () => {
 
   // Enemy click removed - no attacks outside battle
 
-  // Regeneration effect
+  // Regeneration effect with stats
   useEffect(() => {
     const regenInterval = setInterval(() => {
-      setPlayer(prev => ({
-        ...prev,
-        health: Math.min(prev.maxHealth, prev.health + 1),
-        mana: Math.min(prev.maxMana, prev.mana + 1)
-      }));
+      setPlayer(prev => {
+        const healthRegen = calculateHealthRegen(prev.stats.constitution);
+        const manaRegen = calculateManaRegen(prev.stats.intelligence);
+        
+        return {
+          ...prev,
+          health: Math.min(prev.maxHealth, prev.health + Math.max(1, healthRegen)),
+          mana: Math.min(prev.maxMana, prev.mana + Math.max(1, manaRegen))
+        };
+      });
     }, 3000);
 
     return () => clearInterval(regenInterval);
-  }, []);
+  }, [player.stats.constitution, player.stats.intelligence]);
 
   // Handle stat point allocation
   const handleAllocatePoint = useCallback((stat: keyof Player['stats']) => {
@@ -1011,7 +1069,7 @@ const RPGGame = () => {
       return;
     }
 
-    const moveSpeed = 2.5; // Slightly increased speed
+    const moveSpeed = calculateMovementSpeed(player.stats.agility) / 100 * 2.5; // Convert to movement units
     
     setPlayer(prev => {
       const { x, y } = prev.position;
@@ -1341,7 +1399,7 @@ const RPGGame = () => {
     const movePlayer = () => {
       if (activeMenu !== 'none' || showCoalMining || showVisualNovel) return;
       
-      const speed = 1.5;
+      const speed = calculateMovementSpeed(playerRef.current.stats.agility) / 100 * 1.5; // Base speed affected by agility
       let deltaX = 0;
       let deltaY = 0;
       let newDirection = playerRef.current.direction;

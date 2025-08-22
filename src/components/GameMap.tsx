@@ -128,10 +128,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     console.log('Map clicked at world coords:', clickX, clickY, 'player at:', player.position);
     
     if (currentLocation === 'village') {
-      // Check if clicking on fountain
+      // Check if clicking on fountain (adjusted for fountain shape)
       const fountainDistance = Math.sqrt(Math.pow(400 - clickX, 2) + Math.pow(400 - clickY, 2));
       const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
-      if (fountainDistance < 30 && playerToFountainDistance < 80) {
+      if (fountainDistance < 25 && playerToFountainDistance < 80) {
         console.log('Fountain clicked!');
         onFountainUse();
         return;
@@ -421,7 +421,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         Math.pow(400 - player.position.x, 2) + 
         Math.pow(400 - player.position.y, 2)
       );
-      return distance < 80;
+      return distance < 65;
     }
     return false;
   };

@@ -8,15 +8,14 @@ import stoneTexture from '@/assets/stone-texture.png';
 
 export const MinesMap = ({ mapWidth, mapHeight }: MinesMapProps) => {
   // Visual style for walls
-  const getWallStyle = (x: number, y: number) => ({
+  const wallStyle = {
     backgroundImage: `url(${stoneTexture})`,
     backgroundRepeat: 'repeat',
     backgroundSize: '64px 64px',
-    backgroundPosition: `${-(x % 64)}px ${-(y % 64)}px`,
     imageRendering: 'pixelated' as const,
     position: 'absolute' as const,
     boxShadow: 'inset 0 0 4px rgba(0,0,0,0.35)'
-  });
+  } as const;
 
   return (
     <div className="absolute inset-0" style={{ width: mapWidth, height: mapHeight }}>
@@ -25,7 +24,7 @@ export const MinesMap = ({ mapWidth, mapHeight }: MinesMapProps) => {
         <div
           key={idx}
           style={{
-            ...getWallStyle(r.x, r.y),
+            ...wallStyle,
             left: r.x,
             top: r.y,
             width: r.w,

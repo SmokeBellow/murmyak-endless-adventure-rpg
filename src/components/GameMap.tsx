@@ -327,9 +327,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           top: 0,
           width: 64,
           height: mapHeight,
-          backgroundImage: 'url(/chastokol_side_left.png)',
+          backgroundImage: 'url(/chastokol_left.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: '64px auto',
+          backgroundSize: '32px auto',
           imageRendering: 'pixelated',
           zIndex: 10
         }}
@@ -343,9 +343,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           top: 0,
           width: 64,
           height: mapHeight,
-          backgroundImage: 'url(/chastokol_side_right.png)',
+          backgroundImage: 'url(/chastokol_left.png)',
           backgroundRepeat: 'repeat-y',
-          backgroundSize: '64px auto',
+          backgroundSize: '32px auto',
           imageRendering: 'pixelated',
           zIndex: 10
         }}

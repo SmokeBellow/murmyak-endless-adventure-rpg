@@ -105,17 +105,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
-    if (currentLocation === 'village') {
-      // Merchant house collision - adjusted to not block fountain area
-      if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
-        // Allow access to fountain area (circular area around 400,400 with radius 45)
-        const distanceToFountain = Math.sqrt(Math.pow(x - 400, 2) + Math.pow(y - 400, 2));
-        if (distanceToFountain <= 45) {
-          return false; // No collision in fountain area
-        }
-        return true;
-      }
-    }
+    // No collisions - merchant house removed
     return false;
   }, [currentLocation]);
 

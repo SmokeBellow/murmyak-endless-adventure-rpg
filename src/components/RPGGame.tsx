@@ -1025,10 +1025,7 @@ const RPGGame = () => {
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Merchant house collision - exact match with visual house (300,300 -> 500,450)
-      if (x >= 300 && x <= 500 && y >= 300 && y <= 450) {
-        return true;
-      }
+      // No collisions - merchant house removed
     } else if (currentLocation === 'abandoned-mines') {
       // Mines labyrinth collision: points inside any wall rectangle are blocked
       for (const r of minesObstacles) {

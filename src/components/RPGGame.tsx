@@ -1140,6 +1140,27 @@ const RPGGame = () => {
       if (x >= 368 && x <= 432 && y >= 368 && y <= 432) {
         return true;
       }
+      
+      // Fence collisions
+      // Upper fence: from 500/500 to 1500/500
+      if (x >= 500 && x <= 1500 && y >= 500 && y <= 564) {
+        return true;
+      }
+      
+      // Lower fence: from 500/1500 to 1500/1500  
+      if (x >= 500 && x <= 1500 && y >= 1500 && y <= 1564) {
+        return true;
+      }
+      
+      // Left fence: from 500/500 to 500/1500
+      if (x >= 468 && x <= 532 && y >= 500 && y <= 1500) {
+        return true;
+      }
+      
+      // Right fence: from 1500/500 to 1500/1500
+      if (x >= 1468 && x <= 1532 && y >= 500 && y <= 1500) {
+        return true;
+      }
     } else if (currentLocation === 'abandoned-mines') {
       // Mines labyrinth collision: points inside any wall rectangle are blocked
       for (const r of minesObstacles) {
@@ -1196,7 +1217,7 @@ const RPGGame = () => {
       
       // Boundary constraints
       newX = Math.max(40, Math.min(1960, newX));
-      newY = Math.max(500, Math.min(1960, newY));
+      newY = Math.max(40, Math.min(1960, newY));
       
       // Collision detection - check if movement is blocked
       if (isColliding(newX, newY)) {

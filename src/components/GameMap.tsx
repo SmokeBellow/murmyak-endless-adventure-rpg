@@ -292,7 +292,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       {/* Forest zones - 200px from each edge */}
       {/* Top forest */}
       <div 
-        className="absolute"
+        className="absolute pixelated"
         style={{
           left: 0,
           top: 0,
@@ -301,14 +301,13 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
           backgroundSize: '200px 200px',
-          imageRendering: 'pixelated',
           zIndex: 5
         }}
       />
       
       {/* Bottom forest */}
       <div 
-        className="absolute"
+        className="absolute pixelated"
         style={{
           left: 0,
           top: mapHeight - 200,
@@ -317,14 +316,13 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
           backgroundSize: '200px 200px',
-          imageRendering: 'pixelated',
           zIndex: 5
         }}
       />
       
       {/* Left forest */}
       <div 
-        className="absolute"
+        className="absolute pixelated"
         style={{
           left: 0,
           top: 200,
@@ -333,14 +331,13 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
           backgroundSize: '200px 200px',
-          imageRendering: 'pixelated',
           zIndex: 5
         }}
       />
       
       {/* Right forest */}
       <div 
-        className="absolute"
+        className="absolute pixelated"
         style={{
           left: mapWidth - 200,
           top: 200,
@@ -349,7 +346,6 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
           backgroundSize: '200px 200px',
-          imageRendering: 'pixelated',
           zIndex: 5
         }}
       />

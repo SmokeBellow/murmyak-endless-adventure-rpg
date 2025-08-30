@@ -1766,36 +1766,6 @@ const handleBuyItem = useCallback((item: Item) => {
                 variant="secondary"
                 className="w-full justify-start text-left h-14 text-sm"
                 onClick={() => {
-                  setActiveMenu('inventory');
-                }}
-              >
-                <span className="text-lg mr-3">🎒</span>
-                Инвентарь
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full justify-start text-left h-14 text-sm"
-                onClick={() => {
-                  setActiveMenu('equipment');
-                }}
-              >
-                <span className="text-lg mr-3">⚔️</span>
-                Экипировка
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full justify-start text-left h-14 text-sm"
-                onClick={() => {
-                  setActiveMenu('quests');
-                }}
-              >
-                <span className="text-lg mr-3">📜</span>
-                Журнал квестов
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full justify-start text-left h-14 text-sm"
-                onClick={() => {
                   setActiveMenu('stats');
                 }}
               >
@@ -1812,11 +1782,44 @@ const handleBuyItem = useCallback((item: Item) => {
                 variant="secondary"
                 className="w-full justify-start text-left h-14 text-sm"
                 onClick={() => {
+                  setActiveMenu('equipment');
+                }}
+              >
+                <span className="text-lg mr-3">⚔️</span>
+                Экипировка
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  setActiveMenu('inventory');
+                }}
+              >
+                <span className="text-lg mr-3">🎒</span>
+                Инвентарь
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
                   setActiveMenu('skills');
                 }}
               >
                 <span className="text-lg mr-3">⚡</span>
                 Умения
+              </Button>
+              
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  setActiveMenu('quests');
+                }}
+              >
+                <span className="text-lg mr-3">📜</span>
+                Журнал квестов
               </Button>
             </div>
           </div>

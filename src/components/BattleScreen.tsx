@@ -63,9 +63,9 @@ export const BattleScreen = ({
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Battle Background - 2/3 of screen */}
+      {/* Battle Background - 65% of screen */}
       <div 
-        className="h-2/3 relative bg-cover bg-center flex items-center justify-between px-16"
+        className="h-[65%] relative bg-cover bg-center flex items-center justify-between px-16"
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
@@ -204,8 +204,8 @@ export const BattleScreen = ({
         }
       `}</style>
 
-      {/* Battle UI - 1/3 of screen */}
-      <div className="h-1/3 bg-gray-800 p-4 flex gap-4 border-t-4 border-white">
+      {/* Battle UI - 35% of screen */}
+      <div className="h-[35%] bg-gray-800 p-4 flex gap-4 border-t-4 border-white">
         {/* Action Buttons - Left 1/3 */}
         <div className="w-1/3 border-2 border-red-400">
           <h3 className="text-white text-lg font-bold mb-4 border border-green-400">Действия</h3>

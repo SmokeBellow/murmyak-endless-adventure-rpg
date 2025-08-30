@@ -1111,6 +1111,11 @@ const RPGGame = () => {
       return;
     }
 
+    // Block movement when menu is open
+    if (activeMenu !== 'none') {
+      return;
+    }
+
     const moveSpeed = calculateMovementSpeed(player.stats.agility) / 100 * 2.5; // Convert to movement units
     
     setPlayer(prev => {
@@ -1147,7 +1152,7 @@ const RPGGame = () => {
         direction: playerDirection
       };
     });
-  }, [currentLocation]);
+  }, [currentLocation, activeMenu]);
 
   const handleNPCInteract = useCallback((npc: NPC) => {
     console.log('handleNPCInteract called with:', npc.name);
@@ -1533,9 +1538,6 @@ const handleBuyItem = useCallback((item: Item) => {
           description: `Вы изучили умение "${skillToUnlock.name}". Теперь его можно использовать в бою.`,
           duration: 2000
         });
-        
-        // Close trade menu after successful purchase
-        setActiveMenu('none');
       } else {
         toast({
           title: "Ошибка",
@@ -1557,9 +1559,6 @@ const handleBuyItem = useCallback((item: Item) => {
         description: `${item.name} добавлен в инвентарь.`,
         duration: 2000
       });
-      
-      // Close trade menu after successful purchase
-      setActiveMenu('none');
     }
   }, [player.coins, toast]);
 

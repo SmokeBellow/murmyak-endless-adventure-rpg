@@ -1576,6 +1576,7 @@ const handleBuyItem = useCallback((item: Item) => {
   const handleTrade = useCallback(() => {
     setActiveMenu('trade');
     setSelectedNPC(null);
+    setShowVisualNovel(false);
   }, []);
 
   const handleFountainUse = useCallback(() => {
@@ -2047,7 +2048,7 @@ const handleBuyItem = useCallback((item: Item) => {
         <TradeMenu
           player={player}
           merchant={npcs.find(npc => npc.type === 'merchant')!}
-          onClose={() => setActiveMenu('none')}
+          onClose={() => { setActiveMenu('none'); setShowVisualNovel(false); setSelectedNPC(null); }}
           onBuyItem={handleBuyItem}
           onSellItem={handleSellItem}
         />

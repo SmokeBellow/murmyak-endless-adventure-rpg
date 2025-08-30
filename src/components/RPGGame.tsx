@@ -17,6 +17,7 @@ import InventoryMenu from './InventoryMenu';
 import EquipmentMenu from './EquipmentMenu';
 import QuestMenu from './QuestMenu';
 import StatsMenu from './StatsMenu';
+import { SkillsMenu } from './SkillsMenu';
 import NPCDialogue from './NPCDialogue';
 import VisualNovelDialogue from './VisualNovelDialogue';
 import TradeMenu from './TradeMenu';
@@ -26,6 +27,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
+import { getSkillById } from '@/data/skills';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
@@ -113,6 +115,7 @@ const RPGGame = () => {
     experience: 0,
     level: 1,
     coins: 50,
+    skillSlots: ['power_strike', null, null], // Умение "Мощный удар" по умолчанию в первом слоте
     inventory: initialItems,
     equipment: {
       head: null,
@@ -637,12 +640,17 @@ const RPGGame = () => {
     }, 1000);
   }, [battleState, player.equipment.weapon, player.health, addDamageText, addBattleLog]);
 
-  const handleBattleSkill = useCallback(() => {
+  const handleBattleSkill = useCallback((skillId: string) => {
     if (!battleState || battleState.turn !== 'player') return;
 
-    const SKILL_MANA_COST = 15;
-    if (player.mana < SKILL_MANA_COST) {
-      addBattleLog('Недостаточно маны для использования умения!');
+    const skill = getSkillById(skillId);
+    if (!skill) {
+      addBattleLog('Умение не найдено!');
+      return;
+    }
+
+    if (player.mana < skill.manaCost) {
+      addBattleLog(`Недостаточно маны для использования ${skill.name}!`);
       return;
     }
     if ((battleState.skillCooldown || 0) > 0) {
@@ -655,7 +663,7 @@ const RPGGame = () => {
     const enemyDamage = battleState.enemy.damage;
 
     // Consume mana
-    setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - SKILL_MANA_COST) }));
+    setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - skill.manaCost) }));
 
     // Skill damage: stronger than basic attack
     const baseDamage = 5 + player.stats.strength * 0.5; // Base damage from strength
@@ -1796,6 +1804,17 @@ const handleBuyItem = useCallback((item: Item) => {
                   </span>
                 )}
               </Button>
+              
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  setActiveMenu('skills');
+                }}
+              >
+                <span className="text-lg mr-3">⚡</span>
+                Умения
+              </Button>
             </div>
           </div>
           
@@ -1946,6 +1965,14 @@ const handleBuyItem = useCallback((item: Item) => {
           player={player}
           onClose={() => setActiveMenu('none')}
           onAllocatePoint={handleAllocatePoint}
+        />
+      )}
+
+      {activeMenu === 'skills' && (
+        <SkillsMenu
+          player={player}
+          onUpdatePlayer={(updates) => setPlayer(prev => ({ ...prev, ...updates }))}
+          onClose={() => setActiveMenu('none')}
         />
       )}
 

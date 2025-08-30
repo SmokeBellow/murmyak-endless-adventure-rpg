@@ -1,3 +1,13 @@
+export interface Skill {
+  id: string;
+  name: string;
+  description: string;
+  manaCost: number;
+  damage: number;
+  icon: string;
+  unlocked: boolean;
+}
+
 export interface PlayerStats {
   strength: number;
   agility: number;
@@ -19,6 +29,7 @@ export interface Player {
   experience: number;
   level: number;
   coins: number;
+  skillSlots: [string | null, string | null, string | null]; // 3 слота для умений
   inventory: Item[];
   equipment: Equipment;
   stats: PlayerStats;
@@ -112,7 +123,7 @@ export interface Enemy {
 }
 
 export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';
-export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar' | 'stats';
+export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar' | 'stats' | 'skills';
 export type LocationType = 'village' | 'abandoned-mines';
 
 export interface BattleState {

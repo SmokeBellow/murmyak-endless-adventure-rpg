@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BattleState, Item, Player } from '@/types/gameTypes';
+import { getSkillById } from '@/data/skills';
 
 interface DamageText {
   id: string;
@@ -15,7 +16,7 @@ interface BattleScreenProps {
   battleState: BattleState;
   currentPlayer: Player;
   onAttack: () => void;
-  onUseSkill: () => void;
+  onUseSkill: (skillId: string) => void;
   onUseItem: (item: Item) => void;
   onBattleEnd: () => void;
   damageTexts: DamageText[];
@@ -26,7 +27,7 @@ export const BattleScreen = ({
   battleState, 
   currentPlayer,
   onAttack, 
-  onUseSkill, 
+  onUseSkill,
   onUseItem, 
   onBattleEnd,
   damageTexts,
@@ -54,7 +55,11 @@ export const BattleScreen = ({
 
   // Filter consumable items from inventory
   const consumableItems = currentPlayer.inventory.filter(item => item.type === 'consumable');
-  const SKILL_MANA_COST = 15;
+
+  // Get equipped skills
+  const equippedSkills = currentPlayer.skillSlots.map(skillId => 
+    skillId ? getSkillById(skillId) : null
+  );
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -205,6 +210,39 @@ export const BattleScreen = ({
         <div className="w-1/3">
           <h3 className="text-white text-lg font-bold mb-4">Действия</h3>
           <div className="space-y-3">
+            {/* Skill Slots - 3 buttons in a row */}
+            <div className="grid grid-cols-3 gap-1 mb-3">
+              {equippedSkills.map((skill, index) => (
+                <Button
+                  key={index}
+                  onClick={() => skill && onUseSkill(skill.id)}
+                  className="w-full h-12 p-1 relative"
+                  variant="secondary"
+                  disabled={
+                    battleState.turn !== 'player' || 
+                    !skill || 
+                    currentPlayer.mana < skill.manaCost ||
+                    battleState.skillCooldown > 0
+                  }
+                >
+                  {skill ? (
+                    <>
+                      <img 
+                        src={skill.icon} 
+                        alt={skill.name}
+                        className="w-8 h-8 object-contain"
+                      />
+                      <span className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded">
+                        {skill.manaCost}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-400">Пусто</span>
+                  )}
+                </Button>
+              ))}
+            </div>
+            
             <Button 
               onClick={onAttack}
               className="w-full"
@@ -212,17 +250,6 @@ export const BattleScreen = ({
               disabled={battleState.turn !== 'player'}
             >
               Атака
-            </Button>
-            <Button 
-              onClick={onUseSkill}
-              className="w-full"
-              variant="secondary"
-              disabled={battleState.turn !== 'player' || battleState.skillCooldown > 0 || currentPlayer.mana < SKILL_MANA_COST}
-            >
-              {battleState.skillCooldown > 0 
-                ? `Умение (${battleState.skillCooldown})` 
-                : `Умение (${SKILL_MANA_COST} маны)`
-              }
             </Button>
             <Button 
               onClick={onBattleEnd}

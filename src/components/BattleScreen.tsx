@@ -82,40 +82,56 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="flex flex-col items-center border-2 border-yellow-500 absolute" style={{ top: '30vh', left: '5vw' }}>
-          {/* Player Name - Above image */}
-          <div className="text-white text-center border border-green-500">
-            <div className="text-lg font-bold border border-blue-500 p-1">{currentPlayer.name}</div>
+        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '30vh', left: '5vw', height: '34vh' }}>
+          {/* Spacing 1vh */}
+          <div style={{ height: '1vh' }}></div>
+          
+          {/* Player Name - 2vh */}
+          <div className="text-white text-center border border-green-500" style={{ height: '2vh' }}>
+            <div className="text-lg font-bold border border-blue-500 h-full flex items-center justify-center">{currentPlayer.name}</div>
           </div>
           
-          <img 
-            src="/player_fight.png" 
-            alt="Player" 
-            className="w-48 h-48 object-contain border-2 border-red-500"
-            onError={(e) => {
-              e.currentTarget.src = '/player.png'; // fallback
-            }}
-          />
+          {/* Spacing 2vh */}
+          <div style={{ height: '2vh' }}></div>
           
-          {/* HP and MP bars - closer to image */}
-          <div className="text-white flex flex-col items-center border-2 border-purple-500">
-            <div className="flex flex-col gap-1 border border-orange-500">
-              <div className="flex items-center gap-2 border border-pink-500">
-                <Progress 
-                  value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-                  className="h-3 bg-gray-700 [&>div]:bg-red-500 w-24 border border-cyan-500"
-                />
-                <div className="text-sm text-left min-w-[50px] border border-lime-500">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
-              </div>
-              <div className="flex items-center gap-2 border border-indigo-500">
-                <Progress 
-                  value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-                  className="h-3 bg-gray-700 [&>div]:bg-blue-500 w-24 border border-cyan-500"
-                />
-                <div className="text-sm text-left min-w-[50px] border border-lime-500">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
-              </div>
-            </div>
+          {/* Player Image - 21vh */}
+          <div className="flex justify-center" style={{ height: '21vh' }}>
+            <img 
+              src="/player_fight.png" 
+              alt="Player" 
+              className="object-contain border-2 border-red-500 h-full"
+              onError={(e) => {
+                e.currentTarget.src = '/player.png'; // fallback
+              }}
+            />
           </div>
+          
+          {/* Spacing 2vh */}
+          <div style={{ height: '2vh' }}></div>
+          
+          {/* HP Bar - 1vh */}
+          <div className="flex items-center gap-2 border border-pink-500" style={{ height: '1vh' }}>
+            <Progress 
+              value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
+              className="h-full bg-gray-700 [&>div]:bg-red-500 w-24 border border-cyan-500"
+            />
+            <div className="text-sm text-left min-w-[50px] border border-lime-500 text-white">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
+          </div>
+          
+          {/* Spacing 2vh */}
+          <div style={{ height: '2vh' }}></div>
+          
+          {/* MP Bar - 1vh */}
+          <div className="flex items-center gap-2 border border-indigo-500" style={{ height: '1vh' }}>
+            <Progress 
+              value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
+              className="h-full bg-gray-700 [&>div]:bg-blue-500 w-24 border border-cyan-500"
+            />
+            <div className="text-sm text-left min-w-[50px] border border-lime-500 text-white">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
+          </div>
+          
+          {/* Spacing 1vh */}
+          <div style={{ height: '1vh' }}></div>
           
           {/* Player Damage Texts */}
           {damageTexts

@@ -245,7 +245,7 @@ export const BattleScreen = ({
       `}</style>
 
       {/* Battle UI - 35% of screen */}
-      <div className="h-[35%] bg-gray-800 px-4 pb-4 flex gap-4 border-t-4 border-white">
+      <div className="h-[35%] bg-gray-800 px-4 pb-4 flex gap-4">
         {/* Action Buttons - Left 1/3 */}
         <div className="w-1/3">
           <h3 className="text-white text-lg font-bold mb-4">Действия</h3>

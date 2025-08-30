@@ -64,7 +64,7 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="flex flex-col items-center relative mb-8 mt-16">
+        <div className="flex flex-col items-center relative mb-4 mt-32">
           <img 
             src="/player_fight.png" 
             alt="Player" 

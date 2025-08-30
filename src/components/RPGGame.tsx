@@ -104,8 +104,8 @@ const RPGGame = () => {
   // Player state
   const [player, setPlayer] = useState<Player>({
     name: 'Герой',
-    position: { x: 600, y: 400 }, // Safe position away from buildings
-    targetPosition: { x: 600, y: 400 },
+    position: { x: 1000, y: 1000 }, // Safe position away from buildings
+    targetPosition: { x: 1000, y: 1000 },
     isMoving: false,
     direction: 'down', // Add direction tracking
     health: 100,
@@ -1711,8 +1711,8 @@ const handleBuyItem = useCallback((item: Item) => {
         setCurrentLocation('village');
         setPlayer(prev => ({
           ...prev,
-          position: { x: 600, y: 400 },
-          targetPosition: { x: 600, y: 400 }
+          position: { x: 1000, y: 1000 },
+          targetPosition: { x: 1000, y: 1000 }
         }));
       }
       setIsLoadingLocation(false);

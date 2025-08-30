@@ -1136,6 +1136,27 @@ const RPGGame = () => {
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
+      // Forest collisions - 200px from each edge
+      // Top forest
+      if (y >= 0 && y <= 200) {
+        return true;
+      }
+      
+      // Bottom forest  
+      if (y >= 1800 && y <= 2000) {
+        return true;
+      }
+      
+      // Left forest
+      if (x >= 0 && x <= 200 && y >= 200 && y <= 1800) {
+        return true;
+      }
+      
+      // Right forest
+      if (x >= 1800 && x <= 2000 && y >= 200 && y <= 1800) {
+        return true;
+      }
+      
       // Fountain collision - based on fountain image boundaries (64x64 centered at 1000,800)
       if (x >= 968 && x <= 1032 && y >= 768 && y <= 832) {
         return true;
@@ -1221,8 +1242,8 @@ const RPGGame = () => {
       let newY = y + (direction.y * moveSpeed);
       
       // Boundary constraints
-      newX = Math.max(40, Math.min(1960, newX));
-      newY = Math.max(40, Math.min(1960, newY));
+      newX = Math.max(200, Math.min(1800, newX));
+      newY = Math.max(200, Math.min(1800, newY));
       
       // Collision detection - check if movement is blocked
       if (isColliding(newX, newY)) {

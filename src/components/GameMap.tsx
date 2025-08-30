@@ -289,6 +289,71 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   const renderVillage = () => (
     <>
+      {/* Forest zones - 200px from each edge */}
+      {/* Top forest */}
+      <div 
+        className="absolute"
+        style={{
+          left: 0,
+          top: 0,
+          width: mapWidth,
+          height: 200,
+          backgroundImage: 'url(/forest.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '100px 100px',
+          imageRendering: 'pixelated',
+          zIndex: 5
+        }}
+      />
+      
+      {/* Bottom forest */}
+      <div 
+        className="absolute"
+        style={{
+          left: 0,
+          top: mapHeight - 200,
+          width: mapWidth,
+          height: 200,
+          backgroundImage: 'url(/forest.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '100px 100px',
+          imageRendering: 'pixelated',
+          zIndex: 5
+        }}
+      />
+      
+      {/* Left forest */}
+      <div 
+        className="absolute"
+        style={{
+          left: 0,
+          top: 200,
+          width: 200,
+          height: mapHeight - 400,
+          backgroundImage: 'url(/forest.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '100px 100px',
+          imageRendering: 'pixelated',
+          zIndex: 5
+        }}
+      />
+      
+      {/* Right forest */}
+      <div 
+        className="absolute"
+        style={{
+          left: mapWidth - 200,
+          top: 200,
+          width: 200,
+          height: mapHeight - 400,
+          backgroundImage: 'url(/forest.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '100px 100px',
+          imageRendering: 'pixelated',
+          zIndex: 5
+        }}
+      />
+
       {/* Upper village boundary - fence - left part */}
       <div 
         className="absolute"

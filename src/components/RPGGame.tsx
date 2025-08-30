@@ -1748,12 +1748,45 @@ const handleBuyItem = useCallback((item: Item) => {
     setTimeout(() => {
       if (currentLocation === 'village') {
         setCurrentLocation('abandoned-mines');
-        const safePos = findSafePositionNear(50, 100);
-        setPlayer(prev => ({
-          ...prev,
-          position: safePos,
-          targetPosition: safePos
-        }));
+        
+        // Find safe position AFTER changing location
+        setTimeout(() => {
+          const inWall = (px: number, py: number) => {
+            for (const r of minesObstacles) {
+              if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
+            }
+            return false;
+          };
+          
+          let safePos = { x: 50, y: 100 };
+          if (inWall(safePos.x, safePos.y)) {
+            // Search for safe position near entrance
+            const step = 10;
+            const maxRadius = 300;
+            let found = false;
+            for (let radius = step; radius <= maxRadius && !found; radius += step) {
+              for (let angle = 0; angle < Math.PI * 2 && !found; angle += Math.PI / 8) {
+                const px = Math.max(40, Math.min(1960, Math.round(50 + Math.cos(angle) * radius)));
+                const py = Math.max(40, Math.min(1960, Math.round(100 + Math.sin(angle) * radius)));
+                if (!inWall(px, py)) {
+                  safePos = { x: px, y: py };
+                  found = true;
+                }
+              }
+            }
+            if (!found) {
+              safePos = { x: 140, y: 140 }; // Fallback position
+            }
+          }
+          
+          setPlayer(prev => ({
+            ...prev,
+            position: safePos,
+            targetPosition: safePos
+          }));
+          
+          console.log('Teleported to mines at position:', safePos);
+        }, 100);
       } else {
         setCurrentLocation('village');
         setPlayer(prev => ({
@@ -1761,6 +1794,7 @@ const handleBuyItem = useCallback((item: Item) => {
           position: { x: 1000, y: 1000 },
           targetPosition: { x: 1000, y: 1000 }
         }));
+        console.log('Teleported to village at position: 1000, 1000');
       }
       setIsLoadingLocation(false);
     }, 1500);

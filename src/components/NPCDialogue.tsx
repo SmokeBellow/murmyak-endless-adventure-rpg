@@ -66,16 +66,27 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
     quest.objectives.every(obj => obj.completed)
   );
 
-  // Check class availability
+  // Check class availability with counts
+  const mageUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'mage').length;
+  const rogueUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'rogue').length;
+  const warriorUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'warrior').length;
+
   const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && 
     playerSkillUsageStats.mage >= 1 && 
-    availableSkills.filter(skill => skill.unlocked && skill.class === 'mage').length >= 2;
+    mageUnlockedCount >= 2;
   const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && 
     playerSkillUsageStats.rogue >= 1 && 
-    availableSkills.filter(skill => skill.unlocked && skill.class === 'rogue').length >= 2;  
+    rogueUnlockedCount >= 2;  
   const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
     playerSkillUsageStats.warrior >= 1 && 
-    availableSkills.filter(skill => skill.unlocked && skill.class === 'warrior').length >= 2;
+    warriorUnlockedCount >= 2;
+
+  console.info('Class check:', {
+    npc: npc.id,
+    mage: { usage: playerSkillUsageStats?.mage, unlocked: mageUnlockedCount, can: canGetMageClass },
+    rogue: { usage: playerSkillUsageStats?.rogue, unlocked: rogueUnlockedCount, can: canGetRogueClass },
+    warrior: { usage: playerSkillUsageStats?.warrior, unlocked: warriorUnlockedCount, can: canGetWarriorClass }
+  });
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">

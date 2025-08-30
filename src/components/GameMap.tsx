@@ -201,20 +201,19 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     // Check if clicking on NPC (only in village)
     if (currentLocation === 'village') {
       const clickedNPC = npcs.find(npc => {
+        // First check if NPC should be visible
+        if (npc.type === 'mage' || npc.type === 'scout' || npc.type === 'guardian') {
+          if (!npc.visible) {
+            return false; // Skip invisible special NPCs from search
+          }
+        }
+        
         const distance = Math.sqrt(Math.pow(npc.position.x - clickX, 2) + Math.pow(npc.position.y - clickY, 2));
         const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
         return distance < 50 && playerToNPCDistance < 300; // Увеличили радиус
       });
       
       if (clickedNPC) {
-        // Check if this is a special NPC that requires conditions
-        if (clickedNPC.type === 'mage' || clickedNPC.type === 'scout' || clickedNPC.type === 'guardian') {
-          // Only allow interaction if the NPC is visible (conditions met)
-          if (!clickedNPC.visible) {
-            return; // Block interaction for invisible special NPCs
-          }
-        }
-        
         console.log('NPC clicked via map:', clickedNPC.name);
         console.log('Click coords:', clickX, clickY, 'NPC coords:', clickedNPC.position, 'Player coords:', player.position);
         onNPCInteract(clickedNPC);

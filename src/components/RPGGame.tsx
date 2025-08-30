@@ -1533,6 +1533,9 @@ const handleBuyItem = useCallback((item: Item) => {
           description: `Вы изучили умение "${skillToUnlock.name}". Теперь его можно использовать в бою.`,
           duration: 2000
         });
+        
+        // Close trade menu after successful purchase
+        setActiveMenu('none');
       } else {
         toast({
           title: "Ошибка",
@@ -1554,6 +1557,9 @@ const handleBuyItem = useCallback((item: Item) => {
         description: `${item.name} добавлен в инвентарь.`,
         duration: 2000
       });
+      
+      // Close trade menu after successful purchase
+      setActiveMenu('none');
     }
   }, [player.coins, toast]);
 

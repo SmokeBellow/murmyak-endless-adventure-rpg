@@ -49,6 +49,7 @@ const RPGGame = () => {
   const [questReward, setQuestReward] = useState<Quest | null>(null);
   const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
 
   // Resource nodes with regeneration
   const [resourceNodes, setResourceNodes] = useState({
@@ -1186,6 +1187,11 @@ const RPGGame = () => {
 
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
+    // No-clip cheat - disable all collisions
+    if (isNoClipCheatEnabled) {
+      return false;
+    }
+    
     if (currentLocation === 'village') {
       // Forest collisions - 200px from each edge
       // Top forest
@@ -1247,7 +1253,7 @@ const RPGGame = () => {
       }
     }
     return false;
-  }, [currentLocation]);
+  }, [currentLocation, isNoClipCheatEnabled]);
 
   // Find nearest safe position not inside walls (mines)
   const findSafePositionNear = useCallback((x: number, y: number) => {
@@ -1532,6 +1538,14 @@ const RPGGame = () => {
       const key = event.key.toLowerCase();
       pressedKeys.add(key);
       
+      // Check for no-clip cheat code (345)
+      if (pressedKeys.has('3') && pressedKeys.has('4') && pressedKeys.has('5')) {
+        setIsNoClipCheatEnabled(prev => !prev);
+        pressedKeys.clear(); // Clear keys after activation
+        console.log('No-clip cheat toggled:', !isNoClipCheatEnabled);
+        return;
+      }
+      
       // E key for interaction (both English and Russian layout)
       if ((key === 'e' || key === 'у') && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
@@ -1653,7 +1667,7 @@ const RPGGame = () => {
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, isNoClipCheatEnabled]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];

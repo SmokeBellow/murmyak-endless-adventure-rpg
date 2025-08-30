@@ -64,7 +64,12 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="flex flex-col items-center relative mb-2 mt-48">
+        <div className="flex flex-col items-center relative mb-2 mt-56">
+          {/* Player Name - Above image */}
+          <div className="text-white text-center mb-2">
+            <div className="text-lg font-bold">{currentPlayer.name}</div>
+          </div>
+          
           <img 
             src="/player_fight.png" 
             alt="Player" 
@@ -73,19 +78,24 @@ export const BattleScreen = ({
               e.currentTarget.src = '/player.png'; // fallback
             }}
           />
-          <div className="mb-24 text-white text-center">
-            <div className="text-lg font-bold">{currentPlayer.name}</div>
+          
+          {/* HP and MP bars - closer to image */}
+          <div className="mt-2 text-white text-center">
             <div className="w-32">
-              <Progress 
-                value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-                className="h-3 bg-gray-700 [&>div]:bg-red-500"
-              />
-              <div className="text-sm">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
-              <Progress 
-                value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-                className="h-3 bg-gray-700 mt-1 [&>div]:bg-blue-500"
-              />
-              <div className="text-sm">{currentPlayer.mana}/{currentPlayer.maxMana} MP</div>
+              <div className="flex items-center gap-2 mb-1">
+                <Progress 
+                  value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
+                  className="h-3 bg-gray-700 [&>div]:bg-red-500 flex-1"
+                />
+                <div className="text-sm text-right min-w-[50px]">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Progress 
+                  value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
+                  className="h-3 bg-gray-700 [&>div]:bg-blue-500 flex-1"
+                />
+                <div className="text-sm text-right min-w-[50px]">{currentPlayer.mana}/{currentPlayer.maxMana} MP</div>
+              </div>
             </div>
           </div>
           

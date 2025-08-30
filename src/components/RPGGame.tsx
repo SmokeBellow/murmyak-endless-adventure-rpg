@@ -964,29 +964,37 @@ const RPGGame = () => {
       const rogueSkills = learnedSkills.filter(skill => skill.class === 'rogue').length;
       const mageSkills = learnedSkills.filter(skill => skill.class === 'mage').length;
 
+      // Debug logging for special NPCs
+      if (npc.type === 'mage' || npc.type === 'scout' || npc.type === 'guardian') {
+        console.log(`NPC ${npc.name} (${npc.type}): visible=${npc.visible}, warriorSkills=${warriorSkills}, rogueSkills=${rogueSkills}, mageSkills=${mageSkills}, usageStats=`, player.skillUsageStats);
+      }
+
       switch (npc.id) {
         case 'mage':
           // маг: игрок изучил 2 и больше умений с классом мага и 1 или более раз использовал умение мага в бою
           if (mageSkills >= 2 && player.skillUsageStats.mage >= 1) {
+            console.log(`Making mage visible: mageSkills=${mageSkills}, usageStats=${player.skillUsageStats.mage}`);
             return { ...npc, visible: true };
           }
           break;
         case 'scout':
           // следопыт: игрок изучил 2 и больше умений с классом разбойника и 1 или более раз использовал умение разбойника в бою
           if (rogueSkills >= 2 && player.skillUsageStats.rogue >= 1) {
+            console.log(`Making scout visible: rogueSkills=${rogueSkills}, usageStats=${player.skillUsageStats.rogue}`);
             return { ...npc, visible: true };
           }
           break;
         case 'guardian':
           // стражник: игрок изучил 2 и больше умений с классом воина и 1 или более раз использовал умение воина в бою
           if (warriorSkills >= 2 && player.skillUsageStats.warrior >= 1) {
+            console.log(`Making guardian visible: warriorSkills=${warriorSkills}, usageStats=${player.skillUsageStats.warrior}`);
             return { ...npc, visible: true };
           }
           break;
       }
       return npc;
     }));
-  }, [player.skillUsageStats]);
+  }, [player.skillUsageStats, availableSkills]);
 
   // Update NPC visibility when skill usage stats change
   useEffect(() => {

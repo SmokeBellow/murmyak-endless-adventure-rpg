@@ -210,6 +210,33 @@ const RPGGame = () => {
           description: 'Обучает умению "Яростный порез"',
           icon: '/sword.png',
           price: 1
+        },
+        {
+          id: 'fire_burst_skill',
+          name: 'Гримуар: Огненный всполох',
+          type: 'skill',
+          skillId: 'fire_burst',
+          description: 'Обучает умению "Огненный всполох"',
+          icon: '/torch.png',
+          price: 1
+        },
+        {
+          id: 'frost_chains_skill',
+          name: 'Гримуар: Морозные цепи',
+          type: 'skill',
+          skillId: 'frost_chains',
+          description: 'Обучает умению "Морозные цепи"',
+          icon: '/trash_rare_gem.png',
+          price: 1
+        },
+        {
+          id: 'mana_spark_skill',
+          name: 'Гримуар: Искра маны',
+          type: 'skill',
+          skillId: 'mana_spark',
+          description: 'Обучает умению "Искра маны"',
+          icon: '/trash_gem.png',
+          price: 1
         }
       ]
     },
@@ -720,6 +747,10 @@ const RPGGame = () => {
       statusMessage = 'Противник ослеплен на 1 ход!';
     } else if (skill.id === 'fury_cut' && Math.random() < 0.8) {
       statusMessage = 'На противника наложено кровотечение на 2 хода!';
+    } else if (skill.id === 'fire_burst' && Math.random() < 0.8) {
+      statusMessage = 'Противник поджжен на 2 хода! Цель получает больше урона от огня!';
+    } else if (skill.id === 'frost_chains') {
+      statusMessage = 'Противник заморожен! Шанс уклонения снижен!';
     }
 
     let isHealing = false;
@@ -737,6 +768,21 @@ const RPGGame = () => {
       
       addDamageText(healAmount, 'player', 'heal');
       addBattleLog(`Вы используете "${skill.name}" и восстанавливаете ${healAmount} здоровья!`);
+      isHealing = true;
+    } else if (skill.id === 'mana_spark') {
+      const manaRestored = 20 + Math.floor(player.stats.intelligence);
+      setPlayer(prev => ({
+        ...prev,
+        mana: Math.min(prev.maxMana, prev.mana + manaRestored - skill.manaCost),
+        skillCooldowns: {
+          ...prev.skillCooldowns,
+          [skillId]: skill.cooldown
+        }
+      }));
+      
+      addDamageText(manaRestored, 'player', 'heal');
+      addBattleLog(`Вы используете "${skill.name}" и восстанавливаете ${manaRestored} маны! Следующая атака усилена!`);
+      statusMessage = 'Следующая атака усилена магией!';
       isHealing = true;
     } else {
       // Reduce player mana and set skill cooldown

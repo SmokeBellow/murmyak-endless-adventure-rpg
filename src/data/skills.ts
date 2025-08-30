@@ -60,6 +60,36 @@ export const availableSkills: Skill[] = [
     icon: '/sword.png',
     unlocked: false,
     cooldown: 4
+  },
+  {
+    id: 'fire_burst',
+    name: 'Огненный всполох',
+    description: 'Наносит урон огнем и поджигает противника на 2 хода с вероятностью 80%. Подожженная цель получает на 10% больше урона от огня',
+    manaCost: 30,
+    damage: 20,
+    icon: '/torch.png',
+    unlocked: false,
+    cooldown: 4
+  },
+  {
+    id: 'frost_chains',
+    name: 'Морозные цепи',
+    description: 'Замораживает цель, снижая шанс уклонения',
+    manaCost: 25,
+    damage: 15,
+    icon: '/trash_rare_gem.png',
+    unlocked: false,
+    cooldown: 3
+  },
+  {
+    id: 'mana_spark',
+    name: 'Искра маны',
+    description: 'Восстанавливает часть маны и усиливает магией следующую атаку',
+    manaCost: 10,
+    damage: 0,
+    icon: '/trash_gem.png',
+    unlocked: false,
+    cooldown: 2
   }
 ];
 

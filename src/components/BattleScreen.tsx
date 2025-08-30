@@ -262,7 +262,7 @@ export const BattleScreen = ({
                     battleState.turn !== 'player' || 
                     !skill || 
                     currentPlayer.mana < skill.manaCost ||
-                    battleState.skillCooldown > 0
+                    (currentPlayer.skillCooldowns[skill.id] || 0) > 0
                   }
                 >
                   {skill ? (
@@ -275,6 +275,11 @@ export const BattleScreen = ({
                       <span className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded">
                         {skill.manaCost}
                       </span>
+                      {(currentPlayer.skillCooldowns[skill.id] || 0) > 0 && (
+                        <span className="absolute top-0 left-0 text-xs bg-red-600 text-white px-1 rounded">
+                          {currentPlayer.skillCooldowns[skill.id]}
+                        </span>
+                      )}
                     </>
                   ) : (
                     <span className="text-xs text-gray-400">Пусто</span>

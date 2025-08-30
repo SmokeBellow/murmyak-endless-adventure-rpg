@@ -6,6 +6,7 @@ export interface Skill {
   damage: number;
   icon: string;
   unlocked: boolean;
+  cooldown: number; // Кулдаун в ходах
 }
 
 export interface PlayerStats {
@@ -30,6 +31,7 @@ export interface Player {
   level: number;
   coins: number;
   skillSlots: [string | null, string | null, string | null]; // 3 слота для умений
+  skillCooldowns: { [skillId: string]: number }; // Отслеживание кулдаунов умений
   inventory: Item[];
   equipment: Equipment;
   stats: PlayerStats;

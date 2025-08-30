@@ -8,7 +8,8 @@ export const availableSkills: Skill[] = [
     manaCost: 15,
     damage: 25,
     icon: '/sword.png',
-    unlocked: true
+    unlocked: true,
+    cooldown: 2
   },
   {
     id: 'heal',
@@ -17,7 +18,8 @@ export const availableSkills: Skill[] = [
     manaCost: 20,
     damage: 0, // Это лечение, не урон
     icon: '/healthpotion.png',
-    unlocked: false
+    unlocked: false,
+    cooldown: 3
   },
   {
     id: 'fire_slash',
@@ -26,7 +28,8 @@ export const availableSkills: Skill[] = [
     manaCost: 25,
     damage: 35,
     icon: '/torch.png',
-    unlocked: false
+    unlocked: false,
+    cooldown: 4
   },
   {
     id: 'heavy_strike',
@@ -35,7 +38,8 @@ export const availableSkills: Skill[] = [
     manaCost: 20,
     damage: 20,
     icon: '/old_sword.png',
-    unlocked: false
+    unlocked: false,
+    cooldown: 5
   },
   {
     id: 'sand_in_eyes',
@@ -44,7 +48,8 @@ export const availableSkills: Skill[] = [
     manaCost: 15,
     damage: 10,
     icon: '/trash_nail.png',
-    unlocked: false
+    unlocked: false,
+    cooldown: 3
   },
   {
     id: 'fury_cut',
@@ -53,7 +58,8 @@ export const availableSkills: Skill[] = [
     manaCost: 25,
     damage: 15,
     icon: '/sword.png',
-    unlocked: false
+    unlocked: false,
+    cooldown: 4
   }
 ];
 

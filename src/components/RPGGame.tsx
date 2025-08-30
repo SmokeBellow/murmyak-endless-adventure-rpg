@@ -116,6 +116,7 @@ const RPGGame = () => {
     level: 1,
     coins: 50,
     skillSlots: ['power_strike', null, null], // Умение "Мощный удар" по умолчанию в первом слоте
+    skillCooldowns: {}, // Отслеживание кулдаунов умений
     inventory: initialItems,
     equipment: {
       head: null,
@@ -614,8 +615,7 @@ const RPGGame = () => {
       const newState = prev ? {
         ...prev,
         enemy: { ...prev.enemy, health: newEnemyHealth },
-        turn: 'enemy' as const,
-        skillCooldown: Math.max(0, (prev.skillCooldown || 0) - 1)
+        turn: 'enemy' as const
       } : null;
       console.log('Updated battle state, new enemy health:', newState?.enemy.health);
       return newState;
@@ -630,10 +630,18 @@ const RPGGame = () => {
       
       setPlayer(prev => {
         const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
+        // Also reduce all skill cooldowns
+        const newCooldowns = { ...prev.skillCooldowns };
+        Object.keys(newCooldowns).forEach(skillId => {
+          if (newCooldowns[skillId] > 0) {
+            newCooldowns[skillId] -= 1;
+          }
+        });
         console.log('Player health before:', prev.health, 'damage:', enemyDamageResult.damage, 'after:', newPlayerHealth);
         return {
           ...prev,
-          health: newPlayerHealth
+          health: newPlayerHealth,
+          skillCooldowns: newCooldowns
         };
       });
       
@@ -682,8 +690,11 @@ const RPGGame = () => {
       addBattleLog(`Недостаточно маны для использования ${skill.name}!`);
       return;
     }
-    if ((battleState.skillCooldown || 0) > 0) {
-      addBattleLog(`Умение недоступно. Откат: ${battleState.skillCooldown} атак(и).`);
+
+    // Check individual skill cooldown
+    const skillCooldown = player.skillCooldowns[skillId] || 0;
+    if (skillCooldown > 0) {
+      addBattleLog(`Умение "${skill.name}" недоступно. Откат: ${skillCooldown} ход(ов).`);
       return;
     }
 
@@ -691,95 +702,153 @@ const RPGGame = () => {
     const enemyName = battleState.enemy.name;
     const enemyDamage = battleState.enemy.damage;
 
-    // Consume mana
-    setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - skill.manaCost) }));
+    // Calculate skill damage
+    let skillDamage = skill.damage;
+    const weaponDamage = player.equipment.weapon?.stats?.damage || 0;
+    const strengthBonus = Math.floor(player.stats.strength / 2);
+    skillDamage += weaponDamage + strengthBonus;
 
-    // Skill damage: stronger than basic attack
-    const baseDamage = 5 + player.stats.strength * 0.5; // Base damage from strength
-    const weaponModifier = player.equipment.weapon?.stats?.damage || 0; // Weapon adds damage
-    const skillMultiplier = 1.8; // Skills are stronger
-    const randomModifier = 0.9 + Math.random() * 0.2; // 90-110% variance for skills
-    const rawDamage = Math.floor((baseDamage + weaponModifier) * skillMultiplier * randomModifier);
-    
-    // Apply enemy damage reduction
+    // Apply damage reduction
     const enemyReduction = battleState.enemy.damageReduction || 0;
-    const afterEnemyReduction = rawDamage * (1 - enemyReduction / 100);
-    
-    // Apply location modifier (mines reduce damage by 2%)
-    const locationModifier = currentLocation === 'abandoned-mines' ? 0.98 : 1;
-    const finalBaseDamage = Math.floor(afterEnemyReduction * locationModifier);
-    
-    // Apply new stat effects for skill
-    const skillDamageResult = calculateDamage(finalBaseDamage, player.stats.luck, 0, 0);
-    const totalDamage = skillDamageResult.damage;
+    const finalDamage = Math.max(1, Math.floor(skillDamage * (1 - enemyReduction / 100)));
 
-    const newEnemyHealth = Math.max(0, currentEnemyHealth - totalDamage);
-    addDamageText(totalDamage, 'enemy', 'skill');
-    const skillCritText = skillDamageResult.isCrit ? ' КРИТИЧЕСКИЙ УРОН!' : '';
-    addBattleLog(`Вы используете особое умение и наносите ${totalDamage} урона ${enemyName}!${skillCritText}`);
-
-    if (newEnemyHealth <= 0) {
-      addBattleLog(`${enemyName} повержен!`);
-      const experienceGained = Math.floor(Math.random() * 20) + 15;
-      const coinsGained = Math.floor(Math.random() * 10) + 5;
-      const lootItems = generateLoot(battleState.enemy.type);
-      setBattleResult({ victory: true, experienceGained, coinsGained, lootItems });
-      setTimeout(() => {
-        setGameScreen('battle-victory');
-        setPlayer(prev => ({
-          ...prev,
-          experience: prev.experience + experienceGained,
-          coins: prev.coins + coinsGained,
-          inventory: addItemsToInventory(prev.inventory, lootItems)
-        }));
-      }, 1500);
-      return;
+    // Special skill effects with status messages
+    let statusMessage = '';
+    if (skill.id === 'heavy_strike' && Math.random() < 0.8) {
+      statusMessage = 'Противник оглушен на 1 ход!';
+    } else if (skill.id === 'sand_in_eyes') {
+      statusMessage = 'Противник ослеплен на 1 ход!';
+    } else if (skill.id === 'fury_cut' && Math.random() < 0.8) {
+      statusMessage = 'На противника наложено кровотечение на 2 хода!';
     }
 
-    // Update enemy health, set cooldown to 3, turn to enemy
-    setBattleState(prev => prev ? {
-      ...prev,
-      enemy: { ...prev.enemy, health: newEnemyHealth },
-      playerAction: 'skill',
-      turn: 'enemy',
-      skillCooldown: 3
-    } : null);
+    let isHealing = false;
+    if (skill.id === 'heal') {
+      const healAmount = skill.damage + Math.floor(player.stats.intelligence * 2);
+      setPlayer(prev => ({
+        ...prev,
+        health: Math.min(prev.maxHealth, prev.health + healAmount),
+        mana: prev.mana - skill.manaCost,
+        skillCooldowns: {
+          ...prev.skillCooldowns,
+          [skillId]: skill.cooldown
+        }
+      }));
+      
+      addDamageText(healAmount, 'player', 'heal');
+      addBattleLog(`Вы используете "${skill.name}" и восстанавливаете ${healAmount} здоровья!`);
+      isHealing = true;
+    } else {
+      // Reduce player mana and set skill cooldown
+      setPlayer(prev => ({
+        ...prev,
+        mana: prev.mana - skill.manaCost,
+        skillCooldowns: {
+          ...prev.skillCooldowns,
+          [skillId]: skill.cooldown
+        }
+      }));
+      
+      addDamageText(finalDamage, 'enemy', 'skill');
+      addBattleLog(`Вы используете "${skill.name}" и наносите ${finalDamage} урона!`);
+    }
 
-    // Enemy counterattack
-    setTimeout(() => {
-      // Calculate enemy damage with player defensive stats
-      const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
-      
-      setPlayer(prev => {
-        const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
-        return { ...prev, health: newPlayerHealth };
-      });
-      
-      addDamageText(enemyDamageResult.damage, 'player', 'damage');
-      
-      let battleMessage = '';
-      if (enemyDamageResult.isDodged) {
-        battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
-      } else if (enemyDamageResult.isBlocked) {
-        battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
-      } else {
-        battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
+    // Log status effect if applied
+    if (statusMessage) {
+      addBattleLog(statusMessage);
+    }
+
+    if (!isHealing) {
+      // Check if enemy is defeated
+      if (currentEnemyHealth - finalDamage <= 0) {
+        addBattleLog(`${enemyName} повержен!`);
+        const experienceGained = Math.floor(Math.random() * 20) + 15;
+        const coinsGained = Math.floor(Math.random() * 10) + 5;
+        const lootItems = generateLoot(battleState.enemy.type);
+        setBattleResult({ victory: true, experienceGained, coinsGained, lootItems });
+        setTimeout(() => {
+          setGameScreen('battle-victory');
+          setPlayer(prev => ({
+            ...prev,
+            experience: prev.experience + experienceGained,
+            coins: prev.coins + coinsGained,
+            inventory: addItemsToInventory(prev.inventory, lootItems)
+          }));
+        }, 1500);
+        return;
       }
-      addBattleLog(battleMessage);
 
-      setTimeout(() => {
-        setPlayer(current => {
-          if (current.health <= 0) {
-            addBattleLog('Вы падаете без сознания...');
-            setTimeout(() => setGameScreen('battle-defeat'), 1500);
-          }
-          return current;
+      // Update battle state with damage
+      setBattleState(prev => prev ? {
+        ...prev,
+        enemy: { ...prev.enemy, health: Math.max(0, currentEnemyHealth - finalDamage) },
+        turn: 'enemy',
+        playerAction: 'skill'
+      } : null);
+    }
+
+    // Enemy turn after player uses skill
+    setTimeout(() => {
+      if (isHealing) {
+        // For healing skills, just reduce cooldowns and switch turn
+        setPlayer(prev => {
+          const newCooldowns = { ...prev.skillCooldowns };
+          Object.keys(newCooldowns).forEach(skillId => {
+            if (newCooldowns[skillId] > 0) {
+              newCooldowns[skillId] -= 1;
+            }
+          });
+          return {
+            ...prev,
+            skillCooldowns: newCooldowns
+          };
         });
-      }, 100);
+        setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
+      } else {
+        // Enemy counter-attack
+        const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
+        
+        setPlayer(prev => {
+          const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
+          // Also reduce all skill cooldowns
+          const newCooldowns = { ...prev.skillCooldowns };
+          Object.keys(newCooldowns).forEach(skillId => {
+            if (newCooldowns[skillId] > 0) {
+              newCooldowns[skillId] -= 1;
+            }
+          });
+          return {
+            ...prev,
+            health: newPlayerHealth,
+            skillCooldowns: newCooldowns
+          };
+        });
+        
+        addDamageText(enemyDamageResult.damage, 'player', 'damage');
+        
+        let battleMessage = '';
+        if (enemyDamageResult.isDodged) {
+          battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
+        } else if (enemyDamageResult.isBlocked) {
+          battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
+        } else {
+          battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
+        }
+        addBattleLog(battleMessage);
 
-      setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
+        setTimeout(() => {
+          setPlayer(current => {
+            if (current.health <= 0) {
+              addBattleLog('Вы падаете без сознания...');
+              setTimeout(() => setGameScreen('battle-defeat'), 1500);
+            }
+            return current;
+          });
+          setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
+        }, 100);
+      }
     }, 1000);
-  }, [battleState, player.equipment.weapon, player.mana, addDamageText, addBattleLog]);
+  }, [battleState, player.equipment.weapon, player.mana, player.skillCooldowns, addDamageText, addBattleLog]);
 
   const handleBattleUseItem = useCallback((item: Item) => {
     if (!battleState || battleState.turn !== 'player') return;

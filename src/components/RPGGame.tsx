@@ -27,7 +27,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
-import { getSkillById } from '@/data/skills';
+import { getSkillById, availableSkills } from '@/data/skills';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
@@ -182,6 +182,33 @@ const RPGGame = () => {
           description: 'Восстанавливает 30 единиц маны',
           icon: '🔮',
           price: 10
+        },
+        {
+          id: 'heavy_strike_skill',
+          name: 'Книга: Тяжелый удар',
+          type: 'skill',
+          skillId: 'heavy_strike',
+          description: 'Обучает умению "Тяжелый удар"',
+          icon: '/old_sword.png',
+          price: 1
+        },
+        {
+          id: 'sand_in_eyes_skill',
+          name: 'Книга: Песок в глаза',
+          type: 'skill',
+          skillId: 'sand_in_eyes',
+          description: 'Обучает умению "Песок в глаза"',
+          icon: '/trash_nail.png',
+          price: 1
+        },
+        {
+          id: 'fury_cut_skill',
+          name: 'Книга: Яростный порез',
+          type: 'skill',
+          skillId: 'fury_cut',
+          description: 'Обучает умению "Яростный порез"',
+          icon: '/sword.png',
+          price: 1
         }
       ]
     },
@@ -1471,14 +1498,46 @@ const handleBuyItem = useCallback((item: Item) => {
       return;
     }
 
-    setPlayer(prev => ({
-      ...prev,
-      coins: prev.coins - item.price!,
-      inventory: [...prev.inventory, item]
-    }));
+    if (item.type === 'skill' && item.skillId) {
+      // Handle skill books - unlock the skill instead of adding to inventory
+      const skillToUnlock = availableSkills.find(skill => skill.id === item.skillId);
+      if (skillToUnlock && !skillToUnlock.unlocked) {
+        // Unlock the skill
+        const skillIndex = availableSkills.findIndex(skill => skill.id === item.skillId);
+        if (skillIndex !== -1) {
+          availableSkills[skillIndex].unlocked = true;
+        }
+        
+        setPlayer(prev => ({
+          ...prev,
+          coins: prev.coins - item.price!
+        }));
+        
+        toast({
+          title: "Умение изучено!",
+          description: `Вы изучили умение "${skillToUnlock.name}". Теперь его можно использовать в бою.`,
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: skillToUnlock?.unlocked ? "Это умение уже изучено" : "Умение не найдено",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Handle regular items
+      setPlayer(prev => ({
+        ...prev,
+        coins: prev.coins - item.price!,
+        inventory: [...prev.inventory, item]
+      }));
 
-    // Item purchased silently
-  }, [player.coins]);
+      toast({
+        title: "Предмет куплен!",
+        description: `${item.name} добавлен в инвентарь.`,
+      });
+    }
+  }, [player.coins, toast]);
 
   const handleSellItem = useCallback((item: Item) => {
     const price = getSellPrice(item);

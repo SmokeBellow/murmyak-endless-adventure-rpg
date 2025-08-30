@@ -47,7 +47,7 @@ export interface Player {
 export interface Item {
   id: string;
   name: string;
-  type: 'weapon' | 'armor' | 'consumable' | 'misc';
+  type: 'weapon' | 'armor' | 'consumable' | 'misc' | 'skill';
   slot?: 'head' | 'chest' | 'legs' | 'weapon' | 'shield';
   stats?: {
     damage?: number;
@@ -61,6 +61,7 @@ export interface Item {
   quantity?: number;
   stackable?: boolean;
   maxStack?: number;
+  skillId?: string; // For skill items
 }
 
 export interface Equipment {

@@ -27,6 +27,33 @@ export const availableSkills: Skill[] = [
     damage: 35,
     icon: '/torch.png',
     unlocked: false
+  },
+  {
+    id: 'heavy_strike',
+    name: 'Тяжелый удар',
+    description: 'Станит противника на 1 ход с вероятностью 80%',
+    manaCost: 20,
+    damage: 20,
+    icon: '/old_sword.png',
+    unlocked: false
+  },
+  {
+    id: 'sand_in_eyes',
+    name: 'Песок в глаза',
+    description: 'Ослепляет противника на 1 ход, снижая его уворот',
+    manaCost: 15,
+    damage: 10,
+    icon: '/trash_nail.png',
+    unlocked: false
+  },
+  {
+    id: 'fury_cut',
+    name: 'Яростный порез',
+    description: 'Накладывает кровотечение на 2 хода с вероятностью 80% (5% здоровья за ход)',
+    manaCost: 25,
+    damage: 15,
+    icon: '/sword.png',
+    unlocked: false
   }
 ];
 

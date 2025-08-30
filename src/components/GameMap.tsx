@@ -308,9 +308,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       <div 
         className="absolute"
         style={{
-          left: 0,
-          top: 1960,
-          width: mapWidth,
+          left: 288,
+          top: 1460,
+          width: mapWidth - 576,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-x',

@@ -85,21 +85,21 @@ export const BattleScreen = ({
           />
           
           {/* HP and MP bars - closer to image */}
-          <div className="mt-2 text-white text-center">
-            <div className="w-32">
+          <div className="mt-1 text-white text-center">
+            <div className="w-40">
               <div className="flex items-center gap-2 mb-1">
                 <Progress 
                   value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-                  className="h-3 bg-gray-700 [&>div]:bg-red-500 flex-1"
+                  className="h-3 bg-gray-700 [&>div]:bg-red-500 w-24"
                 />
-                <div className="text-sm text-right min-w-[50px]">{currentPlayer.health}/{currentPlayer.maxHealth} HP</div>
+                <div className="text-sm text-left min-w-[50px]">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
               </div>
               <div className="flex items-center gap-2">
                 <Progress 
                   value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-                  className="h-3 bg-gray-700 [&>div]:bg-blue-500 flex-1"
+                  className="h-3 bg-gray-700 [&>div]:bg-blue-500 w-24"
                 />
-                <div className="text-sm text-right min-w-[50px]">{currentPlayer.mana}/{currentPlayer.maxMana} MP</div>
+                <div className="text-sm text-left min-w-[50px]">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
               </div>
             </div>
           </div>

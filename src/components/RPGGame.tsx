@@ -930,9 +930,12 @@ const RPGGame = () => {
 
   // Enemy click removed - no attacks outside battle
 
-  // Regeneration effect with stats
+  // Regeneration effect with stats - only when not in battle
   useEffect(() => {
     const regenInterval = setInterval(() => {
+      // Don't regenerate HP/mana during battle
+      if (battleState) return;
+      
       setPlayer(prev => {
         const healthRegen = calculateHealthRegen(prev.stats.constitution);
         const manaRegen = calculateManaRegen(prev.stats.intelligence);
@@ -946,7 +949,7 @@ const RPGGame = () => {
     }, 3000);
 
     return () => clearInterval(regenInterval);
-  }, [player.stats.constitution, player.stats.intelligence]);
+  }, [player.stats.constitution, player.stats.intelligence, battleState]);
 
   // Handle stat point allocation
   const handleAllocatePoint = useCallback((stat: keyof Player['stats']) => {

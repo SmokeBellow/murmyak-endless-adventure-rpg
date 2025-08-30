@@ -857,64 +857,47 @@ const RPGGame = () => {
 
     // Enemy turn after player uses skill
     setTimeout(() => {
-      if (isHealing) {
-        // For healing skills, just reduce cooldowns and switch turn
-        setPlayer(prev => {
-          const newCooldowns = { ...prev.skillCooldowns };
-          Object.keys(newCooldowns).forEach(skillId => {
-            if (newCooldowns[skillId] > 0) {
-              newCooldowns[skillId] -= 1;
-            }
-          });
-          return {
-            ...prev,
-            skillCooldowns: newCooldowns
-          };
+      // Always perform enemy counter-attack (unless stunned or similar status effects)
+      const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
+      
+      setPlayer(prev => {
+        const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
+        // Also reduce all skill cooldowns
+        const newCooldowns = { ...prev.skillCooldowns };
+        Object.keys(newCooldowns).forEach(skillId => {
+          if (newCooldowns[skillId] > 0) {
+            newCooldowns[skillId] -= 1;
+          }
+        });
+        return {
+          ...prev,
+          health: newPlayerHealth,
+          skillCooldowns: newCooldowns
+        };
+      });
+      
+      addDamageText(enemyDamageResult.damage, 'player', 'damage');
+      
+      let battleMessage = '';
+      if (enemyDamageResult.isDodged) {
+        battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
+      } else if (enemyDamageResult.isBlocked) {
+        battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
+      } else {
+        battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
+      }
+      addBattleLog(battleMessage);
+
+      setTimeout(() => {
+        setPlayer(current => {
+          if (current.health <= 0) {
+            addBattleLog('Вы падаете без сознания...');
+            setTimeout(() => setGameScreen('battle-defeat'), 1500);
+          }
+          return current;
         });
         setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
-      } else {
-        // Enemy counter-attack
-        const enemyDamageResult = calculateDamage(enemyDamage, 0, player.stats.agility, player.stats.strength);
-        
-        setPlayer(prev => {
-          const newPlayerHealth = Math.max(0, prev.health - enemyDamageResult.damage);
-          // Also reduce all skill cooldowns
-          const newCooldowns = { ...prev.skillCooldowns };
-          Object.keys(newCooldowns).forEach(skillId => {
-            if (newCooldowns[skillId] > 0) {
-              newCooldowns[skillId] -= 1;
-            }
-          });
-          return {
-            ...prev,
-            health: newPlayerHealth,
-            skillCooldowns: newCooldowns
-          };
-        });
-        
-        addDamageText(enemyDamageResult.damage, 'player', 'damage');
-        
-        let battleMessage = '';
-        if (enemyDamageResult.isDodged) {
-          battleMessage = `${enemyName} атакует, но вы уворачиваетесь!`;
-        } else if (enemyDamageResult.isBlocked) {
-          battleMessage = `${enemyName} атакует и наносит ${enemyDamageResult.damage} урона! Вы частично блокируете атаку!`;
-        } else {
-          battleMessage = `${enemyName} атакует вас и наносит ${enemyDamageResult.damage} урона!`;
-        }
-        addBattleLog(battleMessage);
-
-        setTimeout(() => {
-          setPlayer(current => {
-            if (current.health <= 0) {
-              addBattleLog('Вы падаете без сознания...');
-              setTimeout(() => setGameScreen('battle-defeat'), 1500);
-            }
-            return current;
-          });
-          setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
-        }, 100);
-      }
+      }, 100);
     }, 1000);
   }, [battleState, player.equipment.weapon, player.mana, player.skillCooldowns, addDamageText, addBattleLog]);
 

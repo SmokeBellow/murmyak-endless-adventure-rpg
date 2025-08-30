@@ -1142,8 +1142,13 @@ const RPGGame = () => {
       }
       
       // Fence collisions
-      // Upper fence: from 500/500 to 1500/500
-      if (x >= 500 && x <= 1500 && y >= 500 && y <= 564) {
+      // Upper fence: from 500/500 to 900/500 (left part)
+      if (x >= 500 && x <= 900 && y >= 500 && y <= 564) {
+        return true;
+      }
+      
+      // Upper fence: from 1100/500 to 1500/500 (right part)  
+      if (x >= 1100 && x <= 1500 && y >= 500 && y <= 564) {
         return true;
       }
       

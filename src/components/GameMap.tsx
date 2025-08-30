@@ -289,13 +289,28 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   const renderVillage = () => (
     <>
-      {/* Upper village boundary - fence */}
+      {/* Upper village boundary - fence - left part */}
       <div 
         className="absolute"
         style={{
           left: 500,
           top: 500,
-          width: 1000,
+          width: 400,
+          height: 64,
+          backgroundImage: 'url(/chastokol.png)',
+          backgroundRepeat: 'repeat-x',
+          backgroundSize: 'auto 64px',
+          imageRendering: 'pixelated'
+        }}
+      />
+      
+      {/* Upper village boundary - fence - right part */}
+      <div 
+        className="absolute"
+        style={{
+          left: 1100,
+          top: 500,
+          width: 400,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',
           backgroundRepeat: 'repeat-x',

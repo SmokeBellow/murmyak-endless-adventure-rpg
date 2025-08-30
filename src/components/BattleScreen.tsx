@@ -166,7 +166,7 @@ export const BattleScreen = ({
           
           {/* Enemy Image - 28.8vh */}
           <div className="flex justify-center" style={{ height: '28.8vh' }}>
-            <div className="bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center h-full aspect-square">
+            <div className="bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center h-full object-contain">
               <span className="text-white text-sm">Enemy Image</span>
             </div>
           </div>

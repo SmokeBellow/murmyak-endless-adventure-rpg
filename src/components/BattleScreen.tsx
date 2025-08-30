@@ -155,20 +155,43 @@ export const BattleScreen = ({
         </div>
 
         {/* Enemy Image - Right */}
-        <div className="flex flex-col items-center border-2 border-amber-500 absolute" style={{ top: '30vh', right: '5vw' }}>
-          <div className="w-48 h-48 bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm">Enemy Image</span>
+        <div className="border-2 border-amber-500 absolute flex flex-col" style={{ top: '20.4vh', left: '83.33vw', height: '42.6vh', transform: 'translateX(-50%)' }}>
+          {/* Spacing 1.2vh */}
+          <div style={{ height: '1.2vh' }}></div>
+          
+          {/* Enemy Name - 2.3vh */}
+          <div className="text-white text-center border border-teal-500" style={{ height: '2.3vh' }}>
+            <div className="text-lg font-bold border border-violet-500 h-full flex items-center justify-center">{enemy.name}</div>
           </div>
-          <div className="mt-4 text-white text-center border border-teal-500">
-            <div className="text-lg font-bold border border-violet-500 p-1">{enemy.name}</div>
-            <div className="w-32 border border-rose-500">
-              <Progress 
-                value={(enemy.health / enemy.maxHealth) * 100} 
-                className="h-3 bg-red-900 border border-emerald-500"
-              />
-              <div className="text-sm border border-sky-500 p-1">{enemy.health}/{enemy.maxHealth} HP</div>
+          
+          {/* Enemy Image - 28.8vh */}
+          <div className="flex justify-center" style={{ height: '28.8vh' }}>
+            <div className="bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center h-full aspect-square">
+              <span className="text-white text-sm">Enemy Image</span>
             </div>
           </div>
+          
+          {/* Spacing 2.3vh */}
+          <div style={{ height: '2.3vh' }}></div>
+          
+          {/* HP Bar - 1.2vh */}
+          <div className="flex items-center gap-2 border border-rose-500" style={{ height: '1.2vh' }}>
+            <Progress 
+              value={(enemy.health / enemy.maxHealth) * 100} 
+              className="h-full bg-red-900 border border-emerald-500"
+              style={{ width: '110px' }}
+            />
+            <div className="text-sm text-left min-w-[58px] border border-sky-500 text-white">{enemy.health}/{enemy.maxHealth}</div>
+          </div>
+          
+          {/* Spacing 2.3vh */}
+          <div style={{ height: '2.3vh' }}></div>
+          
+          {/* Empty MP Bar placeholder - 1.2vh */}
+          <div style={{ height: '1.2vh' }}></div>
+          
+          {/* Spacing 1.2vh */}
+          <div style={{ height: '1.2vh' }}></div>
           
           {/* Enemy Damage Texts */}
           {damageTexts

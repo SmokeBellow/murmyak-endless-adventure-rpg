@@ -82,7 +82,7 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '30vh', left: '5vw', height: '34vh' }}>
+        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '30vh', left: '5vw', height: '38vh' }}>
           {/* Spacing 1vh */}
           <div style={{ height: '1vh' }}></div>
           
@@ -94,8 +94,8 @@ export const BattleScreen = ({
           {/* Spacing 2vh */}
           <div style={{ height: '2vh' }}></div>
           
-          {/* Player Image - 21vh */}
-          <div className="flex justify-center" style={{ height: '21vh' }}>
+          {/* Player Image - 25vh */}
+          <div className="flex justify-center" style={{ height: '25vh' }}>
             <img 
               src="/player_fight.png" 
               alt="Player" 

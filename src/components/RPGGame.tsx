@@ -148,7 +148,7 @@ const RPGGame = () => {
     {
       id: 'merchant',
       name: 'Торговец Марк',
-      position: { x: 1070, y: 530 }, // Moved near the corrected house position
+      position: { x: 800, y: 1000 }, // Moved near the corrected house position
       type: 'merchant',
       dialogue: [
         'Добро пожаловать в мою лавку!',
@@ -216,7 +216,7 @@ const RPGGame = () => {
     {
       id: 'elder',
       name: 'Староста Эдвин',
-      position: { x: 820, y: 490 }, // Moved near buildings area
+      position: { x: 900, y: 800 }, // Moved near buildings area
       type: 'elder',
       dialogue: [
         'Приветствую тебя, молодой искатель приключений!',
@@ -259,7 +259,7 @@ const RPGGame = () => {
     {
       id: 'blacksmith',
       name: 'Кузнец Гром',
-      position: { x: 780, y: 540 }, // Moved near blacksmith forge
+      position: { x: 600, y: 700 }, // Moved near blacksmith forge
       type: 'blacksmith',
       dialogue: [
         'Добро пожаловать в мою кузницу!',
@@ -992,8 +992,8 @@ const RPGGame = () => {
     setPlayer(prev => ({
       ...prev,
       health: Math.floor(prev.maxHealth * 0.5), // Half health after defeat
-      position: { x: 820, y: 490 }, // Elder's position in village
-      targetPosition: { x: 820, y: 490 }
+      position: { x: 900, y: 800 }, // Elder's position in village
+      targetPosition: { x: 900, y: 800 }
     }));
     
     setCurrentLocation('village');
@@ -1136,8 +1136,8 @@ const RPGGame = () => {
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Fountain collision - based on fountain image boundaries (64x64 centered at 400,400)
-      if (x >= 368 && x <= 432 && y >= 368 && y <= 432) {
+      // Fountain collision - based on fountain image boundaries (64x64 centered at 1000,800)
+      if (x >= 968 && x <= 1032 && y >= 768 && y <= 832) {
         return true;
       }
       
@@ -1475,8 +1475,8 @@ const RPGGame = () => {
           
           // Check if player is near fountain (only in village)
           const fountainDistance = Math.sqrt(
-            Math.pow(400 - playerRef.current.position.x, 2) + 
-            Math.pow(400 - playerRef.current.position.y, 2)
+            Math.pow(1000 - playerRef.current.position.x, 2) + 
+            Math.pow(800 - playerRef.current.position.y, 2)
           );
           if (fountainDistance < 80) {
             handleFountainUse();

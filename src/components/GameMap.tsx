@@ -504,8 +504,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 360,
-                top: 360,
+                left: 960,
+                top: 760,
               }}
             >
               {/* Label */}

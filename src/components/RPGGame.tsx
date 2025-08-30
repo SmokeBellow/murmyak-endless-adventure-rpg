@@ -1513,7 +1513,7 @@ const RPGGame = () => {
         // Check if player is near portal
         if (currentLocation === 'village') {
           const portalDistance = Math.sqrt(
-            Math.pow(700 - playerRef.current.position.x, 2) + 
+            Math.pow(1700 - playerRef.current.position.x, 2) + 
             Math.pow(300 - playerRef.current.position.y, 2)
           );
           if (portalDistance < 80) {
@@ -1543,8 +1543,8 @@ const RPGGame = () => {
           
           // Check for return portal
           const portalDistance = Math.sqrt(
-            Math.pow(200 - playerRef.current.position.x, 2) + 
-            Math.pow(400 - playerRef.current.position.y, 2)
+            Math.pow(50 - playerRef.current.position.x, 2) + 
+            Math.pow(50 - playerRef.current.position.y, 2)
           );
           if (portalDistance < 80) {
             handlePortalUse();

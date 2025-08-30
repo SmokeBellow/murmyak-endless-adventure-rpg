@@ -85,9 +85,9 @@ export const BattleScreen = ({
           />
           
           {/* HP and MP bars - closer to image */}
-          <div className="mt-1 text-white text-center">
-            <div className="w-40">
-              <div className="flex items-center gap-2 mb-1">
+          <div className="mt-1 text-white flex flex-col items-center">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
                 <Progress 
                   value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
                   className="h-3 bg-gray-700 [&>div]:bg-red-500 w-24"

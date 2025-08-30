@@ -81,12 +81,19 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
     playerSkillUsageStats.warrior >= 1 && 
     warriorUnlockedCount >= 2;
 
-  console.info('Class check:', {
-    npc: npc.id,
+  // More visible debugging
+  console.log('=== CLASS CHECK DEBUG ===');
+  console.log('NPC:', npc.name, npc.type);
+  console.log('Player skill usage stats:', playerSkillUsageStats);
+  console.log('Mage skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'mage').map(s => s.name));
+  console.log('Rogue skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'rogue').map(s => s.name));
+  console.log('Warrior skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'warrior').map(s => s.name));
+  console.log('Class availability:', {
     mage: { usage: playerSkillUsageStats?.mage, unlocked: mageUnlockedCount, can: canGetMageClass },
     rogue: { usage: playerSkillUsageStats?.rogue, unlocked: rogueUnlockedCount, can: canGetRogueClass },
     warrior: { usage: playerSkillUsageStats?.warrior, unlocked: warriorUnlockedCount, can: canGetWarriorClass }
   });
+  console.log('=========================');
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">

@@ -82,17 +82,17 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '25vh', left: '5vw', height: '37vh' }}>
-          {/* Spacing 1vh */}
-          <div style={{ height: '1vh' }}></div>
+        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '25vh', left: '5vw', height: '42.6vh' }}>
+          {/* Spacing 1.2vh */}
+          <div style={{ height: '1.2vh' }}></div>
           
-          {/* Player Name - 2vh */}
-          <div className="text-white text-center border border-green-500" style={{ height: '2vh' }}>
+          {/* Player Name - 2.3vh */}
+          <div className="text-white text-center border border-green-500" style={{ height: '2.3vh' }}>
             <div className="text-lg font-bold border border-blue-500 h-full flex items-center justify-center">{currentPlayer.name}</div>
           </div>
           
-          {/* Player Image - 25vh */}
-          <div className="flex justify-center" style={{ height: '25vh' }}>
+          {/* Player Image - 28.8vh */}
+          <div className="flex justify-center" style={{ height: '28.8vh' }}>
             <img 
               src="/player_fight.png" 
               alt="Player" 
@@ -103,32 +103,34 @@ export const BattleScreen = ({
             />
           </div>
           
-          {/* Spacing 2vh */}
-          <div style={{ height: '2vh' }}></div>
+          {/* Spacing 2.3vh */}
+          <div style={{ height: '2.3vh' }}></div>
           
-          {/* HP Bar - 1vh */}
-          <div className="flex items-center gap-2 border border-pink-500" style={{ height: '1vh' }}>
+          {/* HP Bar - 1.2vh */}
+          <div className="flex items-center gap-2 border border-pink-500" style={{ height: '1.2vh' }}>
             <Progress 
               value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-              className="h-full bg-gray-700 [&>div]:bg-red-500 w-24 border border-cyan-500"
+              className="h-full bg-gray-700 [&>div]:bg-red-500 border border-cyan-500"
+              style={{ width: '110px' }}
             />
-            <div className="text-sm text-left min-w-[50px] border border-lime-500 text-white">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
+            <div className="text-sm text-left min-w-[58px] border border-lime-500 text-white">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
           </div>
           
-          {/* Spacing 2vh */}
-          <div style={{ height: '2vh' }}></div>
+          {/* Spacing 2.3vh */}
+          <div style={{ height: '2.3vh' }}></div>
           
-          {/* MP Bar - 1vh */}
-          <div className="flex items-center gap-2 border border-indigo-500" style={{ height: '1vh' }}>
+          {/* MP Bar - 1.2vh */}
+          <div className="flex items-center gap-2 border border-indigo-500" style={{ height: '1.2vh' }}>
             <Progress 
               value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-              className="h-full bg-gray-700 [&>div]:bg-blue-500 w-24 border border-cyan-500"
+              className="h-full bg-gray-700 [&>div]:bg-blue-500 border border-cyan-500"
+              style={{ width: '110px' }}
             />
-            <div className="text-sm text-left min-w-[50px] border border-lime-500 text-white">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
+            <div className="text-sm text-left min-w-[58px] border border-lime-500 text-white">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
           </div>
           
-          {/* Spacing 1vh */}
-          <div style={{ height: '1vh' }}></div>
+          {/* Spacing 1.2vh */}
+          <div style={{ height: '1.2vh' }}></div>
           
           {/* Player Damage Texts */}
           {damageTexts

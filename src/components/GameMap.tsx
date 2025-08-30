@@ -138,8 +138,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
       
       // Check if clicking on portal
-      const portalDistance = Math.sqrt(Math.pow(700 - clickX, 2) + Math.pow(300 - clickY, 2));
-      const playerToPortalDistance = Math.sqrt(Math.pow(700 - player.position.x, 2) + Math.pow(300 - player.position.y, 2));
+      const portalDistance = Math.sqrt(Math.pow(1700 - clickX, 2) + Math.pow(300 - clickY, 2));
+      const playerToPortalDistance = Math.sqrt(Math.pow(1700 - player.position.x, 2) + Math.pow(300 - player.position.y, 2));
       if (portalDistance < 40 && playerToPortalDistance < 80) {
         console.log('Portal clicked!');
         onPortalUse();
@@ -476,7 +476,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const isNearPortal = () => {
     if (currentLocation === 'village') {
       const distance = Math.sqrt(
-        Math.pow(700 - player.position.x, 2) + 
+        Math.pow(1700 - player.position.x, 2) + 
         Math.pow(300 - player.position.y, 2)
       );
       return distance < 80;
@@ -612,7 +612,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 660,
+                left: 1660,
                 top: 260,
               }}
             >

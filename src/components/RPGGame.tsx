@@ -374,7 +374,7 @@ const RPGGame = () => {
     },
     {
       id: 'scout',
-      name: 'Следопыт Игорь',
+      name: 'Грейнор',
       position: { x: 700, y: 1200 },
       type: 'scout',
       dialogue: [

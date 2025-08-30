@@ -709,8 +709,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="absolute"
               style={{
-                left: 460,
-                top: 760,
+                left: 1200,
+                top: 600,
               }}
             >
               <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-red-400 text-xs whitespace-nowrap font-bold">

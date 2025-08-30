@@ -678,6 +678,82 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 </div>
               )}
             </div>
+            
+            {/* Buildings near special NPCs */}
+            {/* Mage Tower near Альтарис */}
+            <div
+              className="absolute"
+              style={{
+                left: 1160,
+                top: 860,
+              }}
+            >
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-purple-400 text-xs whitespace-nowrap font-bold">
+                Башня мага
+              </div>
+              <img
+                src="/house.png"
+                alt="Башня мага"
+                className="cursor-pointer hover:brightness-110 transition-all"
+                style={{
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated',
+                  filter: 'hue-rotate(240deg) saturate(1.5)'
+                }}
+                title="Башня мага"
+              />
+            </div>
+            
+            {/* Barracks near Guardian */}
+            <div
+              className="absolute"
+              style={{
+                left: 460,
+                top: 760,
+              }}
+            >
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-red-400 text-xs whitespace-nowrap font-bold">
+                Казарма
+              </div>
+              <img
+                src="/house.png"
+                alt="Казарма"
+                className="cursor-pointer hover:brightness-110 transition-all"
+                style={{
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated',
+                  filter: 'hue-rotate(0deg) saturate(1.5)'
+                }}
+                title="Казарма"
+              />
+            </div>
+            
+            {/* Shooting Range near Scout */}
+            <div
+              className="absolute"
+              style={{
+                left: 660,
+                top: 1160,
+              }}
+            >
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-green-400 text-xs whitespace-nowrap font-bold">
+                Стрельбище
+              </div>
+              <img
+                src="/house.png"
+                alt="Стрельбище"
+                className="cursor-pointer hover:brightness-110 transition-all"
+                style={{
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated',
+                  filter: 'hue-rotate(120deg) saturate(1.5)'
+                }}
+                title="Стрельбище"
+              />
+            </div>
           </>
         )}
         

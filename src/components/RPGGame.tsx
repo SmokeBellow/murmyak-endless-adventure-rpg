@@ -362,7 +362,7 @@ const RPGGame = () => {
     },
     {
       id: 'mage',
-      name: 'Маг Аркадий',
+      name: 'Альтарис',
       position: { x: 1200, y: 900 },
       type: 'mage',
       dialogue: [

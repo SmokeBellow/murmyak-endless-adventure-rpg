@@ -12,10 +12,16 @@ interface NPCDialogueProps {
   activeQuests?: Quest[];
   onCompleteQuest?: (quest: Quest) => void;
   completedQuestIds?: string[];
-  allQuests?: Quest[]; // Add all available quests
+  allQuests?: Quest[];
+  playerSkillUsageStats?: {
+    warrior: number;
+    rogue: number;
+    mage: number;
+  };
+  onClassSelection?: (classType: 'warrior' | 'rogue' | 'mage') => void;
 }
 
-const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [], allQuests = [] }: NPCDialogueProps) => {
+const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [], allQuests = [], playerSkillUsageStats, onClassSelection }: NPCDialogueProps) => {
   console.log('NPCDialogue - NPC:', npc.id, 'completedQuestIds:', completedQuestIds);
   
   // Special logic for elder NPC
@@ -58,6 +64,11 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
     quest.giver === npc.id && 
     quest.objectives.every(obj => obj.completed)
   );
+
+  // Check class availability
+  const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && playerSkillUsageStats.mage >= 10;
+  const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && playerSkillUsageStats.rogue >= 10;  
+  const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && playerSkillUsageStats.warrior >= 10;
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -153,6 +164,26 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
                   onClick={onTrade}
                 >
                   🛒 Торговать
+                </Button>
+              </div>
+            )}
+
+            {/* Class Selection */}
+            {(canGetMageClass || canGetRogueClass || canGetWarriorClass) && (
+              <div className="pt-4 border-t border-border">
+                <Button 
+                  variant="default" 
+                  className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold"
+                  onClick={() => {
+                    if (canGetMageClass) onClassSelection?.('mage');
+                    else if (canGetRogueClass) onClassSelection?.('rogue');
+                    else if (canGetWarriorClass) onClassSelection?.('warrior');
+                  }}
+                >
+                  ✨ Хочу получить класс
+                  {canGetMageClass && ' (Маг)'}
+                  {canGetRogueClass && ' (Следопыт)'}
+                  {canGetWarriorClass && ' (Воин)'}
                 </Button>
               </div>
             )}

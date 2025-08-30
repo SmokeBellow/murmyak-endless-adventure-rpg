@@ -105,7 +105,12 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
-    // No collisions - merchant house removed
+    if (currentLocation === 'village') {
+      // Fountain collision - based on fountain image boundaries (64x64 centered at 400,400)
+      if (x >= 368 && x <= 432 && y >= 368 && y <= 432) {
+        return true;
+      }
+    }
     return false;
   }, [currentLocation]);
 

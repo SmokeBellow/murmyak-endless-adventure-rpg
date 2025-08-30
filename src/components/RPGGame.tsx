@@ -143,7 +143,7 @@ const RPGGame = () => {
   });
 
   // NPCs
-  const [npcs] = useState<NPC[]>([
+  const [npcs, setNpcs] = useState<NPC[]>([
     {
       id: 'merchant',
       name: 'Торговец Марк',
@@ -329,13 +329,15 @@ const RPGGame = () => {
         toast({
           title: "Вы погибли!",
           description: "Вы были повержены противником",
-          variant: "destructive"
+          variant: "destructive",
+          duration: 2000
         });
       } else {
         toast({
           title: "Получен урон!",
           description: `Вы потеряли ${damage} здоровья`,
-          variant: "destructive"
+          variant: "destructive",
+          duration: 2000
         });
       }
       return {
@@ -994,6 +996,7 @@ const RPGGame = () => {
     toast({
       title: "Характеристика улучшена!",
       description: `Увеличена характеристика: ${stat === 'strength' ? 'Сила' : stat === 'agility' ? 'Ловкость' : stat === 'intelligence' ? 'Интеллект' : stat === 'constitution' ? 'Телосложение' : 'Удача'}`,
+      duration: 2000
     });
   }, [player.unallocatedPoints, toast]);
 
@@ -1020,6 +1023,7 @@ const RPGGame = () => {
         toast({
           title: "Повышение уровня!",
           description: `Уровень ${newLevel}! Получено ${totalPoints} очков характеристик.`,
+          duration: 2000
         });
       }
     }
@@ -1499,7 +1503,7 @@ const handleBuyItem = useCallback((item: Item) => {
     }
 
     if (item.type === 'skill' && item.skillId) {
-      // Handle skill books - unlock the skill instead of adding to inventory
+      // Handle skill books - unlock the skill and remove from shop
       const skillToUnlock = availableSkills.find(skill => skill.id === item.skillId);
       if (skillToUnlock && !skillToUnlock.unlocked) {
         // Unlock the skill
@@ -1507,6 +1511,17 @@ const handleBuyItem = useCallback((item: Item) => {
         if (skillIndex !== -1) {
           availableSkills[skillIndex].unlocked = true;
         }
+        
+        // Remove book from merchant's shop
+        setNpcs(prev => prev.map(npc => {
+          if (npc.type === 'merchant' && npc.shop) {
+            return {
+              ...npc,
+              shop: npc.shop.filter(shopItem => shopItem.id !== item.id)
+            };
+          }
+          return npc;
+        }));
         
         setPlayer(prev => ({
           ...prev,
@@ -1516,12 +1531,14 @@ const handleBuyItem = useCallback((item: Item) => {
         toast({
           title: "Умение изучено!",
           description: `Вы изучили умение "${skillToUnlock.name}". Теперь его можно использовать в бою.`,
+          duration: 2000
         });
       } else {
         toast({
           title: "Ошибка",
           description: skillToUnlock?.unlocked ? "Это умение уже изучено" : "Умение не найдено",
-          variant: "destructive"
+          variant: "destructive",
+          duration: 2000
         });
       }
     } else {
@@ -1535,6 +1552,7 @@ const handleBuyItem = useCallback((item: Item) => {
       toast({
         title: "Предмет куплен!",
         description: `${item.name} добавлен в инвентарь.`,
+        duration: 2000
       });
     }
   }, [player.coins, toast]);
@@ -1560,7 +1578,8 @@ const handleBuyItem = useCallback((item: Item) => {
       toast({
         title: "Недостаточно монет",
         description: "Нужно 5 монет для использования фонтана",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 2000
       });
       return;
     }
@@ -1579,6 +1598,7 @@ const handleBuyItem = useCallback((item: Item) => {
     toast({
       title: "Фонтан исцеления",
       description: "Здоровье и мана полностью восстановлены!",
+      duration: 2000
     });
 
     // Update first quest objective
@@ -1667,6 +1687,7 @@ const handleBuyItem = useCallback((item: Item) => {
     toast({
       title: "Добыча угля",
       description: "Вы добыли уголь!",
+      duration: 2000
     });
   }, [resourceNodes.coal.count, quests, toast]);
 
@@ -1716,6 +1737,7 @@ const handleBuyItem = useCallback((item: Item) => {
     toast({
       title: "Добыча руды",
       description: "Вы добыли железную руду!",
+      duration: 2000
     });
   }, [resourceNodes.ore.count, quests, player.inventory, toast]);
 
@@ -1970,6 +1992,7 @@ const handleBuyItem = useCallback((item: Item) => {
               toast({
                 title: "Новый квест!",
                 description: `Принят квест: ${newQuest.title}`,
+                duration: 2000
               });
             }
 }}

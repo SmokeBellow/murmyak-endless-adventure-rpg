@@ -106,8 +106,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   // Collision detection
   const isColliding = useCallback((x: number, y: number) => {
     if (currentLocation === 'village') {
-      // Fountain collision - based on fountain image boundaries (64x64 centered at 400,400)
-      if (x >= 368 && x <= 432 && y >= 368 && y <= 432) {
+      // Fountain collision - based on fountain image boundaries (64x64 centered at 1000,800)
+      if (x >= 968 && x <= 1032 && y >= 768 && y <= 832) {
         return true;
       }
     }
@@ -129,8 +129,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     
     if (currentLocation === 'village') {
       // Check if clicking on fountain (adjusted for fountain shape)
-      const fountainDistance = Math.sqrt(Math.pow(400 - clickX, 2) + Math.pow(400 - clickY, 2));
-      const playerToFountainDistance = Math.sqrt(Math.pow(400 - player.position.x, 2) + Math.pow(400 - player.position.y, 2));
+      const fountainDistance = Math.sqrt(Math.pow(1000 - clickX, 2) + Math.pow(800 - clickY, 2));
+      const playerToFountainDistance = Math.sqrt(Math.pow(1000 - player.position.x, 2) + Math.pow(800 - player.position.y, 2));
       if (fountainDistance < 25 && playerToFountainDistance < 80) {
         console.log('Fountain clicked!');
         onFountainUse();
@@ -494,8 +494,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const isNearFountain = () => {
     if (currentLocation === 'village') {
       const distance = Math.sqrt(
-        Math.pow(400 - player.position.x, 2) + 
-        Math.pow(400 - player.position.y, 2)
+        Math.pow(1000 - player.position.x, 2) + 
+        Math.pow(800 - player.position.y, 2)
       );
       return distance < 65;
     }

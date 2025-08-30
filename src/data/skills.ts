@@ -85,11 +85,21 @@ export const availableSkills: Skill[] = [
     id: 'mana_spark',
     name: 'Искра маны',
     description: 'Восстанавливает часть маны и усиливает магией следующую атаку',
-    manaCost: 10,
+    manaCost: 0,
     damage: 0,
     icon: '/trash_gem.png',
     unlocked: false,
     cooldown: 2
+  },
+  {
+    id: 'shadow_veil',
+    name: 'Вуаль тьмы',
+    description: 'Увеличивает шанс уклонения игрока на 40% на 2 хода',
+    manaCost: 20,
+    damage: 0,
+    icon: '/bat.png',
+    unlocked: false,
+    cooldown: 5
   }
 ];
 

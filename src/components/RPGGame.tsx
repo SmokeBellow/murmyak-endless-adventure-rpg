@@ -237,6 +237,15 @@ const RPGGame = () => {
           description: 'Обучает умению "Искра маны"',
           icon: '/trash_gem.png',
           price: 1
+        },
+        {
+          id: 'shadow_veil_skill',
+          name: 'Гримуар: Вуаль тьмы',
+          type: 'skill',
+          skillId: 'shadow_veil',
+          description: 'Обучает умению "Вуаль тьмы"',
+          icon: '/bat.png',
+          price: 1
         }
       ]
     },
@@ -773,7 +782,7 @@ const RPGGame = () => {
       const manaRestored = 20 + Math.floor(player.stats.intelligence);
       setPlayer(prev => ({
         ...prev,
-        mana: Math.min(prev.maxMana, prev.mana + manaRestored - skill.manaCost),
+        mana: Math.min(prev.maxMana, prev.mana + manaRestored),
         skillCooldowns: {
           ...prev.skillCooldowns,
           [skillId]: skill.cooldown
@@ -783,6 +792,19 @@ const RPGGame = () => {
       addDamageText(manaRestored, 'player', 'heal');
       addBattleLog(`Вы используете "${skill.name}" и восстанавливаете ${manaRestored} маны! Следующая атака усилена!`);
       statusMessage = 'Следующая атака усилена магией!';
+      isHealing = true;
+    } else if (skill.id === 'shadow_veil') {
+      setPlayer(prev => ({
+        ...prev,
+        mana: prev.mana - skill.manaCost,
+        skillCooldowns: {
+          ...prev.skillCooldowns,
+          [skillId]: skill.cooldown
+        }
+      }));
+      
+      addBattleLog(`Вы используете "${skill.name}" и окутываетесь тенями!`);
+      statusMessage = 'Шанс уклонения увеличен на 40% на 2 хода!';
       isHealing = true;
     } else {
       // Reduce player mana and set skill cooldown

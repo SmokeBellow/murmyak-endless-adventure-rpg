@@ -14,6 +14,16 @@ export const SkillsMenu = ({ player, onUpdatePlayer, onClose }: SkillsMenuProps)
 
   const handleSlotChange = (slotIndex: number, skillId: string | null) => {
     const newSlots = [...player.skillSlots] as [string | null, string | null, string | null];
+    
+    // Если добавляем умение, сначала убираем его из всех других слотов
+    if (skillId) {
+      for (let i = 0; i < newSlots.length; i++) {
+        if (newSlots[i] === skillId && i !== slotIndex) {
+          newSlots[i] = null;
+        }
+      }
+    }
+    
     newSlots[slotIndex] = skillId;
     onUpdatePlayer({ skillSlots: newSlots });
   };

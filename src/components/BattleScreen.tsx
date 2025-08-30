@@ -91,9 +91,6 @@ export const BattleScreen = ({
             <div className="text-lg font-bold border border-blue-500 h-full flex items-center justify-center">{currentPlayer.name}</div>
           </div>
           
-          {/* Spacing 2vh */}
-          <div style={{ height: '2vh' }}></div>
-          
           {/* Player Image - 25vh */}
           <div className="flex justify-center" style={{ height: '25vh' }}>
             <img 

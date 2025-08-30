@@ -1196,7 +1196,7 @@ const RPGGame = () => {
       
       // Boundary constraints
       newX = Math.max(40, Math.min(1960, newX));
-      newY = Math.max(100, Math.min(1960, newY));
+      newY = Math.max(500, Math.min(1960, newY));
       
       // Collision detection - check if movement is blocked
       if (isColliding(newX, newY)) {

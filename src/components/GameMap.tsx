@@ -15,10 +15,12 @@ interface GameMapProps {
   onCoalMineInteract: () => void;
   currentLocation: LocationType;
   onPortalUse: () => void;
+  onNoClipToggle?: (enabled: boolean) => void;
 }
 
-const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse }: GameMapProps) => {
+const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onNoClipToggle }: GameMapProps) => {
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
+  const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const lightCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -45,10 +47,19 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     };
   }, []);
 
-  // Check for cheat code
+  // Check for cheat codes
   useEffect(() => {
     if (pressedKeys.has('1') && pressedKeys.has('2') && pressedKeys.has('3')) {
       setIsLightCheatEnabled(prev => !prev);
+      setPressedKeys(new Set()); // Clear keys after activation
+    }
+    if (pressedKeys.has('3') && pressedKeys.has('4') && pressedKeys.has('5')) {
+      setIsNoClipCheatEnabled(prev => {
+        const newValue = !prev;
+        onNoClipToggle?.(newValue);
+        console.log('No-clip cheat toggled:', newValue);
+        return newValue;
+      });
       setPressedKeys(new Set()); // Clear keys after activation
     }
   }, [pressedKeys]);

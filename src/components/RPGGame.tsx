@@ -1538,14 +1538,6 @@ const RPGGame = () => {
       const key = event.key.toLowerCase();
       pressedKeys.add(key);
       
-      // Check for no-clip cheat code (345)
-      if (pressedKeys.has('3') && pressedKeys.has('4') && pressedKeys.has('5')) {
-        setIsNoClipCheatEnabled(prev => !prev);
-        pressedKeys.clear(); // Clear keys after activation
-        console.log('No-clip cheat toggled:', !isNoClipCheatEnabled);
-        return;
-      }
-      
       // E key for interaction (both English and Russian layout)
       if ((key === 'e' || key === 'у') && selectedNPC === null && activeMenu === 'none') {
         event.preventDefault();
@@ -2021,6 +2013,7 @@ const handleBuyItem = useCallback((item: Item) => {
             onCoalMineInteract={handleCoalMineInteract}
             currentLocation={currentLocation}
             onPortalUse={handlePortalUse}
+            onNoClipToggle={setIsNoClipCheatEnabled}
           />
 
       {isMobile && (

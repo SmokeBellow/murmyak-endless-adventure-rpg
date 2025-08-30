@@ -890,7 +890,6 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         
         {/* Render NPCs only in village */}
         {currentLocation === 'village' && npcs.map(npc => {
-          console.log(`Rendering NPC: ${npc.name} (${npc.type}), visible=${npc.visible}`);
           return (
             <div
               key={npc.id}

@@ -248,7 +248,7 @@ export const BattleScreen = ({
       <div className="h-[35%] bg-gray-800 px-4 pt-4 pb-4 flex gap-4">
         {/* Action Buttons - Left 1/3 */}
         <div className="w-1/3">
-          <h3 className="text-white text-lg font-bold mb-4">Действия</h3>
+          <h3 className="text-white text-lg font-bold mb-4 text-center">Действия</h3>
           <div className="space-y-3">
             {/* Skill Slots - 3 buttons in a row */}
             <div className="grid grid-cols-3 gap-1 mb-3">
@@ -303,7 +303,7 @@ export const BattleScreen = ({
 
         {/* Inventory Items - Middle 1/3 */}
         <div className="w-1/3">
-          <h3 className="text-white text-lg font-bold mb-4">Предметы</h3>
+          <h3 className="text-white text-lg font-bold mb-4 text-center">Предметы</h3>
           <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto">
             {consumableItems.map((item) => (
               <Card 
@@ -334,7 +334,7 @@ export const BattleScreen = ({
 
         {/* Battle Log - Right 1/3 */}
         <div className="w-1/3">
-          <h3 className="text-white text-lg font-bold mb-4">Лог боя</h3>
+          <h3 className="text-white text-lg font-bold mb-4 text-center">Лог боя</h3>
           <div ref={battleLogRef} className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm">
             {battleLog.length === 0 ? (
               <div className="text-gray-400">Бой начинается...</div>

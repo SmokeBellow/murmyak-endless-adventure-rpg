@@ -63,17 +63,6 @@ export const BattleScreen = ({
 
   return (
     <div className="fixed inset-0 bg-black z-50">
-      {/* Debug Grid - covers entire screen */}
-      <div 
-        className="fixed inset-0 z-50 pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '1vw 1vh'
-        }}
-      />
       
       <div className="h-full flex flex-col relative z-40">
       {/* Battle Background - 65% of screen */}
@@ -82,13 +71,13 @@ export const BattleScreen = ({
         style={{ backgroundImage: `url(${getBackgroundImage()})` }}
       >
         {/* Player Image - Left */}
-        <div className="border-2 border-yellow-500 absolute flex flex-col" style={{ top: '20.4vh', left: '16.67vw', height: '42.6vh', transform: 'translateX(-50%)' }}>
+        <div className="absolute flex flex-col" style={{ top: '20.4vh', left: '16.67vw', height: '42.6vh', transform: 'translateX(-50%)' }}>
           {/* Spacing 1.2vh */}
           <div style={{ height: '1.2vh' }}></div>
           
           {/* Player Name - 2.3vh */}
-          <div className="text-white text-center border border-green-500" style={{ height: '2.3vh' }}>
-            <div className="text-lg font-bold border border-blue-500 h-full flex items-center justify-center">{currentPlayer.name}</div>
+          <div className="text-white text-center" style={{ height: '2.3vh' }}>
+            <div className="text-lg font-bold h-full flex items-center justify-center">{currentPlayer.name}</div>
           </div>
           
           {/* Player Image - 28.8vh */}
@@ -96,7 +85,7 @@ export const BattleScreen = ({
             <img 
               src="/player_fight.png" 
               alt="Player" 
-              className="object-contain border-2 border-red-500 h-full"
+              className="object-contain h-full"
               onError={(e) => {
                 e.currentTarget.src = '/player.png'; // fallback
               }}
@@ -107,26 +96,26 @@ export const BattleScreen = ({
           <div style={{ height: '2.3vh' }}></div>
           
           {/* HP Bar - 1.2vh */}
-          <div className="flex items-center gap-2 border border-pink-500" style={{ height: '1.2vh' }}>
+          <div className="flex items-center gap-2" style={{ height: '1.2vh' }}>
             <Progress 
               value={(currentPlayer.health / currentPlayer.maxHealth) * 100} 
-              className="h-full bg-gray-700 [&>div]:bg-red-500 border border-cyan-500"
+              className="h-full bg-gray-700 [&>div]:bg-red-500"
               style={{ width: '110px' }}
             />
-            <div className="text-sm text-left min-w-[58px] border border-lime-500 text-white">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
+            <div className="text-sm text-left min-w-[58px] text-white">{currentPlayer.health}/{currentPlayer.maxHealth}</div>
           </div>
           
           {/* Spacing 2.3vh */}
           <div style={{ height: '2.3vh' }}></div>
           
           {/* MP Bar - 1.2vh */}
-          <div className="flex items-center gap-2 border border-indigo-500" style={{ height: '1.2vh' }}>
+          <div className="flex items-center gap-2" style={{ height: '1.2vh' }}>
             <Progress 
               value={(currentPlayer.mana / currentPlayer.maxMana) * 100} 
-              className="h-full bg-gray-700 [&>div]:bg-blue-500 border border-cyan-500"
+              className="h-full bg-gray-700 [&>div]:bg-blue-500"
               style={{ width: '110px' }}
             />
-            <div className="text-sm text-left min-w-[58px] border border-lime-500 text-white">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
+            <div className="text-sm text-left min-w-[58px] text-white">{currentPlayer.mana}/{currentPlayer.maxMana}</div>
           </div>
           
           {/* Spacing 1.2vh */}
@@ -155,18 +144,18 @@ export const BattleScreen = ({
         </div>
 
         {/* Enemy Image - Right */}
-        <div className="border-2 border-amber-500 absolute flex flex-col" style={{ top: '20.4vh', left: '83.33vw', height: '42.6vh', transform: 'translateX(-50%)' }}>
+        <div className="absolute flex flex-col" style={{ top: '20.4vh', left: '83.33vw', height: '42.6vh', transform: 'translateX(-50%)' }}>
           {/* Spacing 1.2vh */}
           <div style={{ height: '1.2vh' }}></div>
           
           {/* Enemy Name - 2.3vh */}
-          <div className="text-white text-center border border-teal-500" style={{ height: '2.3vh' }}>
-            <div className="text-lg font-bold border border-violet-500 h-full flex items-center justify-center">{enemy.name}</div>
+          <div className="text-white text-center" style={{ height: '2.3vh' }}>
+            <div className="text-lg font-bold h-full flex items-center justify-center">{enemy.name}</div>
           </div>
           
           {/* Enemy Image - 28.8vh */}
           <div className="flex justify-center" style={{ height: '28.8vh' }}>
-            <div className="bg-gray-600 border-2 border-gray-400 rounded-lg flex items-center justify-center h-full object-contain">
+            <div className="bg-gray-600 rounded-lg flex items-center justify-center h-full object-contain">
               <span className="text-white text-sm">Enemy Image</span>
             </div>
           </div>
@@ -175,13 +164,13 @@ export const BattleScreen = ({
           <div style={{ height: '2.3vh' }}></div>
           
           {/* HP Bar - 1.2vh */}
-          <div className="flex items-center gap-2 border border-rose-500" style={{ height: '1.2vh' }}>
+          <div className="flex items-center gap-2" style={{ height: '1.2vh' }}>
             <Progress 
               value={(enemy.health / enemy.maxHealth) * 100} 
-              className="h-full bg-gray-700 [&>div]:bg-red-500 border border-emerald-500"
+              className="h-full bg-gray-700 [&>div]:bg-red-500"
               style={{ width: '110px' }}
             />
-            <div className="text-sm text-left min-w-[58px] border border-sky-500 text-white">{enemy.health}/{enemy.maxHealth}</div>
+            <div className="text-sm text-left min-w-[58px] text-white">{enemy.health}/{enemy.maxHealth}</div>
           </div>
           
           {/* Spacing 2.3vh */}
@@ -258,16 +247,16 @@ export const BattleScreen = ({
       {/* Battle UI - 35% of screen */}
       <div className="h-[35%] bg-gray-800 px-4 pb-4 flex gap-4 border-t-4 border-white">
         {/* Action Buttons - Left 1/3 */}
-        <div className="w-1/3 border-2 border-red-400">
-          <h3 className="text-white text-lg font-bold mb-4 border border-green-400">Действия</h3>
-          <div className="space-y-3 border border-blue-400">
+        <div className="w-1/3">
+          <h3 className="text-white text-lg font-bold mb-4">Действия</h3>
+          <div className="space-y-3">
             {/* Skill Slots - 3 buttons in a row */}
-            <div className="grid grid-cols-3 gap-1 mb-3 border border-yellow-400">
+            <div className="grid grid-cols-3 gap-1 mb-3">
               {equippedSkills.map((skill, index) => (
                 <Button
                   key={index}
                   onClick={() => skill && onUseSkill(skill.id)}
-                  className="w-full h-12 p-1 relative border border-purple-400"
+                  className="w-full h-12 p-1 relative"
                   variant="secondary"
                   disabled={
                     battleState.turn !== 'player' || 
@@ -281,9 +270,9 @@ export const BattleScreen = ({
                       <img 
                         src={skill.icon} 
                         alt={skill.name}
-                        className="w-8 h-8 object-contain border border-orange-400"
+                        className="w-8 h-8 object-contain"
                       />
-                      <span className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded border border-pink-400">
+                      <span className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded">
                         {skill.manaCost}
                       </span>
                     </>
@@ -296,7 +285,7 @@ export const BattleScreen = ({
             
             <Button 
               onClick={onAttack}
-              className="w-full border-2 border-cyan-400"
+              className="w-full"
               variant="destructive"
               disabled={battleState.turn !== 'player'}
             >
@@ -304,7 +293,7 @@ export const BattleScreen = ({
             </Button>
             <Button 
               onClick={onBattleEnd}
-              className="w-full border-2 border-lime-400"
+              className="w-full"
               variant="outline"
             >
               Бежать
@@ -313,45 +302,45 @@ export const BattleScreen = ({
         </div>
 
         {/* Inventory Items - Middle 1/3 */}
-        <div className="w-1/3 border-2 border-green-400">
-          <h3 className="text-white text-lg font-bold mb-4 border border-blue-400">Предметы</h3>
-          <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto border border-yellow-400">
+        <div className="w-1/3">
+          <h3 className="text-white text-lg font-bold mb-4">Предметы</h3>
+          <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto">
             {consumableItems.map((item) => (
               <Card 
                 key={item.id}
-                className="p-2 cursor-pointer hover:bg-gray-600 transition-colors relative border border-purple-400"
+                className="p-2 cursor-pointer hover:bg-gray-600 transition-colors relative"
                 onClick={() => onUseItem(item)}
               >
                 <img 
                   src={item.icon} 
                   alt={item.name}
-                  className="w-6 h-6 object-contain mx-auto border border-orange-400"
+                  className="w-6 h-6 object-contain mx-auto"
                 />
                 {item.quantity && item.quantity > 1 && (
-                  <span className="absolute bottom-0 right-0 text-xs font-bold text-primary transform translate-x-1 translate-y-1 border border-pink-400">
+                  <span className="absolute bottom-0 right-0 text-xs font-bold text-primary transform translate-x-1 translate-y-1">
                     x{item.quantity}
                   </span>
                 )}
-                <div className="text-xs text-white text-center mt-1 truncate border border-cyan-400">
+                <div className="text-xs text-white text-center mt-1 truncate">
                   {item.name}
                 </div>
               </Card>
             ))}
           </div>
           {consumableItems.length === 0 && (
-            <div className="text-gray-400 text-sm border border-red-400">Нет предметов</div>
+            <div className="text-gray-400 text-sm">Нет предметов</div>
           )}
         </div>
 
         {/* Battle Log - Right 1/3 */}
-        <div className="w-1/3 border-2 border-blue-400">
-          <h3 className="text-white text-lg font-bold mb-4 border border-green-400">Лог боя</h3>
-          <div ref={battleLogRef} className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm border-2 border-yellow-400">
+        <div className="w-1/3">
+          <h3 className="text-white text-lg font-bold mb-4">Лог боя</h3>
+          <div ref={battleLogRef} className="bg-gray-900 rounded p-3 h-32 overflow-y-auto text-sm">
             {battleLog.length === 0 ? (
-              <div className="text-gray-400 border border-red-400">Бой начинается...</div>
+              <div className="text-gray-400">Бой начинается...</div>
             ) : (
               battleLog.slice(-10).map((log, index) => (
-                <div key={index} className="text-gray-300 mb-1 border border-purple-400">
+                <div key={index} className="text-gray-300 mb-1">
                   {log}
                 </div>
               ))

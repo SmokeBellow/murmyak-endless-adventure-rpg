@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
+import { availableSkills } from '@/data/skills';
 
 interface NPCDialogueProps {
   npc: NPC;
@@ -66,9 +67,15 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
   );
 
   // Check class availability
-  const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && playerSkillUsageStats.mage >= 10;
-  const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && playerSkillUsageStats.rogue >= 10;  
-  const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && playerSkillUsageStats.warrior >= 10;
+  const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && 
+    playerSkillUsageStats.mage >= 1 && 
+    availableSkills.filter(skill => skill.unlocked && skill.class === 'mage').length >= 2;
+  const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && 
+    playerSkillUsageStats.rogue >= 1 && 
+    availableSkills.filter(skill => skill.unlocked && skill.class === 'rogue').length >= 2;  
+  const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
+    playerSkillUsageStats.warrior >= 1 && 
+    availableSkills.filter(skill => skill.unlocked && skill.class === 'warrior').length >= 2;
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">

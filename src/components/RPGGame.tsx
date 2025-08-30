@@ -1241,9 +1241,11 @@ const RPGGame = () => {
       let newX = x + (direction.x * moveSpeed);
       let newY = y + (direction.y * moveSpeed);
       
-      // Boundary constraints
-      newX = Math.max(200, Math.min(1800, newX));
-      newY = Math.max(200, Math.min(1800, newY));
+      // Boundary constraints (different for village vs mines)
+      const minBound = currentLocation === 'village' ? 200 : 40;
+      const maxBound = currentLocation === 'village' ? 1800 : 1960;
+      newX = Math.max(minBound, Math.min(maxBound, newX));
+      newY = Math.max(minBound, Math.min(maxBound, newY));
       
       // Collision detection - check if movement is blocked
       if (isColliding(newX, newY)) {

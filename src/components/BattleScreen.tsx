@@ -178,7 +178,7 @@ export const BattleScreen = ({
           <div className="flex items-center gap-2 border border-rose-500" style={{ height: '1.2vh' }}>
             <Progress 
               value={(enemy.health / enemy.maxHealth) * 100} 
-              className="h-full bg-red-900 border border-emerald-500"
+              className="h-full bg-gray-700 [&>div]:bg-red-500 border border-emerald-500"
               style={{ width: '110px' }}
             />
             <div className="text-sm text-left min-w-[58px] border border-sky-500 text-white">{enemy.health}/{enemy.maxHealth}</div>

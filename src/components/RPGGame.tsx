@@ -386,8 +386,8 @@ const RPGGame = () => {
     },
     {
       id: 'guardian',
-      name: 'Стражник Олег',
-      position: { x: 500, y: 800 },
+      name: 'Гарлок',
+      position: { x: 1240, y: 680 },
       type: 'guardian',
       dialogue: [
         'Приветствую тебя, воин!',

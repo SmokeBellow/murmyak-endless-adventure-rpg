@@ -9,7 +9,8 @@ export const availableSkills: Skill[] = [
     damage: 25,
     icon: '/sword.png',
     unlocked: true,
-    cooldown: 2
+    cooldown: 2,
+    class: 'warrior'
   },
   {
     id: 'heal',
@@ -19,7 +20,8 @@ export const availableSkills: Skill[] = [
     damage: 0, // Это лечение, не урон
     icon: '/healthpotion.png',
     unlocked: false,
-    cooldown: 3
+    cooldown: 3,
+    class: 'warrior'
   },
   {
     id: 'fire_slash',
@@ -29,7 +31,8 @@ export const availableSkills: Skill[] = [
     damage: 35,
     icon: '/torch.png',
     unlocked: false,
-    cooldown: 4
+    cooldown: 4,
+    class: 'warrior'
   },
   {
     id: 'heavy_strike',
@@ -39,7 +42,8 @@ export const availableSkills: Skill[] = [
     damage: 20,
     icon: '/old_sword.png',
     unlocked: false,
-    cooldown: 5
+    cooldown: 5,
+    class: 'warrior'
   },
   {
     id: 'sand_in_eyes',
@@ -49,7 +53,8 @@ export const availableSkills: Skill[] = [
     damage: 10,
     icon: '/trash_nail.png',
     unlocked: false,
-    cooldown: 3
+    cooldown: 3,
+    class: 'rogue'
   },
   {
     id: 'fury_cut',
@@ -59,7 +64,8 @@ export const availableSkills: Skill[] = [
     damage: 15,
     icon: '/sword.png',
     unlocked: false,
-    cooldown: 4
+    cooldown: 4,
+    class: 'rogue'
   },
   {
     id: 'fire_burst',
@@ -69,7 +75,8 @@ export const availableSkills: Skill[] = [
     damage: 20,
     icon: '/torch.png',
     unlocked: false,
-    cooldown: 4
+    cooldown: 4,
+    class: 'mage'
   },
   {
     id: 'frost_chains',
@@ -79,7 +86,8 @@ export const availableSkills: Skill[] = [
     damage: 15,
     icon: '/trash_rare_gem.png',
     unlocked: false,
-    cooldown: 3
+    cooldown: 3,
+    class: 'mage'
   },
   {
     id: 'mana_spark',
@@ -89,7 +97,8 @@ export const availableSkills: Skill[] = [
     damage: 0,
     icon: '/trash_gem.png',
     unlocked: false,
-    cooldown: 2
+    cooldown: 2,
+    class: 'mage'
   },
   {
     id: 'shadow_veil',
@@ -99,7 +108,8 @@ export const availableSkills: Skill[] = [
     damage: 0,
     icon: '/bat.png',
     unlocked: false,
-    cooldown: 5
+    cooldown: 5,
+    class: 'rogue'
   }
 ];
 

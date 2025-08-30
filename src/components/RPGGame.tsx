@@ -142,6 +142,11 @@ const RPGGame = () => {
       talkedToBlacksmith: false,
       firstMerchantTalk: true,
       firstBlacksmithTalk: true
+    },
+    skillUsageStats: {
+      warrior: 0,
+      rogue: 0,
+      mage: 0
     }
   });
 
@@ -197,7 +202,7 @@ const RPGGame = () => {
         },
         {
           id: 'sand_in_eyes_skill',
-          name: 'Книга: Песок в глаза',
+          name: 'Свиток: Песок в глаза',
           type: 'skill',
           skillId: 'sand_in_eyes',
           description: 'Обучает умению "Песок в глаза"',
@@ -206,7 +211,7 @@ const RPGGame = () => {
         },
         {
           id: 'fury_cut_skill',
-          name: 'Книга: Яростный порез',
+          name: 'Свиток: Яростный порез',
           type: 'skill',
           skillId: 'fury_cut',
           description: 'Обучает умению "Яростный порез"',
@@ -242,7 +247,7 @@ const RPGGame = () => {
         },
         {
           id: 'shadow_veil_skill',
-          name: 'Гримуар: Вуаль тьмы',
+          name: 'Свиток: Вуаль тьмы',
           type: 'skill',
           skillId: 'shadow_veil',
           description: 'Обучает умению "Вуаль тьмы"',
@@ -354,6 +359,42 @@ const RPGGame = () => {
           }
         }
       ]
+    },
+    {
+      id: 'mage',
+      name: 'Маг Аркадий',
+      position: { x: 1200, y: 900 },
+      type: 'mage',
+      dialogue: [
+        'Приветствую тебя, собрат по магическому искусству!',
+        'Вижу, ты познал силу магии.',
+        'Позволь мне поделиться с тобой древними знаниями.'
+      ],
+      visible: false
+    },
+    {
+      id: 'scout',
+      name: 'Следопыт Игорь',
+      position: { x: 700, y: 1200 },
+      type: 'scout',
+      dialogue: [
+        'Ах, вижу перед собой умелого разбойника!',
+        'Ты освоил искусство скрытности и хитрости.',
+        'Давно не встречал достойного ученика.'
+      ],
+      visible: false
+    },
+    {
+      id: 'guardian',
+      name: 'Стражник Олег',
+      position: { x: 500, y: 800 },
+      type: 'guardian',
+      dialogue: [
+        'Приветствую тебя, воин!',
+        'Твое мастерство владения оружием впечатляет.',
+        'Не каждый может стать настоящим защитником.'
+      ],
+      visible: false
     }
   ]);
 
@@ -736,6 +777,15 @@ const RPGGame = () => {
       return;
     }
 
+    // Track skill usage for NPC visibility
+    setPlayer(prevPlayer => ({
+      ...prevPlayer,
+      skillUsageStats: {
+        ...prevPlayer.skillUsageStats,
+        [skill.class]: prevPlayer.skillUsageStats[skill.class] + 1
+      }
+    }));
+
     const currentEnemyHealth = battleState.enemy.health;
     const enemyName = battleState.enemy.name;
     const enemyDamage = battleState.enemy.damage;
@@ -901,7 +951,47 @@ const RPGGame = () => {
         setBattleState(prev => prev ? { ...prev, turn: 'player' } : null);
       }, 100);
     }, 1000);
-  }, [battleState, player.equipment.weapon, player.mana, player.skillCooldowns, addDamageText, addBattleLog]);
+  }, [battleState, player.equipment.weapon, player.mana, player.skillCooldowns, addDamageText, addBattleLog, setPlayer]);
+
+  // Function to check and update NPC visibility based on conditions
+  const updateNPCVisibility = useCallback(() => {
+    setNpcs(prevNpcs => prevNpcs.map(npc => {
+      if (npc.visible === true) return npc; // Already visible, no need to check
+
+      // Count learned skills for each class
+      const learnedSkills = availableSkills.filter(skill => skill.unlocked);
+      const warriorSkills = learnedSkills.filter(skill => skill.class === 'warrior').length;
+      const rogueSkills = learnedSkills.filter(skill => skill.class === 'rogue').length;
+      const mageSkills = learnedSkills.filter(skill => skill.class === 'mage').length;
+
+      switch (npc.id) {
+        case 'mage':
+          // маг: игрок изучил 2 и больше умений с классом мага и 1 или более раз использовал умение мага в бою
+          if (mageSkills >= 2 && player.skillUsageStats.mage >= 1) {
+            return { ...npc, visible: true };
+          }
+          break;
+        case 'scout':
+          // следопыт: игрок изучил 2 и больше умений с классом разбойника и 1 или более раз использовал умение разбойника в бою
+          if (rogueSkills >= 2 && player.skillUsageStats.rogue >= 1) {
+            return { ...npc, visible: true };
+          }
+          break;
+        case 'guardian':
+          // стражник: игрок изучил 2 и больше умений с классом воина и 1 или более раз использовал умение воина в бою
+          if (warriorSkills >= 2 && player.skillUsageStats.warrior >= 1) {
+            return { ...npc, visible: true };
+          }
+          break;
+      }
+      return npc;
+    }));
+  }, [player.skillUsageStats]);
+
+  // Update NPC visibility when skill usage stats change
+  useEffect(() => {
+    updateNPCVisibility();
+  }, [updateNPCVisibility]);
 
   const handleBattleUseItem = useCallback((item: Item) => {
     if (!battleState || battleState.turn !== 'player') return;

@@ -7,6 +7,7 @@ export interface Skill {
   icon: string;
   unlocked: boolean;
   cooldown: number; // Кулдаун в ходах
+  class: 'warrior' | 'rogue' | 'mage'; // Класс умения
 }
 
 export interface PlayerStats {
@@ -44,6 +45,11 @@ export interface Player {
     firstMerchantTalk: boolean;
     firstBlacksmithTalk: boolean;
   };
+  skillUsageStats: {
+    warrior: number;
+    rogue: number;
+    mage: number;
+  };
 }
 
 export interface Item {
@@ -78,10 +84,11 @@ export interface NPC {
   id: string;
   name: string;
   position: { x: number; y: number };
-  type: 'merchant' | 'elder' | 'blacksmith';
+  type: 'merchant' | 'elder' | 'blacksmith' | 'mage' | 'scout' | 'guardian';
   dialogue: string[];
   quests?: Quest[];
   shop?: Item[];
+  visible?: boolean;
 }
 
 export interface Quest {

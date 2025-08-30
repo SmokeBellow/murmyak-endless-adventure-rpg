@@ -300,7 +300,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           height: 200,
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
-          backgroundSize: '100px 100px',
+          backgroundSize: '200px 200px',
           imageRendering: 'pixelated',
           zIndex: 5
         }}
@@ -316,7 +316,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           height: 200,
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
-          backgroundSize: '100px 100px',
+          backgroundSize: '200px 200px',
           imageRendering: 'pixelated',
           zIndex: 5
         }}
@@ -332,7 +332,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           height: mapHeight - 400,
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
-          backgroundSize: '100px 100px',
+          backgroundSize: '200px 200px',
           imageRendering: 'pixelated',
           zIndex: 5
         }}
@@ -348,7 +348,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           height: mapHeight - 400,
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
-          backgroundSize: '100px 100px',
+          backgroundSize: '200px 200px',
           imageRendering: 'pixelated',
           zIndex: 5
         }}

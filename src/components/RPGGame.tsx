@@ -955,43 +955,44 @@ const RPGGame = () => {
 
   // Function to check and update NPC visibility based on conditions
   const updateNPCVisibility = useCallback(() => {
+    // Debug current player state
+    const learnedSkills = availableSkills.filter(skill => skill.unlocked);
+    const warriorSkills = learnedSkills.filter(skill => skill.class === 'warrior').length;
+    const rogueSkills = learnedSkills.filter(skill => skill.class === 'rogue').length;
+    const mageSkills = learnedSkills.filter(skill => skill.class === 'mage').length;
+    
+    console.log('=== NPC VISIBILITY CHECK ===');
+    console.log('Current skill usage stats:', player.skillUsageStats);
+    console.log('Learned skills by class:', { warriorSkills, rogueSkills, mageSkills });
+    console.log('All learned skills:', learnedSkills.map(s => `${s.name} (${s.class})`));
+    
     setNpcs(prevNpcs => prevNpcs.map(npc => {
-      if (npc.visible === true) return npc; // Already visible, no need to check
-
-      // Count learned skills for each class
-      const learnedSkills = availableSkills.filter(skill => skill.unlocked);
-      const warriorSkills = learnedSkills.filter(skill => skill.class === 'warrior').length;
-      const rogueSkills = learnedSkills.filter(skill => skill.class === 'rogue').length;
-      const mageSkills = learnedSkills.filter(skill => skill.class === 'mage').length;
-
-      // Debug logging for special NPCs
+      // For special NPCs, ALWAYS recalculate visibility (remove the early return)
       if (npc.type === 'mage' || npc.type === 'scout' || npc.type === 'guardian') {
-        console.log(`NPC ${npc.name} (${npc.type}): visible=${npc.visible}, warriorSkills=${warriorSkills}, rogueSkills=${rogueSkills}, mageSkills=${mageSkills}, usageStats=`, player.skillUsageStats);
+        console.log(`Checking special NPC ${npc.name} (${npc.type}): current visible=${npc.visible}`);
+        
+        switch (npc.id) {
+          case 'mage':
+            // маг: игрок изучил 2 и больше умений с классом мага и 1 или более раз использовал умение мага в бою
+            const shouldMageBeVisible = mageSkills >= 2 && player.skillUsageStats.mage >= 1;
+            console.log(`Mage visibility check: mageSkills=${mageSkills} >= 2? ${mageSkills >= 2}, usageStats=${player.skillUsageStats.mage} >= 1? ${player.skillUsageStats.mage >= 1}, result=${shouldMageBeVisible}`);
+            return { ...npc, visible: shouldMageBeVisible };
+            
+          case 'scout':
+            // следопыт: игрок изучил 2 и больше умений с классом разбойника и 1 или более раз использовал умение разбойника в бою
+            const shouldScoutBeVisible = rogueSkills >= 2 && player.skillUsageStats.rogue >= 1;
+            console.log(`Scout visibility check: rogueSkills=${rogueSkills} >= 2? ${rogueSkills >= 2}, usageStats=${player.skillUsageStats.rogue} >= 1? ${player.skillUsageStats.rogue >= 1}, result=${shouldScoutBeVisible}`);
+            return { ...npc, visible: shouldScoutBeVisible };
+            
+          case 'guardian':
+            // стражник: игрок изучил 2 и больше умений с классом воина и 1 или более раз использовал умение воина в бою
+            const shouldGuardianBeVisible = warriorSkills >= 2 && player.skillUsageStats.warrior >= 1;
+            console.log(`Guardian visibility check: warriorSkills=${warriorSkills} >= 2? ${warriorSkills >= 2}, usageStats=${player.skillUsageStats.warrior} >= 1? ${player.skillUsageStats.warrior >= 1}, result=${shouldGuardianBeVisible}`);
+            return { ...npc, visible: shouldGuardianBeVisible };
+        }
       }
-
-      switch (npc.id) {
-        case 'mage':
-          // маг: игрок изучил 2 и больше умений с классом мага и 1 или более раз использовал умение мага в бою
-          if (mageSkills >= 2 && player.skillUsageStats.mage >= 1) {
-            console.log(`Making mage visible: mageSkills=${mageSkills}, usageStats=${player.skillUsageStats.mage}`);
-            return { ...npc, visible: true };
-          }
-          break;
-        case 'scout':
-          // следопыт: игрок изучил 2 и больше умений с классом разбойника и 1 или более раз использовал умение разбойника в бою
-          if (rogueSkills >= 2 && player.skillUsageStats.rogue >= 1) {
-            console.log(`Making scout visible: rogueSkills=${rogueSkills}, usageStats=${player.skillUsageStats.rogue}`);
-            return { ...npc, visible: true };
-          }
-          break;
-        case 'guardian':
-          // стражник: игрок изучил 2 и больше умений с классом воина и 1 или более раз использовал умение воина в бою
-          if (warriorSkills >= 2 && player.skillUsageStats.warrior >= 1) {
-            console.log(`Making guardian visible: warriorSkills=${warriorSkills}, usageStats=${player.skillUsageStats.warrior}`);
-            return { ...npc, visible: true };
-          }
-          break;
-      }
+      
+      // For regular NPCs, return as is
       return npc;
     }));
   }, [player.skillUsageStats, availableSkills]);

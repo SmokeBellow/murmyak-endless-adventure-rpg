@@ -50,6 +50,7 @@ const RPGGame = () => {
   const [currentLocation, setCurrentLocation] = useState<LocationType>('village');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
+  const [isTreasureChestOpened, setIsTreasureChestOpened] = useState(false);
 
   // Resource nodes with regeneration
   const [resourceNodes, setResourceNodes] = useState({
@@ -1529,6 +1530,87 @@ const RPGGame = () => {
     npcsRef.current = npcs;
   }, [player, npcs]);
 
+  // Handle treasure chest interaction
+  const handleTreasureChestInteract = useCallback(() => {
+    if (isTreasureChestOpened) return;
+
+    // Create magical items
+    const magicalItems: Item[] = [
+      {
+        id: 'magical-boots',
+        name: 'Магические сапоги',
+        type: 'armor',
+        slot: 'legs',
+        stats: { armor: 2, health: 5 },
+        description: 'Зачарованные сапоги, дающие дополнительную защиту и магическую силу',
+        icon: '/boots_empty.png',
+        price: 120
+      },
+      {
+        id: 'magical-cloak',
+        name: 'Магический плащ',
+        type: 'armor',
+        slot: 'chest',
+        stats: { armor: 4, health: 8 },
+        description: 'Волшебный плащ, пропитанный древней магией',
+        icon: '/leatherarmor.png',
+        price: 180
+      },
+      {
+        id: 'magical-hood',
+        name: 'Магический капюшон',
+        type: 'armor',
+        slot: 'head',
+        stats: { armor: 3, health: 10 },
+        description: 'Мистический капюшон, усиливающий магические способности',
+        icon: '/helmet_empty.png',
+        price: 150
+      }
+    ];
+
+    // Select random magical item
+    const selectedMagicalItem = magicalItems[Math.floor(Math.random() * magicalItems.length)];
+
+    // Health potions
+    const healthPotions: Item[] = [
+      {
+        id: 'health-potion-1',
+        name: 'Зелье здоровья',
+        type: 'consumable',
+        description: 'Восстанавливает 50 единиц здоровья',
+        icon: '/healthpotion.png',
+        stackable: true,
+        maxStack: 10,
+        quantity: 1
+      },
+      {
+        id: 'health-potion-2',
+        name: 'Зелье здоровья',
+        type: 'consumable',
+        description: 'Восстанавливает 50 единиц здоровья',
+        icon: '/healthpotion.png',
+        stackable: true,
+        maxStack: 10,
+        quantity: 1
+      }
+    ];
+
+    // Add items to inventory and coins
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins + 100,
+      inventory: addItemsToInventory(prev.inventory, [selectedMagicalItem, ...healthPotions])
+    }));
+
+    // Mark chest as opened
+    setIsTreasureChestOpened(true);
+
+    toast({
+      title: "Сундук с сокровищами!",
+      description: `Получено: 100 монет, 2 зелья здоровья, ${selectedMagicalItem.name}`,
+    });
+  }, [isTreasureChestOpened, toast]);
+
   useEffect(() => {
     if (isMobile) return;
     
@@ -1600,6 +1682,16 @@ const RPGGame = () => {
             return;
           }
           
+          // Check for treasure chest
+          const treasureChestDistance = Math.sqrt(
+            Math.pow(1960 - playerRef.current.position.x, 2) + 
+            Math.pow(50 - playerRef.current.position.y, 2)
+          );
+          if (treasureChestDistance < 80 && !isTreasureChestOpened) {
+            handleTreasureChestInteract();
+            return;
+          }
+          
           // Check for return portal
           const portalDistance = Math.sqrt(
             Math.pow(50 - playerRef.current.position.x, 2) + 
@@ -1659,7 +1751,7 @@ const RPGGame = () => {
       document.removeEventListener('keyup', handleKeyUp);
       clearInterval(moveInterval);
     };
-  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, isNoClipCheatEnabled]);
+  }, [isMobile, activeMenu, selectedNPC, handleJoystickMove, isNoClipCheatEnabled, isTreasureChestOpened, handleTreasureChestInteract]);
 
   const handleUnequipItem = useCallback((slot: keyof Equipment) => {
     const equippedItem = player.equipment[slot];
@@ -2014,6 +2106,8 @@ const handleBuyItem = useCallback((item: Item) => {
             currentLocation={currentLocation}
             onPortalUse={handlePortalUse}
             onNoClipToggle={setIsNoClipCheatEnabled}
+            onTreasureChestInteract={handleTreasureChestInteract}
+            isTreasureChestOpened={isTreasureChestOpened}
           />
 
       {isMobile && (

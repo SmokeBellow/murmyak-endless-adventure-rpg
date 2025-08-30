@@ -16,9 +16,11 @@ interface GameMapProps {
   currentLocation: LocationType;
   onPortalUse: () => void;
   onNoClipToggle?: (enabled: boolean) => void;
+  onTreasureChestInteract?: () => void;
+  isTreasureChestOpened?: boolean;
 }
 
-const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onNoClipToggle }: GameMapProps) => {
+const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onNoClipToggle, onTreasureChestInteract, isTreasureChestOpened }: GameMapProps) => {
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
@@ -175,6 +177,17 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         return;
       }
       
+      // Check if clicking on treasure chest in abandoned mines
+      if (!isTreasureChestOpened) {
+        const treasureChestDistance = Math.sqrt(Math.pow(1960 - clickX, 2) + Math.pow(50 - clickY, 2));
+        const playerToTreasureChestDistance = Math.sqrt(Math.pow(1960 - player.position.x, 2) + Math.pow(50 - player.position.y, 2));
+        if (treasureChestDistance < 40 && playerToTreasureChestDistance < 80) {
+          console.log('Treasure chest clicked!');
+          onTreasureChestInteract?.();
+          return;
+        }
+      }
+      
       // Check if clicking on return portal
       const portalDistance = Math.sqrt(Math.pow(mineCenters.portal.x - clickX, 2) + Math.pow(mineCenters.portal.y - clickY, 2));
       const playerToPortalDistance = Math.sqrt(Math.pow(mineCenters.portal.x - player.position.x, 2) + Math.pow(mineCenters.portal.y - player.position.y, 2));
@@ -217,7 +230,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
     }
     // Removed player movement on click
-  }, [player.position, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse]);
+  }, [player.position, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onTreasureChestInteract, isTreasureChestOpened]);
 
   // Calculate camera offset to center player exactly in the middle of screen
   const zoomLevel = 1.0;
@@ -537,6 +550,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     return false;
   };
 
+  // Check if player is near treasure chest for interaction
+  const isNearTreasureChest = () => {
+    if (currentLocation === 'abandoned-mines' && !isTreasureChestOpened) {
+      const distance = Math.sqrt(
+        Math.pow(1960 - player.position.x, 2) + 
+        Math.pow(50 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
   // Get walking animation frame for down direction
   const getWalkDownFrame = () => {
     const frames = ['walk_down1.png', 'walk_down2.png', 'walk_down3.png'];
@@ -721,6 +746,31 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 </div>
               )}
             </div>
+            
+            {/* Treasure Chest */}
+            {!isTreasureChestOpened && (
+              <div
+                className="absolute"
+                style={{
+                  left: 1925,
+                  top: 15,
+                }}
+              >
+                <img 
+                  src="/treasure_chest.png" 
+                  alt="Treasure Chest" 
+                  className="w-12 h-12 pixelated cursor-pointer hover:brightness-110 transition-all"
+                  title="Сундук с сокровищами"
+                />
+                
+                {/* E prompt when player is near */}
+                {isNearTreasureChest() && (
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                    E
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Return portal */}
             <div

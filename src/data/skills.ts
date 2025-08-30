@@ -110,6 +110,39 @@ export const availableSkills: Skill[] = [
     unlocked: false,
     cooldown: 5,
     class: 'rogue'
+  },
+  {
+    id: 'powerful_strike',
+    name: 'Мощный удар',
+    description: 'Наносит урон и оглушает противника с вероятностью 80% на 1 ход',
+    manaCost: 20,
+    damage: 30,
+    icon: '/sword.png',
+    unlocked: false,
+    cooldown: 3,
+    class: 'warrior'
+  },
+  {
+    id: 'defensive_stance',
+    name: 'Глухая оборона',
+    description: 'Снижает урон по игроку на 2 хода на 40%, но снижает урон игрока на 2 хода на 20%',
+    manaCost: 25,
+    damage: 0,
+    icon: '/shield_empty.png',
+    unlocked: false,
+    cooldown: 6,
+    class: 'warrior'
+  },
+  {
+    id: 'battle_cry',
+    name: 'Боевой клич',
+    description: 'Повышает урон игрока на 30% на один ход',
+    manaCost: 15,
+    damage: 0,
+    icon: '/helmet_empty.png',
+    unlocked: false,
+    cooldown: 4,
+    class: 'warrior'
   }
 ];
 

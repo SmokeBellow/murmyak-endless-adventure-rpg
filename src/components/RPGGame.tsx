@@ -253,6 +253,33 @@ const RPGGame = () => {
           description: 'Обучает умению "Вуаль тьмы"',
           icon: '/bat.png',
           price: 1
+        },
+        {
+          id: 'powerful_strike_skill',
+          name: 'Книга: Мощный удар',
+          type: 'skill',
+          skillId: 'powerful_strike',
+          description: 'Обучает умению "Мощный удар"',
+          icon: '/sword.png',
+          price: 1
+        },
+        {
+          id: 'defensive_stance_skill',
+          name: 'Книга: Глухая оборона',
+          type: 'skill',
+          skillId: 'defensive_stance',
+          description: 'Обучает умению "Глухая оборона"',
+          icon: '/shield_empty.png',
+          price: 1
+        },
+        {
+          id: 'battle_cry_skill',
+          name: 'Книга: Боевой клич',
+          type: 'skill',
+          skillId: 'battle_cry',
+          description: 'Обучает умению "Боевой клич"',
+          icon: '/helmet_empty.png',
+          price: 1
         }
       ]
     },

@@ -203,12 +203,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       const clickedNPC = npcs.find(npc => {
         const distance = Math.sqrt(Math.pow(npc.position.x - clickX, 2) + Math.pow(npc.position.y - clickY, 2));
         const playerToNPCDistance = Math.sqrt(Math.pow(npc.position.x - player.position.x, 2) + Math.pow(npc.position.y - player.position.y, 2));
-        // Only allow interaction with visible NPCs or those not requiring special conditions
-        const canInteract = npc.visible || (npc.type !== 'mage' && npc.type !== 'scout' && npc.type !== 'guardian');
-        return distance < 50 && playerToNPCDistance < 300 && canInteract; // Увеличили радиус
+        return distance < 50 && playerToNPCDistance < 300; // Увеличили радиус
       });
       
       if (clickedNPC) {
+        // Check if this is a special NPC that requires conditions
+        if (clickedNPC.type === 'mage' || clickedNPC.type === 'scout' || clickedNPC.type === 'guardian') {
+          // Only allow interaction if the NPC is visible (conditions met)
+          if (!clickedNPC.visible) {
+            return; // Block interaction for invisible special NPCs
+          }
+        }
+        
         console.log('NPC clicked via map:', clickedNPC.name);
         console.log('Click coords:', clickX, clickY, 'NPC coords:', clickedNPC.position, 'Player coords:', player.position);
         onNPCInteract(clickedNPC);
@@ -902,6 +908,14 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             <div
               className="relative cursor-pointer"
               onClick={() => {
+                // Check if this is a special NPC that requires conditions
+                if (npc.type === 'mage' || npc.type === 'scout' || npc.type === 'guardian') {
+                  // Only allow interaction if the NPC is visible (conditions met)
+                  if (!npc.visible) {
+                    return; // Block interaction for invisible special NPCs
+                  }
+                }
+                
                 if (isNearNPC(npc)) onNPCInteract(npc);
               }}
             >

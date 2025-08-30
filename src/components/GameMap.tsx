@@ -890,7 +890,14 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         )}
         
         {/* Render NPCs only in village */}
-        {currentLocation === 'village' && npcs.filter(npc => npc.visible !== false).map(npc => (
+        {currentLocation === 'village' && npcs.filter(npc => {
+          // For special NPCs (mage, scout, guardian), only show if explicitly visible
+          if (npc.type === 'mage' || npc.type === 'scout' || npc.type === 'guardian') {
+            return npc.visible === true;
+          }
+          // For regular NPCs, show unless explicitly hidden
+          return npc.visible !== false;
+        }).map(npc => (
           <div
             key={npc.id}
             className="absolute"

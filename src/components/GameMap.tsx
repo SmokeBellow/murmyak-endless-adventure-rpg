@@ -895,8 +895,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
             console.log(`Filtering special NPC ${npc.name}: visible=${npc.visible}, should render=${npc.visible === true}`);
             return npc.visible === true;
           }
-          // For regular NPCs, show unless explicitly hidden
-          return npc.visible !== false;
+          // For regular NPCs (merchant, elder, blacksmith), always show them
+          return true;
         }).map(npc => {
           console.log(`Rendering NPC: ${npc.name} (${npc.type}), visible=${npc.visible}`);
           return (

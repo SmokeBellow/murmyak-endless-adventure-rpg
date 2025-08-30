@@ -62,7 +62,18 @@ export const BattleScreen = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+    <div className="fixed inset-0 bg-black z-50 flex flex-col relative">
+      {/* Debug Grid */}
+      <div 
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '1vw 1vh'
+        }}
+      />
       {/* Battle Background - 65% of screen */}
       <div 
         className="h-[65%] relative bg-cover bg-center flex items-center justify-between px-16"

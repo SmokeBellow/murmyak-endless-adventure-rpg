@@ -3,6 +3,7 @@ import { NPC } from '@/types/gameTypes';
 import { Button } from '@/components/ui/button';
 import { dialoguesData } from '@/data/dialogues';
 import { DialogueState, DialogueOption } from '@/types/dialogueTypes';
+import { availableSkills } from '@/data/skills';
 
 interface VisualNovelDialogueProps {
   npc: NPC;
@@ -14,9 +15,15 @@ interface VisualNovelDialogueProps {
   firstMerchantTalk?: boolean;
   firstBlacksmithTalk?: boolean;
   onMarkConversation?: (npcType: 'merchant' | 'blacksmith') => void;
+  playerSkillUsageStats?: {
+    warrior: number;
+    rogue: number;
+    mage: number;
+  };
+  onClassSelection?: (classType: 'warrior' | 'rogue' | 'mage') => void;
 }
 
-const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade, firstMerchantTalk, firstBlacksmithTalk, onMarkConversation }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade, firstMerchantTalk, firstBlacksmithTalk, onMarkConversation, playerSkillUsageStats, onClassSelection }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
@@ -61,6 +68,21 @@ const [displayedNPCText, setDisplayedNPCText] = useState('');
 const [displayedPlayerText, setDisplayedPlayerText] = useState('');
 const [isTyping, setIsTyping] = useState(false);
 const [pendingTrade, setPendingTrade] = useState(false);
+
+  // Check class availability
+  const mageUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'mage').length;
+  const rogueUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'rogue').length;
+  const warriorUnlockedCount = availableSkills.filter(skill => skill.unlocked && skill.class === 'warrior').length;
+
+  const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && 
+    playerSkillUsageStats.mage >= 1 && 
+    mageUnlockedCount >= 2;
+  const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && 
+    playerSkillUsageStats.rogue >= 1 && 
+    rogueUnlockedCount >= 2;  
+  const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
+    playerSkillUsageStats.warrior >= 1 && 
+    warriorUnlockedCount >= 2;
 
   // Typing effect for NPC text
   useEffect(() => {
@@ -270,15 +292,34 @@ if (isTradeTrigger) {
                       {option.player}
                     </Button>
                   ))
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="col-span-2 bg-red-500/20 border-red-500/50 text-white hover:bg-red-500/30 transition-all duration-200"
-                    onClick={onClose}
-                  >
-                    Уйти
-                  </Button>
-                )}
+                 ) : (
+                   <>
+                     <Button
+                       variant="outline"
+                       className="bg-red-500/20 border-red-500/50 text-white hover:bg-red-500/30 transition-all duration-200"
+                       onClick={onClose}
+                     >
+                       Уйти
+                     </Button>
+                     {/* Class Selection Button */}
+                     {(canGetMageClass || canGetRogueClass || canGetWarriorClass) && (
+                       <Button 
+                         variant="default" 
+                         className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold"
+                         onClick={() => {
+                           if (canGetMageClass) onClassSelection?.('mage');
+                           else if (canGetRogueClass) onClassSelection?.('rogue');
+                           else if (canGetWarriorClass) onClassSelection?.('warrior');
+                         }}
+                       >
+                         ✨ Получить класс
+                         {canGetMageClass && ' (Маг)'}
+                         {canGetRogueClass && ' (Следопыт)'}
+                         {canGetWarriorClass && ' (Воин)'}
+                       </Button>
+                     )}
+                   </>
+                 )}
               </div>
             </>
           ) : displayedPlayerText ? (

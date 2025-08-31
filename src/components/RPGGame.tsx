@@ -2334,6 +2334,21 @@ const handleBuyItem = useCallback((item: Item) => {
     hasCompletedVillageQuest={completedQuestIds.includes('village-introduction')}
     firstMerchantTalk={player.questProgress.firstMerchantTalk}
     firstBlacksmithTalk={player.questProgress.firstBlacksmithTalk}
+    playerSkillUsageStats={player.skillUsageStats}
+    onClassSelection={(classType) => {
+      // Handle class selection logic here
+      console.log(`Selected class: ${classType}`);
+      
+      // Close dialogue
+      setSelectedNPC(null);
+      setShowVisualNovel(false);
+      
+      // You can add more class selection logic here
+      toast({
+        title: "Класс получен!",
+        description: `Вы получили класс "${classType === 'mage' ? 'Маг' : classType === 'rogue' ? 'Следопыт' : 'Воин'}"`,
+      });
+    }}
     onMarkConversation={(npcType) => {
       setPlayer(prev => ({
         ...prev,

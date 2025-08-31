@@ -150,6 +150,32 @@ const RPGGame = () => {
     }
   });
 
+  // Debug: class availability when opening NPC dialogue (works for both VisualNovel and NPCDialogue)
+  useEffect(() => {
+    if (!selectedNPC) return;
+
+    const mageUnlockedCount = availableSkills.filter(s => s.unlocked && s.class === 'mage').length;
+    const rogueUnlockedCount = availableSkills.filter(s => s.unlocked && s.class === 'rogue').length;
+    const warriorUnlockedCount = availableSkills.filter(s => s.unlocked && s.class === 'warrior').length;
+
+    const canGetMageClass = selectedNPC.type === 'mage' && player.skillUsageStats.mage >= 1 && mageUnlockedCount >= 2;
+    const canGetRogueClass = selectedNPC.type === 'scout' && player.skillUsageStats.rogue >= 1 && rogueUnlockedCount >= 2;
+    const canGetWarriorClass = selectedNPC.type === 'guardian' && player.skillUsageStats.warrior >= 1 && warriorUnlockedCount >= 2;
+
+    console.log('=== CLASS CHECK DEBUG ===');
+    console.log('NPC:', selectedNPC.name, selectedNPC.type);
+    console.log('Player skill usage stats:', player.skillUsageStats);
+    console.log('Mage skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'mage').map(s => s.name));
+    console.log('Rogue skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'rogue').map(s => s.name));
+    console.log('Warrior skills unlocked:', availableSkills.filter(s => s.unlocked && s.class === 'warrior').map(s => s.name));
+    console.log('Class availability:', {
+      mage: { usage: player.skillUsageStats.mage, unlocked: mageUnlockedCount, can: canGetMageClass },
+      rogue: { usage: player.skillUsageStats.rogue, unlocked: rogueUnlockedCount, can: canGetRogueClass },
+      warrior: { usage: player.skillUsageStats.warrior, unlocked: warriorUnlockedCount, can: canGetWarriorClass }
+    });
+    console.log('=========================');
+  }, [selectedNPC]);
+
   // NPCs
   const [npcs, setNpcs] = useState<NPC[]>([
     {

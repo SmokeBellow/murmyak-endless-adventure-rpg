@@ -49,6 +49,8 @@ const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQues
         } else {
           return 'kuznec_no_quest';
         }
+      case 'mage':
+        return 'altaris';
       default:
         return 'starosta';
     }
@@ -83,6 +85,17 @@ const [pendingTrade, setPendingTrade] = useState(false);
   const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
     playerSkillUsageStats.warrior >= 1 && 
     warriorUnlockedCount >= 2;
+
+  // Debug class selection
+  console.log('VisualNovel - Class check:', {
+    npcType: npc.type,
+    npcId: npc.id,
+    playerSkillUsageStats,
+    mageUnlocked: mageUnlockedCount,
+    canGetMageClass,
+    canGetRogueClass,
+    canGetWarriorClass
+  });
 
   // Typing effect for NPC text
   useEffect(() => {
@@ -140,6 +153,8 @@ const typeTimer = setInterval(() => {
         return '/trademan_image.png';
       case 'blacksmith':
         return '/blacksmith_image.png';
+      case 'mage':
+        return '/headman_image.png'; // Using headman image for now, can be changed later
       default:
         return '/headman_image.png';
     }

@@ -282,16 +282,34 @@ if (isTradeTrigger) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {dialogueState.currentOptions.length > 0 ? (
-                  dialogueState.currentOptions.map((option, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
-                      onClick={() => handlePlayerChoice(option)}
-                    >
-                      {option.player}
-                    </Button>
-                  ))
+                  <>
+                    {dialogueState.currentOptions.map((option, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="text-left justify-start bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-200"
+                        onClick={() => handlePlayerChoice(option)}
+                      >
+                        {option.player}
+                      </Button>
+                    ))}
+                    {(canGetMageClass || canGetRogueClass || canGetWarriorClass) && (
+                      <Button 
+                        variant="default" 
+                        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold"
+                        onClick={() => {
+                          if (canGetMageClass) onClassSelection?.('mage');
+                          else if (canGetRogueClass) onClassSelection?.('rogue');
+                          else if (canGetWarriorClass) onClassSelection?.('warrior');
+                        }}
+                      >
+                        ✨ Выбрать класс
+                        {canGetMageClass && ' (Маг)'}
+                        {canGetRogueClass && ' (Следопыт)'}
+                        {canGetWarriorClass && ' (Воин)'}
+                      </Button>
+                    )}
+                  </>
                  ) : (
                    <>
                      <Button
@@ -311,12 +329,12 @@ if (isTradeTrigger) {
                            else if (canGetRogueClass) onClassSelection?.('rogue');
                            else if (canGetWarriorClass) onClassSelection?.('warrior');
                          }}
-                       >
-                         ✨ Получить класс
-                         {canGetMageClass && ' (Маг)'}
-                         {canGetRogueClass && ' (Следопыт)'}
-                         {canGetWarriorClass && ' (Воин)'}
-                       </Button>
+                        >
+                          ✨ Выбрать класс
+                          {canGetMageClass && ' (Маг)'}
+                          {canGetRogueClass && ' (Следопыт)'}
+                          {canGetWarriorClass && ' (Воин)'}
+                        </Button>
                      )}
                    </>
                  )}

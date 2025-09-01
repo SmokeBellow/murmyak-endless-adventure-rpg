@@ -4,6 +4,7 @@ import { MinesMap } from '@/components/MinesMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
 import AnimatedBat from '@/components/AnimatedBat';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface GameMapProps {
   player: Player;
@@ -24,6 +25,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [isSignpostDialogOpen, setIsSignpostDialogOpen] = useState(false);
   const lightCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Handle cheat code for light (123 keys)
@@ -156,6 +158,15 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       if (portalDistance < 40 && playerToPortalDistance < 80) {
         console.log('Portal clicked!');
         onPortalUse();
+        return;
+      }
+      
+      // Check if clicking on signpost
+      const signpostDistance = Math.sqrt(Math.pow(1020 - clickX, 2) + Math.pow(380 - clickY, 2));
+      const playerToSignpostDistance = Math.sqrt(Math.pow(1020 - player.position.x, 2) + Math.pow(380 - player.position.y, 2));
+      if (signpostDistance < 40 && playerToSignpostDistance < 80) {
+        console.log('Signpost clicked!');
+        setIsSignpostDialogOpen(true);
         return;
       }
     } else if (currentLocation === 'abandoned-mines') {
@@ -569,6 +580,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
     return false;
   };
 
+  // Check if player is near signpost for interaction
+  const isNearSignpost = () => {
+    if (currentLocation === 'village') {
+      const distance = Math.sqrt(
+        Math.pow(1020 - player.position.x, 2) + 
+        Math.pow(380 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
   // Get walking animation frame for down direction
   const getWalkDownFrame = () => {
     const frames = ['walk_down1.png', 'walk_down2.png', 'walk_down3.png'];
@@ -760,6 +783,40 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
                 }}
                 title="Стрельбище"
               />
+            </div>
+            
+            {/* Signpost */}
+            <div
+              className="absolute"
+              style={{
+                left: 980,
+                top: 340,
+              }}
+            >
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs whitespace-nowrap font-bold">
+                Указательный столб
+              </div>
+              <img
+                src="/chastokol.png"
+                alt="Указательный столб"
+                className="cursor-pointer hover:brightness-110 transition-all"
+                style={{
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated'
+                }}
+                title="Указательный столб"
+                onClick={() => {
+                  if (isNearSignpost()) setIsSignpostDialogOpen(true);
+                }}
+              />
+              
+              {/* E prompt when player is near */}
+              {isNearSignpost() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
             </div>
           </>
         )}
@@ -1018,6 +1075,19 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           imageRendering: 'pixelated'
         }}
       />
+      
+      {/* Signpost Dialog */}
+      <Dialog open={isSignpostDialogOpen} onOpenChange={setIsSignpostDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Указательный столб</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-lg mb-2">🏃‍♂️ Заброшенные шахты - восток</p>
+            <p className="text-lg">🌲 Темный лес - юго-запад</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

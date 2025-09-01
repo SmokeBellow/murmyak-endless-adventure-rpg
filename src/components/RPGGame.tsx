@@ -1801,6 +1801,19 @@ const handleBuyItem = useCallback((item: Item) => {
       // Handle skill books - unlock the skill and remove from shop
       const skillToUnlock = availableSkills.find(skill => skill.id === item.skillId);
       if (skillToUnlock && !skillToUnlock.unlocked) {
+        // Check class restrictions - can learn any skill of own class, or only level 1 skills of other classes
+        const canLearnSkill = skillToUnlock.class === player.selectedClass || skillToUnlock.level === 1;
+        
+        if (!canLearnSkill) {
+          toast({
+            title: "Ограничение класса",
+            description: `Вы можете изучать только умения 1-го уровня других классов. Это умение ${skillToUnlock.level}-го уровня.`,
+            variant: "destructive",
+            duration: 3000
+          });
+          return;
+        }
+        
         // Unlock the skill
         const skillIndex = availableSkills.findIndex(skill => skill.id === item.skillId);
         if (skillIndex !== -1) {

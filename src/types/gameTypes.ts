@@ -8,6 +8,7 @@ export interface Skill {
   unlocked: boolean;
   cooldown: number; // Кулдаун в ходах
   class: 'warrior' | 'rogue' | 'mage'; // Класс умения
+  level: number; // Уровень умения
 }
 
 export interface PlayerStats {

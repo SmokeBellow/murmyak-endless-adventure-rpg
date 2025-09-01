@@ -10,7 +10,8 @@ export const availableSkills: Skill[] = [
     icon: '/sword.png',
     unlocked: true,
     cooldown: 2,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'heal',
@@ -21,7 +22,8 @@ export const availableSkills: Skill[] = [
     icon: '/healthpotion.png',
     unlocked: false,
     cooldown: 3,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'fire_slash',
@@ -32,7 +34,8 @@ export const availableSkills: Skill[] = [
     icon: '/torch.png',
     unlocked: false,
     cooldown: 4,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'heavy_strike',
@@ -43,7 +46,8 @@ export const availableSkills: Skill[] = [
     icon: '/old_sword.png',
     unlocked: false,
     cooldown: 5,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'sand_in_eyes',
@@ -54,7 +58,8 @@ export const availableSkills: Skill[] = [
     icon: '/trash_nail.png',
     unlocked: false,
     cooldown: 3,
-    class: 'rogue'
+    class: 'rogue',
+    level: 1
   },
   {
     id: 'fury_cut',
@@ -65,7 +70,8 @@ export const availableSkills: Skill[] = [
     icon: '/sword.png',
     unlocked: false,
     cooldown: 4,
-    class: 'rogue'
+    class: 'rogue',
+    level: 1
   },
   {
     id: 'fire_burst',
@@ -76,7 +82,8 @@ export const availableSkills: Skill[] = [
     icon: '/torch.png',
     unlocked: false,
     cooldown: 4,
-    class: 'mage'
+    class: 'mage',
+    level: 1
   },
   {
     id: 'frost_chains',
@@ -87,7 +94,8 @@ export const availableSkills: Skill[] = [
     icon: '/trash_rare_gem.png',
     unlocked: false,
     cooldown: 3,
-    class: 'mage'
+    class: 'mage',
+    level: 1
   },
   {
     id: 'mana_spark',
@@ -98,7 +106,8 @@ export const availableSkills: Skill[] = [
     icon: '/trash_gem.png',
     unlocked: false,
     cooldown: 2,
-    class: 'mage'
+    class: 'mage',
+    level: 1
   },
   {
     id: 'shadow_veil',
@@ -109,7 +118,8 @@ export const availableSkills: Skill[] = [
     icon: '/bat.png',
     unlocked: false,
     cooldown: 5,
-    class: 'rogue'
+    class: 'rogue',
+    level: 1
   },
   {
     id: 'powerful_strike',
@@ -120,7 +130,8 @@ export const availableSkills: Skill[] = [
     icon: '/sword.png',
     unlocked: false,
     cooldown: 3,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'defensive_stance',
@@ -131,7 +142,8 @@ export const availableSkills: Skill[] = [
     icon: '/shield_empty.png',
     unlocked: false,
     cooldown: 6,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   },
   {
     id: 'battle_cry',
@@ -142,7 +154,8 @@ export const availableSkills: Skill[] = [
     icon: '/helmet_empty.png',
     unlocked: false,
     cooldown: 4,
-    class: 'warrior'
+    class: 'warrior',
+    level: 1
   }
 ];
 

@@ -19,10 +19,11 @@ interface NPCDialogueProps {
     rogue: number;
     mage: number;
   };
+  playerSelectedClass?: 'warrior' | 'rogue' | 'mage' | null;
   onClassSelection?: (classType: 'warrior' | 'rogue' | 'mage') => void;
 }
 
-const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [], allQuests = [], playerSkillUsageStats, onClassSelection }: NPCDialogueProps) => {
+const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], onCompleteQuest, completedQuestIds = [], allQuests = [], playerSkillUsageStats, playerSelectedClass, onClassSelection }: NPCDialogueProps) => {
   console.log('NPCDialogue - NPC:', npc.id, 'completedQuestIds:', completedQuestIds);
   
   // Special logic for elder NPC
@@ -73,13 +74,16 @@ const NPCDialogue = ({ npc, onClose, onAcceptQuest, onTrade, activeQuests = [], 
 
   const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && 
     playerSkillUsageStats.mage >= 1 && 
-    mageUnlockedCount >= 2;
+    mageUnlockedCount >= 2 && 
+    !playerSelectedClass; // Можно выбрать класс только если еще не выбран
   const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && 
     playerSkillUsageStats.rogue >= 1 && 
-    rogueUnlockedCount >= 2;  
+    rogueUnlockedCount >= 2 && 
+    !playerSelectedClass;  
   const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
     playerSkillUsageStats.warrior >= 1 && 
-    warriorUnlockedCount >= 2;
+    warriorUnlockedCount >= 2 && 
+    !playerSelectedClass;
 
   // More visible debugging
   console.log('=== CLASS CHECK DEBUG ===');

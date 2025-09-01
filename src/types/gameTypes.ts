@@ -37,6 +37,7 @@ export interface Player {
   equipment: Equipment;
   stats: PlayerStats;
   unallocatedPoints: number;
+  selectedClass: 'warrior' | 'rogue' | 'mage' | null; // Выбранный класс игрока
   questProgress: {
     visitedMerchant: boolean;
     usedFountain: boolean;

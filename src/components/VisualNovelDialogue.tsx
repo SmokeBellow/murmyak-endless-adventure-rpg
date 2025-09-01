@@ -20,10 +20,11 @@ interface VisualNovelDialogueProps {
     rogue: number;
     mage: number;
   };
+  playerSelectedClass?: 'warrior' | 'rogue' | 'mage' | null;
   onClassSelection?: (classType: 'warrior' | 'rogue' | 'mage') => void;
 }
 
-const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade, firstMerchantTalk, firstBlacksmithTalk, onMarkConversation, playerSkillUsageStats, onClassSelection }: VisualNovelDialogueProps) => {
+const VisualNovelDialogue = ({ npc, onClose, onQuestAccept, hasActiveVillageQuest, hasCompletedVillageQuest, onTrade, firstMerchantTalk, firstBlacksmithTalk, onMarkConversation, playerSkillUsageStats, playerSelectedClass, onClassSelection }: VisualNovelDialogueProps) => {
   const getDialogueKey = () => {
     switch (npc.type) {
       case 'elder':
@@ -78,13 +79,16 @@ const [pendingTrade, setPendingTrade] = useState(false);
 
   const canGetMageClass = npc.type === 'mage' && playerSkillUsageStats && 
     playerSkillUsageStats.mage >= 1 && 
-    mageUnlockedCount >= 2;
+    mageUnlockedCount >= 2 && 
+    !playerSelectedClass; // Можно выбрать класс только если еще не выбран
   const canGetRogueClass = npc.type === 'scout' && playerSkillUsageStats && 
     playerSkillUsageStats.rogue >= 1 && 
-    rogueUnlockedCount >= 2;  
+    rogueUnlockedCount >= 2 && 
+    !playerSelectedClass;  
   const canGetWarriorClass = npc.type === 'guardian' && playerSkillUsageStats && 
     playerSkillUsageStats.warrior >= 1 && 
-    warriorUnlockedCount >= 2;
+    warriorUnlockedCount >= 2 && 
+    !playerSelectedClass;
 
   // Debug class selection
   console.log('VisualNovel - Class check:', {

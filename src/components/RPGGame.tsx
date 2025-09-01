@@ -135,6 +135,7 @@ const RPGGame = () => {
       luck: 5
     },
     unallocatedPoints: 0,
+    selectedClass: null, // Изначально класс не выбран
     questProgress: {
       visitedMerchant: false,
       usedFountain: false,
@@ -2335,15 +2336,22 @@ const handleBuyItem = useCallback((item: Item) => {
     firstMerchantTalk={player.questProgress.firstMerchantTalk}
     firstBlacksmithTalk={player.questProgress.firstBlacksmithTalk}
     playerSkillUsageStats={player.skillUsageStats}
+    playerSelectedClass={player.selectedClass}
     onClassSelection={(classType) => {
       // Handle class selection logic here
       console.log(`Selected class: ${classType}`);
+      
+      // Set player's selected class
+      setPlayer(prev => ({
+        ...prev,
+        selectedClass: classType
+      }));
       
       // Close dialogue
       setSelectedNPC(null);
       setShowVisualNovel(false);
       
-      // You can add more class selection logic here
+      // Show success message
       toast({
         title: "Класс получен!",
         description: `Вы получили класс "${classType === 'mage' ? 'Маг' : classType === 'rogue' ? 'Следопыт' : 'Воин'}"`,
@@ -2440,11 +2448,25 @@ const handleBuyItem = useCallback((item: Item) => {
           completedQuestIds={completedQuestIds}
           allQuests={quests}
           playerSkillUsageStats={player.skillUsageStats}
+          playerSelectedClass={player.selectedClass}
           onClassSelection={(classType) => {
             // Handle class selection
             console.log(`Player selected class: ${classType}`);
-            // Here you can add logic to give the player a class, unlock special skills, etc.
+            
+            // Set player's selected class
+            setPlayer(prev => ({
+              ...prev,
+              selectedClass: classType
+            }));
+            
+            // Close dialogue
             setSelectedNPC(null);
+            
+            // Show success message
+            toast({
+              title: "Класс получен!",
+              description: `Вы получили класс "${classType === 'mage' ? 'Маг' : classType === 'rogue' ? 'Следопыт' : 'Воин'}"`,
+            });
           }}
         />
       )}

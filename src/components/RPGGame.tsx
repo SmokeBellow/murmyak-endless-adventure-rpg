@@ -1309,8 +1309,14 @@ const RPGGame = () => {
         return true;
       }
       
-      // Left forest
-      if (x >= 0 && x <= 200 && y >= 200 && y <= 1800) {
+      // Left forest - split into two parts to allow road passage
+      // Upper part: y from 200 to 1200
+      if (x >= 0 && x <= 200 && y >= 200 && y <= 1200) {
+        return true;
+      }
+      
+      // Lower part: y from 1400 to 1800 (road gap between 1200-1400)
+      if (x >= 0 && x <= 200 && y >= 1400 && y <= 1800) {
         return true;
       }
       

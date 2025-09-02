@@ -1416,8 +1416,8 @@ const RPGGame = () => {
       let newY = y + (direction.y * moveSpeed);
       
       // Boundary constraints (different for village vs mines)
-      const minBound = currentLocation === 'village' ? 200 : 40;
-      const maxBound = currentLocation === 'village' ? 1800 : 1960;
+      const minBound = currentLocation === 'village' ? 0 : 40;
+      const maxBound = currentLocation === 'village' ? 2000 : 1960;
       newX = Math.max(minBound, Math.min(maxBound, newX));
       newY = Math.max(minBound, Math.min(maxBound, newY));
       

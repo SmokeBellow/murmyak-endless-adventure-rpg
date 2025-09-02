@@ -2068,6 +2068,14 @@ const handleBuyItem = useCallback((item: Item) => {
     }, 1500);
   }, [currentLocation]);
 
+  const handleDarkForestPortalUse = useCallback(() => {
+    // For now, just show a message that this area is not implemented yet
+    toast({
+      title: "Темный лес",
+      description: "Эта область еще не реализована! Скоро будет доступна.",
+    });
+  }, [toast]);
+
   const handleMineCoal = useCallback(() => {
     if (resourceNodes.coal.count <= 0) return;
 
@@ -2222,6 +2230,7 @@ const handleBuyItem = useCallback((item: Item) => {
             onCoalMineInteract={handleCoalMineInteract}
             currentLocation={currentLocation}
             onPortalUse={handlePortalUse}
+            onDarkForestPortalUse={handleDarkForestPortalUse}
             onNoClipToggle={setIsNoClipCheatEnabled}
             onTreasureChestInteract={handleTreasureChestInteract}
             isTreasureChestOpened={isTreasureChestOpened}

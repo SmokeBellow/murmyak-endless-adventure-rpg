@@ -16,12 +16,13 @@ interface GameMapProps {
   onCoalMineInteract: () => void;
   currentLocation: LocationType;
   onPortalUse: () => void;
+  onDarkForestPortalUse: () => void;
   onNoClipToggle?: (enabled: boolean) => void;
   onTreasureChestInteract?: () => void;
   isTreasureChestOpened?: boolean;
 }
 
-const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onNoClipToggle, onTreasureChestInteract, isTreasureChestOpened }: GameMapProps) => {
+const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onDarkForestPortalUse, onNoClipToggle, onTreasureChestInteract, isTreasureChestOpened }: GameMapProps) => {
   const [isLightCheatEnabled, setIsLightCheatEnabled] = useState(false);
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
@@ -169,6 +170,15 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         setIsSignpostDialogOpen(true);
         return;
       }
+      
+      // Check if clicking on dark forest portal
+      const darkForestPortalDistance = Math.sqrt(Math.pow(10 - clickX, 2) + Math.pow(1300 - clickY, 2));
+      const playerToDarkForestPortalDistance = Math.sqrt(Math.pow(10 - player.position.x, 2) + Math.pow(1300 - player.position.y, 2));
+      if (darkForestPortalDistance < 40 && playerToDarkForestPortalDistance < 80) {
+        console.log('Dark forest portal clicked!');
+        onDarkForestPortalUse();
+        return;
+      }
     } else if (currentLocation === 'abandoned-mines') {
       // Check if clicking on coal mine in abandoned mines
       const coalMineDistance = Math.sqrt(Math.pow(mineCenters.coal.x - clickX, 2) + Math.pow(mineCenters.coal.y - clickY, 2));
@@ -248,7 +258,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       }
     }
     // Removed player movement on click
-  }, [player.position, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onTreasureChestInteract, isTreasureChestOpened]);
+  }, [player.position, npcs, enemies, onNPCInteract, onEnemyClick, onFountainUse, onCoalMineInteract, currentLocation, onPortalUse, onDarkForestPortalUse, onTreasureChestInteract, isTreasureChestOpened]);
 
   // Calculate camera offset to center player exactly in the middle of screen
   const zoomLevel = 1.0;
@@ -362,20 +372,37 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
       />
       
-      {/* Left forest */}
+      {/* Left forest - top part */}
       <div 
         className="absolute pixelated"
         style={{
           left: 0,
           top: 200,
           width: 200,
-          height: mapHeight - 400,
+          height: 1000,
           backgroundImage: 'url(/forest.png)',
           backgroundRepeat: 'repeat',
           backgroundSize: '200px 200px',
           zIndex: 5
         }}
       />
+      
+      {/* Left forest - bottom part (after road gap) */}
+      <div 
+        className="absolute pixelated"
+        style={{
+          left: 0,
+          top: 1400,
+          width: 200,
+          height: 400,
+          backgroundImage: 'url(/forest.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '200px 200px',
+          zIndex: 5
+        }}
+      />
+      
+      {/* Road gap in forest (no forest rendering here) */}
       
       {/* Right forest */}
       <div 
@@ -586,6 +613,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
       const distance = Math.sqrt(
         Math.pow(1020 - player.position.x, 2) + 
         Math.pow(380 - player.position.y, 2)
+      );
+      return distance < 80;
+    }
+    return false;
+  };
+
+  // Check if player is near dark forest portal for interaction
+  const isNearDarkForestPortal = () => {
+    if (currentLocation === 'village') {
+      const distance = Math.sqrt(
+        Math.pow(10 - player.position.x, 2) + 
+        Math.pow(1300 - player.position.y, 2)
       );
       return distance < 80;
     }
@@ -813,6 +852,41 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
               
               {/* E prompt when player is near */}
               {isNearSignpost() && (
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  E
+                </div>
+              )}
+            </div>
+            
+            {/* Dark Forest Portal */}
+            <div
+              className="absolute"
+              style={{
+                left: -30,
+                top: 1260,
+              }}
+            >
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-green-400 text-xs whitespace-nowrap font-bold">
+                Вход в Темный лес
+              </div>
+              <img
+                src="/forest.png"
+                alt="Вход в Темный лес"
+                className="cursor-pointer hover:brightness-110 transition-all"
+                style={{
+                  width: 80,
+                  height: 80,
+                  imageRendering: 'pixelated',
+                  filter: 'brightness(0.7) hue-rotate(120deg)'
+                }}
+                title="Вход в Темный лес"
+                onClick={() => {
+                  if (isNearDarkForestPortal()) onDarkForestPortalUse();
+                }}
+              />
+              
+              {/* E prompt when player is near */}
+              {isNearDarkForestPortal() && (
                 <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
                   E
                 </div>

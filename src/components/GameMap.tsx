@@ -464,14 +464,30 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
       />
 
-      {/* Left village boundary - fence */}
+      {/* Left village boundary - fence - upper part */}
       <div 
         className="absolute"
         style={{
           left: 468,
           top: 500,
           width: 64,
-          height: 1000,
+          height: 700,
+          backgroundImage: 'url(/chastokol_left.png)',
+          backgroundRepeat: 'repeat-y',
+          backgroundSize: '32px auto',
+          imageRendering: 'pixelated',
+          zIndex: 10
+        }}
+      />
+      
+      {/* Left village boundary - fence - lower part (after road gap) */}
+      <div 
+        className="absolute"
+        style={{
+          left: 468,
+          top: 1400,
+          width: 64,
+          height: 100,
           backgroundImage: 'url(/chastokol_left.png)',
           backgroundRepeat: 'repeat-y',
           backgroundSize: '32px auto',

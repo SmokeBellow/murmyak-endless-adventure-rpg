@@ -1346,8 +1346,14 @@ const RPGGame = () => {
         return true;
       }
       
-      // Left fence: from 500/500 to 500/1500
-      if (x >= 468 && x <= 532 && y >= 500 && y <= 1500) {
+      // Left fence - split into two parts to allow road passage
+      // Upper part: from 500/500 to 500/1200
+      if (x >= 468 && x <= 532 && y >= 500 && y <= 1200) {
+        return true;
+      }
+      
+      // Lower part: from 500/1400 to 500/1500 (road gap between 1200-1400)
+      if (x >= 468 && x <= 532 && y >= 1400 && y <= 1500) {
         return true;
       }
       

@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { Player, NPC, LocationType, Enemy } from '@/types/gameTypes';
 import { MinesMap } from '@/components/MinesMap';
+import { DarkForestMap } from '@/components/DarkForestMap';
 import { AnimatedRat } from '@/components/AnimatedRat';
 import AnimatedBat from '@/components/AnimatedBat';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
@@ -28,6 +29,20 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [isSignpostDialogOpen, setIsSignpostDialogOpen] = useState(false);
   const lightCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Handle portal use from DarkForestMap
+  useEffect(() => {
+    const handlePortalUse = () => {
+      if (currentLocation === 'dark-forest') {
+        onPortalUse();
+      }
+    };
+
+    window.addEventListener('portalUse', handlePortalUse);
+    return () => {
+      window.removeEventListener('portalUse', handlePortalUse);
+    };
+  }, [currentLocation, onPortalUse]);
 
   // Handle cheat code for light (123 keys)
   useEffect(() => {
@@ -535,6 +550,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         backgroundRepeat: 'repeat, no-repeat, no-repeat, no-repeat',
         backgroundColor: 'rgba(139, 186, 139, 0.1)'
       };
+    } else if (currentLocation === 'dark-forest') {
+      return {
+        backgroundColor: '#0d2818'
+      };
     } else {
       return {
         backgroundImage: `
@@ -670,7 +689,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
 
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
-      currentLocation === 'village' ? 'bg-village-bg' : 'bg-gray-900'
+      currentLocation === 'village' ? 'bg-village-bg' : 
+      currentLocation === 'dark-forest' ? 'bg-gray-800' : 'bg-gray-900'
     }`}>
       <div 
         className="absolute w-full h-full"
@@ -692,7 +712,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         )}
 
         {/* Render location-specific content */}
-        {currentLocation === 'village' ? renderVillage() : renderAbandonedMines()}
+        {currentLocation === 'village' ? renderVillage() : 
+         currentLocation === 'abandoned-mines' ? renderAbandonedMines() :
+         <DarkForestMap mapWidth={mapWidth} mapHeight={mapHeight} />}
         
         {/* Special objects */}
         {currentLocation === 'village' && (

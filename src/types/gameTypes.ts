@@ -136,7 +136,7 @@ export interface Enemy {
 
 export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar' | 'stats' | 'skills';
-export type LocationType = 'village' | 'abandoned-mines';
+export type LocationType = 'village' | 'abandoned-mines' | 'dark-forest';
 
 export interface BattleState {
   player: Player;

@@ -1368,6 +1368,71 @@ const RPGGame = () => {
           return true;
         }
       }
+    } else if (currentLocation === 'dark-forest') {
+      // Dark forest tree collisions
+      const forestObstacles = [
+        // Border trees
+        { x: 0, y: 0, w: 2000, h: 100 }, // Top border
+        { x: 0, y: 0, w: 100, h: 2000 }, // Left border
+        { x: 1900, y: 0, w: 100, h: 2000 }, // Right border
+        { x: 0, y: 1900, w: 2000, h: 100 }, // Bottom border
+        
+        // Scattered trees in forest (same as in DarkForestMap.tsx)
+        { x: 200, y: 200, w: 80, h: 80 },
+        { x: 350, y: 180, w: 60, h: 60 },
+        { x: 450, y: 300, w: 70, h: 70 },
+        { x: 600, y: 250, w: 90, h: 90 },
+        { x: 800, y: 200, w: 75, h: 75 },
+        { x: 1200, y: 180, w: 85, h: 85 },
+        { x: 1400, y: 280, w: 65, h: 65 },
+        { x: 1600, y: 220, w: 80, h: 80 },
+        
+        { x: 150, y: 500, w: 70, h: 70 },
+        { x: 300, y: 450, w: 80, h: 80 },
+        { x: 500, y: 400, w: 90, h: 90 },
+        { x: 750, y: 480, w: 75, h: 75 },
+        { x: 1000, y: 420, w: 85, h: 85 },
+        { x: 1250, y: 470, w: 70, h: 70 },
+        { x: 1500, y: 450, w: 80, h: 80 },
+        { x: 1750, y: 500, w: 65, h: 65 },
+        
+        { x: 250, y: 800, w: 85, h: 85 },
+        { x: 400, y: 750, w: 70, h: 70 },
+        { x: 650, y: 800, w: 80, h: 80 },
+        { x: 900, y: 750, w: 90, h: 90 },
+        { x: 1150, y: 780, w: 75, h: 75 },
+        { x: 1400, y: 720, w: 85, h: 85 },
+        { x: 1650, y: 800, w: 70, h: 70 },
+        
+        { x: 180, y: 1200, w: 80, h: 80 },
+        { x: 380, y: 1150, w: 75, h: 75 },
+        { x: 580, y: 1200, w: 85, h: 85 },
+        { x: 780, y: 1180, w: 70, h: 70 },
+        { x: 1080, y: 1220, w: 80, h: 80 },
+        { x: 1280, y: 1150, w: 90, h: 90 },
+        { x: 1480, y: 1200, w: 75, h: 75 },
+        { x: 1680, y: 1180, w: 65, h: 65 },
+        
+        { x: 300, y: 1500, w: 70, h: 70 },
+        { x: 500, y: 1480, w: 85, h: 85 },
+        { x: 700, y: 1520, w: 80, h: 80 },
+        { x: 1000, y: 1500, w: 75, h: 75 },
+        { x: 1200, y: 1480, w: 90, h: 90 },
+        { x: 1400, y: 1520, w: 70, h: 70 },
+        { x: 1600, y: 1500, w: 85, h: 85 },
+      ];
+      
+      // Check collision with trees (excluding entrance path at top)
+      for (const obstacle of forestObstacles) {
+        if (x >= obstacle.x && x <= obstacle.x + obstacle.w && 
+            y >= obstacle.y && y <= obstacle.y + obstacle.h) {
+          // Allow passage in entrance area at top (900-1100, 0-100)
+          if (x >= 900 && x <= 1100 && y >= 0 && y <= 100) {
+            continue;
+          }
+          return true;
+        }
+      }
     }
     return false;
   }, [currentLocation, isNoClipCheatEnabled]);
@@ -1415,9 +1480,16 @@ const RPGGame = () => {
       let newX = x + (direction.x * moveSpeed);
       let newY = y + (direction.y * moveSpeed);
       
-      // Boundary constraints (different for village vs mines)
-      const minBound = currentLocation === 'village' ? 0 : 40;
-      const maxBound = currentLocation === 'village' ? 2000 : 1960;
+      // Boundary constraints (different for each location)
+      let minBound = 40;
+      let maxBound = 1960;
+      if (currentLocation === 'village') {
+        minBound = 0;
+        maxBound = 2000;
+      } else if (currentLocation === 'dark-forest') {
+        minBound = 0;
+        maxBound = 2000;
+      }
       newX = Math.max(minBound, Math.min(maxBound, newX));
       newY = Math.max(minBound, Math.min(maxBound, newY));
       
@@ -2081,12 +2153,29 @@ const handleBuyItem = useCallback((item: Item) => {
   }, [currentLocation]);
 
   const handleDarkForestPortalUse = useCallback(() => {
-    // For now, just show a message that this area is not implemented yet
-    toast({
-      title: "Темный лес",
-      description: "Эта область еще не реализована! Скоро будет доступна.",
-    });
-  }, [toast]);
+    setIsLoadingLocation(true);
+    
+    setTimeout(() => {
+      if (currentLocation === 'village') {
+        setCurrentLocation('dark-forest');
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: 1000, y: 150 },
+          targetPosition: { x: 1000, y: 150 }
+        }));
+        console.log('Teleported to dark forest at position: 1000, 150');
+      } else if (currentLocation === 'dark-forest') {
+        setCurrentLocation('village');
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: 500, y: 1350 },
+          targetPosition: { x: 500, y: 1350 }
+        }));
+        console.log('Teleported to village from dark forest at position: 500, 1350');
+      }
+      setIsLoadingLocation(false);
+    }, 1500);
+  }, [currentLocation]);
 
   const handleMineCoal = useCallback(() => {
     if (resourceNodes.coal.count <= 0) return;

@@ -1,5 +1,3 @@
-import grassTexture from '@/assets/grass-texture.png';
-
 interface DarkForestMapProps {
   mapWidth: number;
   mapHeight: number;
@@ -160,13 +158,13 @@ export const DarkForestMap = ({ mapWidth, mapHeight }: DarkForestMapProps) => {
         height: mapHeight,
         backgroundColor: '#0a1f12',
         backgroundImage: `
-          radial-gradient(circle at 25% 25%, #1a332a 0%, transparent 50%),
-          radial-gradient(circle at 75% 75%, #0f251a 0%, transparent 50%),
-          url(${grassTexture})
+          url(/grass.png),
+          radial-gradient(circle at 500px 500px, rgba(40, 20, 10, 0.3) 0%, transparent 200px),
+          radial-gradient(circle at 300px 800px, rgba(20, 40, 20, 0.2) 0%, transparent 150px),
+          radial-gradient(circle at 800px 300px, rgba(20, 40, 20, 0.2) 0%, transparent 150px)
         `,
-        backgroundSize: '300px 300px, 400px 400px, 128px 128px',
-        backgroundRepeat: 'repeat',
-        imageRendering: 'pixelated',
+        backgroundSize: '256px 256px, 400px 400px, 300px 300px, 300px 300px',
+        backgroundRepeat: 'repeat, no-repeat, no-repeat, no-repeat',
         filter: 'brightness(0.4) contrast(1.1) hue-rotate(20deg)'
       }}
     >

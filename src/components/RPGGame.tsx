@@ -27,6 +27,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
+import { useDarkForestEnemySystem } from './DarkForestEnemySystem';
 import { getSkillById, availableSkills } from '@/data/skills';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
@@ -1166,10 +1167,17 @@ const RPGGame = () => {
     }, 500);
   }, [handleBattleEnd, toast]);
 
-  // Enemy system (only in abandoned mines)
-  const { enemies, attackEnemy, removeEnemy } = useEnemySystem({
+  // Enemy system (mines and dark forest)
+  const { enemies: minesEnemies, attackEnemy: attackMinesEnemy, removeEnemy: removeMinesEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
+    onBattleStart: handleBattleStart,
+    isInBattle: gameScreen === 'battle' || battleState !== null
+  });
+
+  const { enemies: darkForestEnemies, attackEnemy: attackDarkForestEnemy, removeEnemy: removeDarkForestEnemy } = useDarkForestEnemySystem({
+    player,
+    onPlayerTakeDamage: currentLocation === 'dark-forest' ? handlePlayerTakeDamage : () => {},
     onBattleStart: handleBattleStart,
     isInBattle: gameScreen === 'battle' || battleState !== null
   });
@@ -1178,10 +1186,14 @@ const RPGGame = () => {
   const handleBattleVictory = useCallback(() => {
     // Remove defeated enemy from the map and schedule respawn
     if (battleState) {
-      removeEnemy(battleState.enemy.id);
+      if (currentLocation === 'abandoned-mines') {
+        removeMinesEnemy(battleState.enemy.id);
+      } else if (currentLocation === 'dark-forest') {
+        removeDarkForestEnemy(battleState.enemy.id);
+      }
     }
     handleBattleEnd();
-  }, [handleBattleEnd, battleState, removeEnemy]);
+  }, [handleBattleEnd, battleState, currentLocation, removeMinesEnemy, removeDarkForestEnemy]);
 
   // Enemy click removed - no attacks outside battle
 
@@ -2404,7 +2416,11 @@ const handleBuyItem = useCallback((item: Item) => {
           <GameMap
             player={player}
             npcs={npcs}
-            enemies={currentLocation === 'abandoned-mines' ? enemies : []}
+            enemies={
+              currentLocation === 'abandoned-mines' ? minesEnemies : 
+              currentLocation === 'dark-forest' ? darkForestEnemies : 
+              []
+            }
             onNPCInteract={handleNPCInteract}
             onEnemyClick={() => {}} // No attacks outside battle
             onFountainUse={handleFountainUse}

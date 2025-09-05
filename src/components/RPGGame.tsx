@@ -27,7 +27,6 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
-import { useDarkForestEnemySystem } from './DarkForestEnemySystem';
 import { getSkillById, availableSkills } from '@/data/skills';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
@@ -1167,17 +1166,10 @@ const RPGGame = () => {
     }, 500);
   }, [handleBattleEnd, toast]);
 
-  // Enemy system (mines and dark forest)
-  const { enemies: minesEnemies, attackEnemy: attackMinesEnemy, removeEnemy: removeMinesEnemy } = useEnemySystem({
+  // Enemy system (only in abandoned mines)
+  const { enemies, attackEnemy, removeEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
-    onBattleStart: handleBattleStart,
-    isInBattle: gameScreen === 'battle' || battleState !== null
-  });
-
-  const { enemies: darkForestEnemies, attackEnemy: attackDarkForestEnemy, removeEnemy: removeDarkForestEnemy } = useDarkForestEnemySystem({
-    player,
-    onPlayerTakeDamage: currentLocation === 'dark-forest' ? handlePlayerTakeDamage : () => {},
     onBattleStart: handleBattleStart,
     isInBattle: gameScreen === 'battle' || battleState !== null
   });
@@ -1186,14 +1178,10 @@ const RPGGame = () => {
   const handleBattleVictory = useCallback(() => {
     // Remove defeated enemy from the map and schedule respawn
     if (battleState) {
-      if (currentLocation === 'abandoned-mines') {
-        removeMinesEnemy(battleState.enemy.id);
-      } else if (currentLocation === 'dark-forest') {
-        removeDarkForestEnemy(battleState.enemy.id);
-      }
+      removeEnemy(battleState.enemy.id);
     }
     handleBattleEnd();
-  }, [handleBattleEnd, battleState, currentLocation, removeMinesEnemy, removeDarkForestEnemy]);
+  }, [handleBattleEnd, battleState, removeEnemy]);
 
   // Enemy click removed - no attacks outside battle
 
@@ -1381,7 +1369,7 @@ const RPGGame = () => {
         }
       }
     } else if (currentLocation === 'dark-forest') {
-      // Dark forest tree collisions - updated with more trees
+      // Dark forest tree collisions
       const forestObstacles = [
         // Border trees
         { x: 0, y: 0, w: 2000, h: 100 }, // Top border
@@ -1389,129 +1377,49 @@ const RPGGame = () => {
         { x: 1900, y: 0, w: 100, h: 2000 }, // Right border
         { x: 0, y: 1900, w: 2000, h: 100 }, // Bottom border
         
-        // Row 1: Top area (y: 180-300)
+        // Scattered trees in forest (same as in DarkForestMap.tsx)
         { x: 200, y: 200, w: 80, h: 80 },
-        { x: 320, y: 180, w: 70, h: 70 },
-        { x: 450, y: 220, w: 85, h: 85 },
-        { x: 580, y: 190, w: 75, h: 75 },
-        { x: 720, y: 240, w: 80, h: 80 },
-        { x: 850, y: 200, w: 65, h: 65 },
-        { x: 1150, y: 180, w: 90, h: 90 },
-        { x: 1280, y: 220, w: 75, h: 75 },
-        { x: 1420, y: 190, w: 80, h: 80 },
-        { x: 1560, y: 240, w: 70, h: 70 },
-        { x: 1720, y: 200, w: 85, h: 85 },
+        { x: 350, y: 180, w: 60, h: 60 },
+        { x: 450, y: 300, w: 70, h: 70 },
+        { x: 600, y: 250, w: 90, h: 90 },
+        { x: 800, y: 200, w: 75, h: 75 },
+        { x: 1200, y: 180, w: 85, h: 85 },
+        { x: 1400, y: 280, w: 65, h: 65 },
+        { x: 1600, y: 220, w: 80, h: 80 },
         
-        // Row 2: Upper middle (y: 350-480)
-        { x: 150, y: 380, w: 75, h: 75 },
-        { x: 280, y: 350, w: 80, h: 80 },
-        { x: 420, y: 400, w: 70, h: 70 },
-        { x: 540, y: 360, w: 85, h: 85 },
-        { x: 680, y: 420, w: 75, h: 75 },
-        { x: 820, y: 380, w: 80, h: 80 },
-        { x: 960, y: 350, w: 90, h: 90 },
-        { x: 1120, y: 400, w: 70, h: 70 },
-        { x: 1280, y: 370, w: 85, h: 85 },
-        { x: 1440, y: 420, w: 75, h: 75 },
-        { x: 1600, y: 350, w: 80, h: 80 },
-        { x: 1750, y: 390, w: 65, h: 65 },
+        { x: 150, y: 500, w: 70, h: 70 },
+        { x: 300, y: 450, w: 80, h: 80 },
+        { x: 500, y: 400, w: 90, h: 90 },
+        { x: 750, y: 480, w: 75, h: 75 },
+        { x: 1000, y: 420, w: 85, h: 85 },
+        { x: 1250, y: 470, w: 70, h: 70 },
+        { x: 1500, y: 450, w: 80, h: 80 },
+        { x: 1750, y: 500, w: 65, h: 65 },
         
-        // Row 3: Middle area (y: 550-680)
-        { x: 180, y: 580, w: 80, h: 80 },
-        { x: 320, y: 550, w: 75, h: 75 },
-        { x: 460, y: 600, w: 85, h: 85 },
-        { x: 600, y: 570, w: 70, h: 70 },
-        { x: 740, y: 620, w: 80, h: 80 },
-        { x: 880, y: 580, w: 90, h: 90 },
-        { x: 1040, y: 550, w: 75, h: 75 },
-        { x: 1180, y: 600, w: 85, h: 85 },
-        { x: 1340, y: 570, w: 80, h: 80 },
-        { x: 1480, y: 620, w: 70, h: 70 },
-        { x: 1620, y: 580, w: 85, h: 85 },
-        { x: 1780, y: 550, w: 75, h: 75 },
+        { x: 250, y: 800, w: 85, h: 85 },
+        { x: 400, y: 750, w: 70, h: 70 },
+        { x: 650, y: 800, w: 80, h: 80 },
+        { x: 900, y: 750, w: 90, h: 90 },
+        { x: 1150, y: 780, w: 75, h: 75 },
+        { x: 1400, y: 720, w: 85, h: 85 },
+        { x: 1650, y: 800, w: 70, h: 70 },
         
-        // Row 4: Lower middle (y: 750-880)
-        { x: 120, y: 780, w: 85, h: 85 },
-        { x: 250, y: 750, w: 80, h: 80 },
-        { x: 380, y: 800, w: 70, h: 70 },
-        { x: 520, y: 770, w: 85, h: 85 },
-        { x: 660, y: 820, w: 75, h: 75 },
-        { x: 800, y: 780, w: 80, h: 80 },
-        { x: 940, y: 750, w: 90, h: 90 },
-        { x: 1100, y: 800, w: 75, h: 75 },
-        { x: 1240, y: 770, w: 85, h: 85 },
-        { x: 1380, y: 820, w: 70, h: 70 },
-        { x: 1520, y: 780, w: 80, h: 80 },
-        { x: 1660, y: 750, w: 85, h: 85 },
-        { x: 1820, y: 800, w: 75, h: 75 },
+        { x: 180, y: 1200, w: 80, h: 80 },
+        { x: 380, y: 1150, w: 75, h: 75 },
+        { x: 580, y: 1200, w: 85, h: 85 },
+        { x: 780, y: 1180, w: 70, h: 70 },
+        { x: 1080, y: 1220, w: 80, h: 80 },
+        { x: 1280, y: 1150, w: 90, h: 90 },
+        { x: 1480, y: 1200, w: 75, h: 75 },
+        { x: 1680, y: 1180, w: 65, h: 65 },
         
-        // Row 5: Center area (y: 950-1080)
-        { x: 200, y: 980, w: 75, h: 75 },
-        { x: 340, y: 950, w: 80, h: 80 },
-        { x: 480, y: 1000, w: 85, h: 85 },
-        { x: 620, y: 970, w: 70, h: 70 },
-        { x: 760, y: 1020, w: 80, h: 80 },
-        { x: 900, y: 980, w: 75, h: 75 },
-        { x: 1060, y: 950, w: 90, h: 90 },
-        { x: 1200, y: 1000, w: 85, h: 85 },
-        { x: 1340, y: 970, w: 80, h: 80 },
-        { x: 1480, y: 1020, w: 75, h: 75 },
-        { x: 1620, y: 980, w: 85, h: 85 },
-        { x: 1780, y: 950, w: 70, h: 70 },
-        
-        // Row 6: Lower area (y: 1150-1280)
-        { x: 160, y: 1180, w: 80, h: 80 },
-        { x: 300, y: 1150, w: 85, h: 85 },
-        { x: 440, y: 1200, w: 75, h: 75 },
-        { x: 580, y: 1170, w: 80, h: 80 },
-        { x: 720, y: 1220, w: 85, h: 85 },
-        { x: 860, y: 1180, w: 70, h: 70 },
-        { x: 1020, y: 1150, w: 90, h: 90 },
-        { x: 1160, y: 1200, w: 75, h: 75 },
-        { x: 1300, y: 1170, w: 85, h: 85 },
-        { x: 1440, y: 1220, w: 80, h: 80 },
-        { x: 1580, y: 1180, w: 75, h: 75 },
-        { x: 1720, y: 1150, w: 85, h: 85 },
-        
-        // Row 7: Bottom area (y: 1350-1480)
-        { x: 220, y: 1380, w: 85, h: 85 },
-        { x: 360, y: 1350, w: 80, h: 80 },
-        { x: 500, y: 1400, w: 75, h: 75 },
-        { x: 640, y: 1370, w: 85, h: 85 },
-        { x: 780, y: 1420, w: 80, h: 80 },
-        { x: 920, y: 1380, w: 70, h: 70 },
-        { x: 1080, y: 1350, w: 90, h: 90 },
-        { x: 1220, y: 1400, w: 75, h: 75 },
-        { x: 1360, y: 1370, w: 85, h: 85 },
-        { x: 1500, y: 1420, w: 80, h: 80 },
-        { x: 1640, y: 1380, w: 75, h: 75 },
-        { x: 1780, y: 1350, w: 85, h: 85 },
-        
-        // Row 8: Near bottom (y: 1550-1680)
-        { x: 180, y: 1580, w: 80, h: 80 },
-        { x: 320, y: 1550, w: 75, h: 75 },
-        { x: 460, y: 1600, w: 85, h: 85 },
-        { x: 600, y: 1570, w: 80, h: 80 },
-        { x: 740, y: 1620, w: 75, h: 75 },
-        { x: 880, y: 1580, w: 90, h: 90 },
-        { x: 1040, y: 1550, w: 85, h: 85 },
-        { x: 1180, y: 1600, w: 80, h: 80 },
-        { x: 1320, y: 1570, w: 75, h: 75 },
-        { x: 1460, y: 1620, w: 85, h: 85 },
-        { x: 1600, y: 1580, w: 80, h: 80 },
-        { x: 1740, y: 1550, w: 75, h: 75 },
-        
-        // Additional scattered trees for density
-        { x: 250, y: 470, w: 60, h: 60 },
-        { x: 700, y: 330, w: 65, h: 65 },
-        { x: 1300, y: 450, w: 70, h: 70 },
-        { x: 450, y: 680, w: 65, h: 65 },
-        { x: 1050, y: 720, w: 70, h: 70 },
-        { x: 350, y: 1050, w: 65, h: 65 },
-        { x: 1150, y: 1120, w: 70, h: 70 },
-        { x: 650, y: 1300, w: 65, h: 65 },
-        { x: 1400, y: 1250, w: 70, h: 70 },
-        { x: 800, y: 1500, w: 65, h: 65 },
+        { x: 300, y: 1500, w: 70, h: 70 },
+        { x: 500, y: 1480, w: 85, h: 85 },
+        { x: 700, y: 1520, w: 80, h: 80 },
+        { x: 1000, y: 1500, w: 75, h: 75 },
+        { x: 1200, y: 1480, w: 90, h: 90 },
+        { x: 1400, y: 1520, w: 70, h: 70 },
+        { x: 1600, y: 1500, w: 85, h: 85 },
       ];
       
       // Check collision with trees (excluding entrance path at top)
@@ -2255,7 +2163,7 @@ const handleBuyItem = useCallback((item: Item) => {
           position: { x: 1000, y: 150 },
           targetPosition: { x: 1000, y: 150 }
         }));
-        console.log('Отправляемся в темный лес...');
+        console.log('Teleported to dark forest at position: 1000, 150');
       } else if (currentLocation === 'dark-forest') {
         setCurrentLocation('village');
         setPlayer(prev => ({
@@ -2263,7 +2171,7 @@ const handleBuyItem = useCallback((item: Item) => {
           position: { x: 500, y: 1350 },
           targetPosition: { x: 500, y: 1350 }
         }));
-        console.log('Возвращаемся в деревню из темного леса...');
+        console.log('Teleported to village from dark forest at position: 500, 1350');
       }
       setIsLoadingLocation(false);
     }, 1500);
@@ -2416,11 +2324,7 @@ const handleBuyItem = useCallback((item: Item) => {
           <GameMap
             player={player}
             npcs={npcs}
-            enemies={
-              currentLocation === 'abandoned-mines' ? minesEnemies : 
-              currentLocation === 'dark-forest' ? darkForestEnemies : 
-              []
-            }
+            enemies={currentLocation === 'abandoned-mines' ? enemies : []}
             onNPCInteract={handleNPCInteract}
             onEnemyClick={() => {}} // No attacks outside battle
             onFountainUse={handleFountainUse}
@@ -2769,15 +2673,7 @@ const handleBuyItem = useCallback((item: Item) => {
       {/* Loading Screen */}
       {isLoadingLocation && (
         <LoadingScreen 
-          message={
-            currentLocation === 'village' && gameScreen === 'game' 
-              ? 'Отправляемся в темный лес...' 
-              : currentLocation === 'abandoned-mines' 
-                ? 'Возвращение в деревню...'
-                : currentLocation === 'dark-forest'
-                  ? 'Возвращение в деревню из темного леса...'
-                  : 'Переход в заброшенные шахты...'
-          }
+          message={currentLocation === 'village' ? 'Переход в заброшенные шахты...' : 'Возвращение в деревню...'}
         />
       )}
     </div>

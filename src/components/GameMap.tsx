@@ -33,7 +33,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   // Handle portal use from DarkForestMap
   useEffect(() => {
     const handlePortalUse = () => {
-      if (currentLocation === 'dark-forest') {
+      if (currentLocation === 'darkforest') {
         onPortalUse();
       }
     };
@@ -550,7 +550,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         backgroundRepeat: 'repeat, no-repeat, no-repeat, no-repeat',
         backgroundColor: 'rgba(139, 186, 139, 0.1)'
       };
-    } else if (currentLocation === 'dark-forest') {
+    } else if (currentLocation === 'darkforest') {
       return {
         backgroundColor: '#0d2818'
       };
@@ -690,7 +690,7 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
   return (
     <div className={`flex-1 overflow-hidden relative cursor-crosshair ${
       currentLocation === 'village' ? 'bg-village-bg' : 
-      currentLocation === 'dark-forest' ? 'bg-gray-800' : 'bg-gray-900'
+      currentLocation === 'darkforest' ? 'bg-gray-800' : 'bg-gray-900'
     }`}>
       <div 
         className="absolute w-full h-full"
@@ -712,9 +712,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         )}
 
         {/* Render location-specific content */}
-        {currentLocation === 'village' ? renderVillage() : 
-         currentLocation === 'abandoned-mines' ? renderAbandonedMines() :
-         <DarkForestMap mapWidth={mapWidth} mapHeight={mapHeight} />}
+         {currentLocation === 'village' ? renderVillage() : 
+          currentLocation === 'abandoned-mines' ? renderAbandonedMines() :
+          <DarkForestMap mapWidth={mapWidth} mapHeight={mapHeight} enemies={enemies} />}
         
         {/* Special objects */}
         {currentLocation === 'village' && (

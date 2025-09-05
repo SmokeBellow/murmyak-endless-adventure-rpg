@@ -27,6 +27,7 @@ import OreMining from './OreMining';
 import QuestRewardModal from './QuestRewardModal';
 import LoadingScreen from './LoadingScreen';
 import { useEnemySystem } from './EnemySystem';
+import { useDarkForestEnemySystem } from './DarkForestEnemySystem';
 import { getSkillById, availableSkills } from '@/data/skills';
 import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
@@ -502,7 +503,7 @@ const RPGGame = () => {
   }, [player, currentLocation, battleState, gameScreen]);
 
   // Loot generation function
-  const generateLoot = useCallback((enemyType: 'rat' | 'bat') => {
+  const generateLoot = useCallback((enemyType: 'rat' | 'bat' | 'wolf' | 'spirit' | 'spider') => {
     const lootItems: Item[] = [];
     
     if (enemyType === 'rat') {
@@ -1166,13 +1167,25 @@ const RPGGame = () => {
     }, 500);
   }, [handleBattleEnd, toast]);
 
-  // Enemy system (only in abandoned mines)
-  const { enemies, attackEnemy, removeEnemy } = useEnemySystem({
+  // Use enemy system hooks
+  const { enemies: mineEnemies, attackEnemy: attackMineEnemy, removeEnemy: removeMineEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
     onBattleStart: handleBattleStart,
     isInBattle: gameScreen === 'battle' || battleState !== null
   });
+
+  const { enemies: forestEnemies, attackEnemy: attackForestEnemy, removeEnemy: removeForestEnemy } = useDarkForestEnemySystem({
+    player,
+    onPlayerTakeDamage: currentLocation === 'darkforest' ? handlePlayerTakeDamage : () => {},
+    onBattleStart: handleBattleStart,
+    isInBattle: gameScreen === 'battle' || battleState !== null
+  });
+
+  // Get current enemies and handlers based on location
+  const enemies = currentLocation === 'darkforest' ? forestEnemies : mineEnemies;
+  const attackEnemy = currentLocation === 'darkforest' ? attackForestEnemy : attackMineEnemy;
+  const removeEnemy = currentLocation === 'darkforest' ? removeForestEnemy : removeMineEnemy;
 
   // Handle battle victory
   const handleBattleVictory = useCallback(() => {
@@ -1368,7 +1381,7 @@ const RPGGame = () => {
           return true;
         }
       }
-    } else if (currentLocation === 'dark-forest') {
+    } else if (currentLocation === 'darkforest') {
       // Dark forest tree collisions
       const forestObstacles = [
         // Border trees
@@ -1486,7 +1499,7 @@ const RPGGame = () => {
       if (currentLocation === 'village') {
         minBound = 0;
         maxBound = 2000;
-      } else if (currentLocation === 'dark-forest') {
+      } else if (currentLocation === 'darkforest') {
         minBound = 0;
         maxBound = 2000;
       }
@@ -2157,14 +2170,14 @@ const handleBuyItem = useCallback((item: Item) => {
     
     setTimeout(() => {
       if (currentLocation === 'village') {
-        setCurrentLocation('dark-forest');
+        setCurrentLocation('darkforest');
         setPlayer(prev => ({
           ...prev,
           position: { x: 1000, y: 150 },
           targetPosition: { x: 1000, y: 150 }
         }));
         console.log('Teleported to dark forest at position: 1000, 150');
-      } else if (currentLocation === 'dark-forest') {
+      } else if (currentLocation === 'darkforest') {
         setCurrentLocation('village');
         setPlayer(prev => ({
           ...prev,

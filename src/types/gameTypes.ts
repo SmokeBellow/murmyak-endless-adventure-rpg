@@ -114,7 +114,7 @@ export interface Quest {
 export interface Enemy {
   id: string;
   name: string;
-  type: 'bat' | 'rat';
+  type: 'bat' | 'rat' | 'wolf' | 'spirit' | 'spider';
   position: { x: number; y: number };
   spawnPosition: { x: number; y: number };
   targetPosition: { x: number; y: number };
@@ -136,7 +136,7 @@ export interface Enemy {
 
 export type GameScreen = 'intro' | 'game' | 'battle' | 'battle-victory' | 'battle-defeat';
 export type MenuType = 'none' | 'inventory' | 'equipment' | 'quests' | 'trade' | 'sidebar' | 'stats' | 'skills';
-export type LocationType = 'village' | 'abandoned-mines' | 'dark-forest';
+export type LocationType = 'village' | 'abandoned-mines' | 'darkforest';
 
 export interface BattleState {
   player: Player;

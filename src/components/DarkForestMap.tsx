@@ -8,6 +8,9 @@ interface DarkForestMapProps {
 }
 
 export const DarkForestMap = ({ mapWidth, mapHeight, enemies }: DarkForestMapProps) => {
+  // Debug log
+  console.log('DarkForestMap enemies:', enemies);
+  
   // Dark forest obstacles - trees and rocks
   const forestObstacles = [
     // Border trees

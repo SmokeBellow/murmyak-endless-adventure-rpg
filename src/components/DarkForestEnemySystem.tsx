@@ -92,6 +92,7 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
 
   // Initialize Dark Forest enemies
   useEffect(() => {
+    console.log('Initializing Dark Forest enemies...');
     const initialEnemies: Enemy[] = [
       // Темные волки
       {

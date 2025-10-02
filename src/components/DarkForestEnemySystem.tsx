@@ -68,15 +68,15 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
   const [enemies, setEnemies] = useState<Enemy[]>([]);
 
   // Helper: check if a point is inside any tree/obstacle
-  const isPointInWall = (px: number, py: number) => {
+  const isPointInWall = useCallback((px: number, py: number) => {
     for (const r of forestObstacles) {
       if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
     }
     return false;
-  };
+  }, []);
 
   // Helper: find nearest safe position near a point
-  const findSafePositionNear = (x: number, y: number) => {
+  const findSafePositionNear = useCallback((x: number, y: number) => {
     if (!isPointInWall(x, y)) return { x, y };
     const step = 10;
     const maxRadius = 300;
@@ -88,7 +88,7 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
       }
     }
     return { x: 1000, y: 1000 };
-  };
+  }, [isPointInWall]);
 
   // Initialize Dark Forest enemies
   useEffect(() => {
@@ -253,13 +253,16 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
       }
     ];
 
-    setEnemies(initialEnemies.map(e => ({
+    const processedEnemies = initialEnemies.map(e => ({
       ...e,
       position: findSafePositionNear(e.position.x, e.position.y),
       spawnPosition: findSafePositionNear(e.spawnPosition.x, e.spawnPosition.y),
       targetPosition: findSafePositionNear(e.targetPosition.x, e.targetPosition.y)
-    })));
-  }, []);
+    }));
+    
+    console.log('Processed enemies:', processedEnemies);
+    setEnemies(processedEnemies);
+  }, [findSafePositionNear]);
 
   // Helper: check line of sight between two points (no trees blocking)
   const hasLineOfSight = useCallback((from: { x: number; y: number }, to: { x: number; y: number }) => {

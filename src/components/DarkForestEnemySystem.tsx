@@ -92,7 +92,6 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
 
   // Initialize Dark Forest enemies
   useEffect(() => {
-    console.log('Initializing Dark Forest enemies...');
     const initialEnemies: Enemy[] = [
       // Темные волки
       {
@@ -260,7 +259,6 @@ export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleS
       targetPosition: findSafePositionNear(e.targetPosition.x, e.targetPosition.y)
     }));
     
-    console.log('Processed enemies:', processedEnemies);
     setEnemies(processedEnemies);
   }, [findSafePositionNear]);
 

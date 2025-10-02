@@ -2337,7 +2337,7 @@ const handleBuyItem = useCallback((item: Item) => {
           <GameMap
             player={player}
             npcs={npcs}
-            enemies={currentLocation === 'abandoned-mines' ? enemies : []}
+            enemies={enemies}
             onNPCInteract={handleNPCInteract}
             onEnemyClick={() => {}} // No attacks outside battle
             onFountainUse={handleFountainUse}

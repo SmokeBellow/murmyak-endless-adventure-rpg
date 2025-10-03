@@ -2661,6 +2661,17 @@ const handleBuyItem = useCallback((item: Item) => {
                 <span className="text-lg mr-3">📜</span>
                 Журнал квестов
               </Button>
+              
+              <Button
+                variant="secondary"
+                className="w-full justify-start text-left h-14 text-sm"
+                onClick={() => {
+                  window.open('/loot-table', '_blank');
+                }}
+              >
+                <span className="text-lg mr-3">📊</span>
+                Таблица лута
+              </Button>
             </div>
           </div>
           

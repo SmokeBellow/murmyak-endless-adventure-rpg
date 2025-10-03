@@ -434,6 +434,18 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         }}
       />
 
+      {/* Chastokol image */}
+      <img 
+        src="/chastokol.png" 
+        alt="Chastokol" 
+        className="absolute pixelated"
+        style={{
+          left: 700,
+          top: 700,
+          imageRendering: 'pixelated',
+          zIndex: 10
+        }}
+      />
 
     </>
   );

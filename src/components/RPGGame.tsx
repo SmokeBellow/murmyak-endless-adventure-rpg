@@ -1551,38 +1551,6 @@ const RPGGame = () => {
       if (x >= 968 && x <= 1032 && y >= 768 && y <= 832) {
         return true;
       }
-      
-      // Fence collisions
-      // Upper fence: from 500/500 to 900/500 (left part)
-      if (x >= 500 && x <= 900 && y >= 500 && y <= 564) {
-        return true;
-      }
-      
-      // Upper fence: from 1100/500 to 1500/500 (right part)  
-      if (x >= 1100 && x <= 1500 && y >= 500 && y <= 564) {
-        return true;
-      }
-      
-      // Lower fence: from 500/1500 to 1500/1500  
-      if (x >= 500 && x <= 1500 && y >= 1500 && y <= 1564) {
-        return true;
-      }
-      
-      // Left fence - split into two parts to allow road passage
-      // Upper part: from 500/500 to 500/1200
-      if (x >= 468 && x <= 532 && y >= 500 && y <= 1200) {
-        return true;
-      }
-      
-      // Lower part: from 500/1400 to 500/1500 (road gap between 1200-1400)
-      if (x >= 468 && x <= 532 && y >= 1400 && y <= 1500) {
-        return true;
-      }
-      
-      // Right fence: from 1500/500 to 1500/1500
-      if (x >= 1468 && x <= 1532 && y >= 500 && y <= 1500) {
-        return true;
-      }
     } else if (currentLocation === 'abandoned-mines') {
       // Mines labyrinth collision: points inside any wall rectangle are blocked
       for (const r of minesObstacles) {

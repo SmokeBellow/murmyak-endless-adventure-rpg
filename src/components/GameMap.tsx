@@ -443,8 +443,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           width: 400,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',
-          backgroundRepeat: 'repeat-x',
-          backgroundSize: 'auto 64px',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated'
         }}
       />
@@ -458,8 +458,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           width: 400,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',
-          backgroundRepeat: 'repeat-x',
-          backgroundSize: 'auto 64px',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated'
         }}
       />
@@ -473,8 +473,8 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           width: 1000,
           height: 64,
           backgroundImage: 'url(/chastokol.png)',
-          backgroundRepeat: 'repeat-x',
-          backgroundSize: 'auto 64px',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated'
         }}
       />
@@ -487,9 +487,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           top: 500,
           width: 64,
           height: 700,
-          backgroundImage: 'url(/chastokol_left.png)',
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '32px auto',
+          backgroundImage: 'url(/chastokol.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated',
           zIndex: 10
         }}
@@ -503,9 +503,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           top: 1400,
           width: 64,
           height: 100,
-          backgroundImage: 'url(/chastokol_left.png)',
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '32px auto',
+          backgroundImage: 'url(/chastokol.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated',
           zIndex: 10
         }}
@@ -519,9 +519,9 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
           top: 500,
           width: 64,
           height: 1000,
-          backgroundImage: 'url(/chastokol_left.png)',
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '32px auto',
+          backgroundImage: 'url(/chastokol.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           imageRendering: 'pixelated',
           zIndex: 10
         }}

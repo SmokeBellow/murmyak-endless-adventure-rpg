@@ -651,6 +651,215 @@ const RPGGame = () => {
           });
         }
       });
+
+    } else if (enemyType === 'wolf') {
+      // Темный волк лут
+      const wolfTrashItems = [
+        { name: 'Клык волка', sellPrice: 5, basePrice: 10, icon: '/trash_nail.png', chance: 0.3 },
+        { name: 'Тёмная шерсть', sellPrice: 8, basePrice: 16, icon: '/trash_gem.png', chance: 0.2 },
+        { name: 'Волчий коготь', sellPrice: 12, basePrice: 24, icon: '/trash_old_coin.png', chance: 0.15 },
+        { name: 'Сердце волка', sellPrice: 20, basePrice: 40, icon: '/trash_rare_gem.png', chance: 0.05 },
+        { name: 'Лунный осколок', sellPrice: 35, basePrice: 70, icon: '/trash_rare_gem.png', chance: 0.02 }
+      ];
+
+      const wolfEquipmentItems = [
+        { 
+          name: 'Волчьи перчатки', 
+          sellPrice: 30, 
+          basePrice: 60, 
+          type: 'armor', 
+          slot: 'weapon',
+          stats: { damage: 5, strength: 2 },
+          description: 'Перчатки с когтями тёмного волка',
+          icon: '/weapon_empty.png',
+          chance: 0.06 
+        },
+        { 
+          name: 'Шкура волка', 
+          sellPrice: 45, 
+          basePrice: 90, 
+          type: 'armor', 
+          slot: 'chest',
+          stats: { armor: 8, health: 15 },
+          description: 'Прочная броня из шкуры тёмного волка',
+          icon: '/leatherarmor.png',
+          chance: 0.04 
+        }
+      ];
+
+      wolfTrashItems.forEach((trash, index) => {
+        if (Math.random() < trash.chance) {
+          lootItems.push({
+            id: `wolf-trash-${index}-${Date.now()}`,
+            name: trash.name,
+            type: 'misc',
+            description: 'Можно продать торговцу',
+            icon: trash.icon,
+            price: trash.basePrice,
+            stackable: true,
+            maxStack: 20
+          });
+        }
+      });
+
+      wolfEquipmentItems.forEach((equip, index) => {
+        if (Math.random() < equip.chance) {
+          lootItems.push({
+            id: `wolf-equipment-${index}-${Date.now()}`,
+            name: equip.name,
+            type: equip.type as 'weapon' | 'armor',
+            slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+            stats: equip.stats,
+            description: equip.description,
+            icon: equip.icon,
+            price: equip.basePrice,
+            stackable: false
+          });
+        }
+      });
+
+    } else if (enemyType === 'spirit') {
+      // Лесной дух лут
+      const spiritTrashItems = [
+        { name: 'Эфирная пыль', sellPrice: 10, basePrice: 20, icon: '/trash_gem.png', chance: 0.35 },
+        { name: 'Духовная эссенция', sellPrice: 15, basePrice: 30, icon: '/trash_rare_gem.png', chance: 0.2 },
+        { name: 'Призрачный осколок', sellPrice: 22, basePrice: 44, icon: '/trash_rare_gem.png', chance: 0.12 },
+        { name: 'Кристалл души', sellPrice: 40, basePrice: 80, icon: '/trash_rare_gem.png', chance: 0.06 },
+        { name: 'Сердце леса', sellPrice: 60, basePrice: 120, icon: '/trash_rare_gem.png', chance: 0.02 }
+      ];
+
+      const spiritEquipmentItems = [
+        { 
+          name: 'Призрачный шлем', 
+          sellPrice: 50, 
+          basePrice: 100, 
+          type: 'armor', 
+          slot: 'head',
+          stats: { armor: 5, mana: 20 },
+          description: 'Шлем, пропитанный духовной энергией',
+          icon: '/helmet_empty.png',
+          chance: 0.05 
+        },
+        { 
+          name: 'Эфирный посох', 
+          sellPrice: 70, 
+          basePrice: 140, 
+          type: 'weapon', 
+          slot: 'weapon',
+          stats: { damage: 8, intelligence: 4 },
+          description: 'Посох, пропитанный духовной энергией',
+          icon: '/weapon_empty.png',
+          chance: 0.03 
+        }
+      ];
+
+      spiritTrashItems.forEach((trash, index) => {
+        if (Math.random() < trash.chance) {
+          lootItems.push({
+            id: `spirit-trash-${index}-${Date.now()}`,
+            name: trash.name,
+            type: 'misc',
+            description: 'Можно продать торговцу',
+            icon: trash.icon,
+            price: trash.basePrice,
+            stackable: true,
+            maxStack: 20
+          });
+        }
+      });
+
+      spiritEquipmentItems.forEach((equip, index) => {
+        if (Math.random() < equip.chance) {
+          lootItems.push({
+            id: `spirit-equipment-${index}-${Date.now()}`,
+            name: equip.name,
+            type: equip.type as 'weapon' | 'armor',
+            slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+            stats: equip.stats,
+            description: equip.description,
+            icon: equip.icon,
+            price: equip.basePrice,
+            stackable: false
+          });
+        }
+      });
+
+    } else if (enemyType === 'spider') {
+      // Древний паук лут
+      const spiderTrashItems = [
+        { name: 'Паутина', sellPrice: 7, basePrice: 14, icon: '/trash_nail.png', chance: 0.4 },
+        { name: 'Ядовитая железа', sellPrice: 14, basePrice: 28, icon: '/trash_gem.png', chance: 0.25 },
+        { name: 'Хитиновый осколок', sellPrice: 18, basePrice: 36, icon: '/trash_old_coin.png', chance: 0.15 },
+        { name: 'Паучий яд', sellPrice: 30, basePrice: 60, icon: '/trash_rare_gem.png', chance: 0.08 },
+        { name: 'Драгоценный хитин', sellPrice: 50, basePrice: 100, icon: '/trash_rare_gem.png', chance: 0.03 }
+      ];
+
+      const spiderEquipmentItems = [
+        { 
+          name: 'Хитиновый щит', 
+          sellPrice: 40, 
+          basePrice: 80, 
+          type: 'armor', 
+          slot: 'shield',
+          stats: { armor: 10, health: 10 },
+          description: 'Щит из прочного паучьего хитина',
+          icon: '/shield_empty.png',
+          chance: 0.05 
+        },
+        { 
+          name: 'Ядовитый клинок', 
+          sellPrice: 60, 
+          basePrice: 120, 
+          type: 'weapon', 
+          slot: 'weapon',
+          stats: { damage: 12, agility: 3 },
+          description: 'Клинок, пропитанный паучьим ядом',
+          icon: '/old_sword.png',
+          chance: 0.04 
+        },
+        { 
+          name: 'Хитиновый шлем', 
+          sellPrice: 35, 
+          basePrice: 70, 
+          type: 'armor', 
+          slot: 'head',
+          stats: { armor: 6, health: 12 },
+          description: 'Лёгкий, но прочный шлем из хитина',
+          icon: '/helmet_empty.png',
+          chance: 0.05 
+        }
+      ];
+
+      spiderTrashItems.forEach((trash, index) => {
+        if (Math.random() < trash.chance) {
+          lootItems.push({
+            id: `spider-trash-${index}-${Date.now()}`,
+            name: trash.name,
+            type: 'misc',
+            description: 'Можно продать торговцу',
+            icon: trash.icon,
+            price: trash.basePrice,
+            stackable: true,
+            maxStack: 20
+          });
+        }
+      });
+
+      spiderEquipmentItems.forEach((equip, index) => {
+        if (Math.random() < equip.chance) {
+          lootItems.push({
+            id: `spider-equipment-${index}-${Date.now()}`,
+            name: equip.name,
+            type: equip.type as 'weapon' | 'armor',
+            slot: equip.slot as 'head' | 'chest' | 'legs' | 'weapon' | 'shield',
+            stats: equip.stats,
+            description: equip.description,
+            icon: equip.icon,
+            price: equip.basePrice,
+            stackable: false
+          });
+        }
+      });
     }
     
     return lootItems;

@@ -440,10 +440,10 @@ const GameMap = ({ player, npcs, enemies, onNPCInteract, onEnemyClick, onFountai
         alt="Chastokol" 
         className="absolute pixelated"
         style={{
-          left: 0,
-          top: 0,
-          width: 2000,
-          height: 2000,
+          left: 500,
+          top: 500,
+          width: 1000,
+          height: 1000,
           imageRendering: 'pixelated',
           zIndex: 10
         }}

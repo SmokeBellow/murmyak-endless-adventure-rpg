@@ -8,60 +8,13 @@ interface DarkForestEnemySystemProps {
   isInBattle?: boolean;
 }
 
-// Dark Forest obstacles (trees from DarkForestMap)
+// Dark Forest obstacles - only borders, no trees
 const forestObstacles = [
-  // Border trees
-  { x: 0, y: 0, w: 2000, h: 100 }, // Top border
-  { x: 0, y: 0, w: 100, h: 2000 }, // Left border
-  { x: 1900, y: 0, w: 100, h: 2000 }, // Right border
-  { x: 0, y: 1900, w: 2000, h: 100 }, // Bottom border
-  
-  // Entrance path opening - top center for return to village
-  { x: 900, y: 0, w: 200, h: 0 }, // Clear entrance at top
-  
-  // Scattered trees in forest
-  { x: 200, y: 200, w: 80, h: 80 },
-  { x: 350, y: 180, w: 60, h: 60 },
-  { x: 450, y: 300, w: 70, h: 70 },
-  { x: 600, y: 250, w: 90, h: 90 },
-  { x: 800, y: 200, w: 75, h: 75 },
-  { x: 1200, y: 180, w: 85, h: 85 },
-  { x: 1400, y: 280, w: 65, h: 65 },
-  { x: 1600, y: 220, w: 80, h: 80 },
-  
-  { x: 150, y: 500, w: 70, h: 70 },
-  { x: 300, y: 450, w: 80, h: 80 },
-  { x: 500, y: 400, w: 90, h: 90 },
-  { x: 750, y: 480, w: 75, h: 75 },
-  { x: 1000, y: 420, w: 85, h: 85 },
-  { x: 1250, y: 470, w: 70, h: 70 },
-  { x: 1500, y: 450, w: 80, h: 80 },
-  { x: 1750, y: 500, w: 65, h: 65 },
-  
-  { x: 250, y: 800, w: 85, h: 85 },
-  { x: 400, y: 750, w: 70, h: 70 },
-  { x: 650, y: 800, w: 80, h: 80 },
-  { x: 900, y: 750, w: 90, h: 90 },
-  { x: 1150, y: 780, w: 75, h: 75 },
-  { x: 1400, y: 720, w: 85, h: 85 },
-  { x: 1650, y: 800, w: 70, h: 70 },
-  
-  { x: 180, y: 1200, w: 80, h: 80 },
-  { x: 380, y: 1150, w: 75, h: 75 },
-  { x: 580, y: 1200, w: 85, h: 85 },
-  { x: 780, y: 1180, w: 70, h: 70 },
-  { x: 1080, y: 1220, w: 80, h: 80 },
-  { x: 1280, y: 1150, w: 90, h: 90 },
-  { x: 1480, y: 1200, w: 75, h: 75 },
-  { x: 1680, y: 1180, w: 65, h: 65 },
-  
-  { x: 300, y: 1500, w: 70, h: 70 },
-  { x: 500, y: 1480, w: 85, h: 85 },
-  { x: 700, y: 1520, w: 80, h: 80 },
-  { x: 1000, y: 1500, w: 75, h: 75 },
-  { x: 1200, y: 1480, w: 90, h: 90 },
-  { x: 1400, y: 1520, w: 70, h: 70 },
-  { x: 1600, y: 1500, w: 85, h: 85 },
+  // Border walls only
+  { x: 0, y: 0, w: 2000, h: 50 }, // Top border
+  { x: 0, y: 0, w: 50, h: 2000 }, // Left border
+  { x: 1950, y: 0, w: 50, h: 2000 }, // Right border
+  { x: 0, y: 1950, w: 2000, h: 50 }, // Bottom border
 ];
 
 export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isInBattle = false }: DarkForestEnemySystemProps) => {

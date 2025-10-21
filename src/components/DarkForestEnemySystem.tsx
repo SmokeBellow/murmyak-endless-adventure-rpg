@@ -8,14 +8,8 @@ interface DarkForestEnemySystemProps {
   isInBattle?: boolean;
 }
 
-// Dark Forest obstacles - only borders, no trees
-const forestObstacles = [
-  // Border walls only
-  { x: 0, y: 0, w: 2000, h: 50 }, // Top border
-  { x: 0, y: 0, w: 50, h: 2000 }, // Left border
-  { x: 1950, y: 0, w: 50, h: 2000 }, // Right border
-  { x: 0, y: 1950, w: 2000, h: 50 }, // Bottom border
-];
+// Dark Forest obstacles - no obstacles
+const forestObstacles: { x: number; y: number; w: number; h: number }[] = [];
 
 export const useDarkForestEnemySystem = ({ player, onPlayerTakeDamage, onBattleStart, isInBattle = false }: DarkForestEnemySystemProps) => {
   const [enemies, setEnemies] = useState<Enemy[]>([]);

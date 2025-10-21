@@ -1973,6 +1973,16 @@ const RPGGame = () => {
             handleFountainUse();
             return;
           }
+          
+          // Check if player is near dark forest portal (only in village)
+          const darkForestPortalDistance = Math.sqrt(
+            Math.pow(10 - playerRef.current.position.x, 2) + 
+            Math.pow(1300 - playerRef.current.position.y, 2)
+          );
+          if (darkForestPortalDistance < 80) {
+            handleDarkForestPortalUse();
+            return;
+          }
         }
         
         // Check if player is near portal

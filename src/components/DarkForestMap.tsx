@@ -1,4 +1,3 @@
-import grassTexture from '@/assets/grass-texture.png';
 import { Enemy } from '@/types/gameTypes';
 
 interface DarkForestMapProps {
@@ -80,15 +79,7 @@ export const DarkForestMap = ({ mapWidth, mapHeight, enemies }: DarkForestMapPro
       style={{ 
         width: mapWidth, 
         height: mapHeight,
-        backgroundColor: '#0d2818',
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, #1a3d2a 0%, transparent 50%),
-          radial-gradient(circle at 75% 75%, #0f2b1a 0%, transparent 50%),
-          url(${grassTexture})
-        `,
-        backgroundSize: '300px 300px, 400px 400px, 128px 128px',
-        backgroundRepeat: 'repeat',
-        imageRendering: 'pixelated'
+        backgroundColor: '#000000'
       }}
     >
       {/* Return portal to village */}

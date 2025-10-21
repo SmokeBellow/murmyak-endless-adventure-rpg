@@ -1401,9 +1401,36 @@ const RPGGame = () => {
     // Remove defeated enemy from the map and schedule respawn
     if (battleState) {
       removeEnemy(battleState.enemy.id);
+      
+      // Move player to a safe position away from other enemies
+      if (currentLocation === 'darkforest') {
+        // Move player slightly away from battle position to avoid immediate re-engagement
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 150; // Move 150 pixels away
+        const newX = Math.max(150, Math.min(1850, player.position.x + Math.cos(angle) * distance));
+        const newY = Math.max(150, Math.min(1850, player.position.y + Math.sin(angle) * distance));
+        
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: newX, y: newY },
+          targetPosition: { x: newX, y: newY }
+        }));
+      } else if (currentLocation === 'abandoned-mines') {
+        // For mines, move to a safer position
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 120;
+        const newX = Math.max(100, Math.min(1900, player.position.x + Math.cos(angle) * distance));
+        const newY = Math.max(100, Math.min(1900, player.position.y + Math.sin(angle) * distance));
+        
+        setPlayer(prev => ({
+          ...prev,
+          position: { x: newX, y: newY },
+          targetPosition: { x: newX, y: newY }
+        }));
+      }
     }
     handleBattleEnd();
-  }, [handleBattleEnd, battleState, removeEnemy]);
+  }, [handleBattleEnd, battleState, removeEnemy, currentLocation, player.position]);
 
   // Enemy click removed - no attacks outside battle
 

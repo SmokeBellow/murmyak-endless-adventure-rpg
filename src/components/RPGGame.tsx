@@ -33,12 +33,12 @@ import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
 import { BattleDefeat } from './BattleDefeat';
-import { useImagePreloader } from '@/hooks/useImagePreloader';
+import { useLocationImagePreloader } from '@/hooks/useLocationImagePreloader';
 
 const RPGGame = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { imagesLoaded, loadingProgress } = useImagePreloader();
+  const { preloadLocationImages, loadingProgress, isLoading: isPreloadingImages } = useLocationImagePreloader();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
@@ -54,6 +54,16 @@ const RPGGame = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [isTreasureChestOpened, setIsTreasureChestOpened] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  // Initial load of village images
+  useEffect(() => {
+    const loadInitialImages = async () => {
+      await preloadLocationImages('village');
+      setInitialLoadComplete(true);
+    };
+    loadInitialImages();
+  }, [preloadLocationImages]);
 
   // Resource nodes with regeneration
   const [resourceNodes, setResourceNodes] = useState({
@@ -2326,37 +2336,37 @@ const handleBuyItem = useCallback((item: Item) => {
   const handlePortalUse = useCallback(() => {
     setIsLoadingLocation(true);
     
-    setTimeout(() => {
+    const loadAndTransition = async () => {
+      const targetLocation = currentLocation === 'village' ? 'abandoned-mines' : 'village';
+      
+      // Load images for target location
+      await preloadLocationImages(targetLocation);
+      
+      // Wait for minimum display time
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (currentLocation === 'village') {
         setCurrentLocation('abandoned-mines');
         
-        // Find safe position AFTER changing location
         setTimeout(() => {
-          const inWall = (px: number, py: number) => {
-            for (const r of minesObstacles) {
-              if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return true;
-            }
-            return false;
+          const inWall = (x: number, y: number) => {
+            return minesObstacles.some(obstacle => 
+              x >= obstacle.x && 
+              x <= obstacle.x + obstacle.w && 
+              y >= obstacle.y && 
+              y <= obstacle.y + obstacle.h
+            );
           };
-          
-          let safePos = { x: 50, y: 100 };
-          if (inWall(safePos.x, safePos.y)) {
-            // Search for safe position near entrance
-            const step = 10;
-            const maxRadius = 300;
-            let found = false;
-            for (let radius = step; radius <= maxRadius && !found; radius += step) {
-              for (let angle = 0; angle < Math.PI * 2 && !found; angle += Math.PI / 8) {
-                const px = Math.max(40, Math.min(1960, Math.round(50 + Math.cos(angle) * radius)));
-                const py = Math.max(40, Math.min(1960, Math.round(100 + Math.sin(angle) * radius)));
-                if (!inWall(px, py)) {
-                  safePos = { x: px, y: py };
-                  found = true;
-                }
-              }
-            }
-            if (!found) {
-              safePos = { x: 140, y: 140 }; // Fallback position
+
+          let safePos = { x: 140, y: 140 };
+          for (let attempts = 0; attempts < 100; attempts++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 70 + Math.random() * 80;
+            const px = Math.max(40, Math.min(1960, Math.round(50 + Math.cos(angle) * radius)));
+            const py = Math.max(40, Math.min(1960, Math.round(100 + Math.sin(angle) * radius)));
+            if (!inWall(px, py)) {
+              safePos = { x: px, y: py };
+              break;
             }
           }
           
@@ -2378,13 +2388,23 @@ const handleBuyItem = useCallback((item: Item) => {
         console.log('Teleported to village at position: 1000, 1000');
       }
       setIsLoadingLocation(false);
-    }, 1500);
-  }, [currentLocation]);
+    };
+    
+    loadAndTransition();
+  }, [currentLocation, preloadLocationImages]);
 
   const handleDarkForestPortalUse = useCallback(() => {
     setIsLoadingLocation(true);
     
-    setTimeout(() => {
+    const loadAndTransition = async () => {
+      const targetLocation = currentLocation === 'village' ? 'darkforest' : 'village';
+      
+      // Load images for target location
+      await preloadLocationImages(targetLocation);
+      
+      // Wait for minimum display time
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (currentLocation === 'village') {
         setCurrentLocation('darkforest');
         setPlayer(prev => ({
@@ -2403,8 +2423,10 @@ const handleBuyItem = useCallback((item: Item) => {
         console.log('Teleported to village from dark forest at position: 500, 1350');
       }
       setIsLoadingLocation(false);
-    }, 1500);
-  }, [currentLocation]);
+    };
+    
+    loadAndTransition();
+  }, [currentLocation, preloadLocationImages]);
 
   const handleMineCoal = useCallback(() => {
     if (resourceNodes.coal.count <= 0) return;
@@ -2910,17 +2932,16 @@ const handleBuyItem = useCallback((item: Item) => {
         />
       )}
 
-      {/* Loading Screen */}
-      {isLoadingLocation && (
+      {/* Loading Screen for location transitions */}
+      {(isLoadingLocation || !initialLoadComplete) && (
         <LoadingScreen 
-          message={currentLocation === 'village' ? 'Переход в заброшенные шахты...' : 'Возвращение в деревню...'}
-        />
-      )}
-
-      {/* Initial Loading Screen */}
-      {!imagesLoaded && (
-        <LoadingScreen 
-          message="Загрузка ресурсов игры..."
+          message={
+            !initialLoadComplete 
+              ? 'Загрузка игры...' 
+              : currentLocation === 'village' 
+                ? 'Переход в новую локацию...' 
+                : 'Возвращение в деревню...'
+          }
           progress={loadingProgress}
         />
       )}

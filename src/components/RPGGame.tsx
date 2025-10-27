@@ -33,10 +33,12 @@ import { minesObstaclesThick as minesObstacles } from '@/maps/minesLayout';
 import { BattleScreen } from './BattleScreen';
 import { BattleVictory } from './BattleVictory';
 import { BattleDefeat } from './BattleDefeat';
+import { useImagePreloader } from '@/hooks/useImagePreloader';
 
 const RPGGame = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { imagesLoaded, loadingProgress } = useImagePreloader();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
@@ -2912,6 +2914,14 @@ const handleBuyItem = useCallback((item: Item) => {
       {isLoadingLocation && (
         <LoadingScreen 
           message={currentLocation === 'village' ? 'Переход в заброшенные шахты...' : 'Возвращение в деревню...'}
+        />
+      )}
+
+      {/* Initial Loading Screen */}
+      {!imagesLoaded && (
+        <LoadingScreen 
+          message="Загрузка ресурсов игры..."
+          progress={loadingProgress}
         />
       )}
     </div>

@@ -4,6 +4,9 @@ interface LoadingScreenProps {
 }
 
 const LoadingScreen = ({ message = "Переход между локациями...", progress }: LoadingScreenProps) => {
+  // Debug logging
+  console.log('LoadingScreen render - progress:', progress, 'message:', message);
+  
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center">
       <div className="text-center">
@@ -17,7 +20,7 @@ const LoadingScreen = ({ message = "Переход между локациями
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-muted-foreground text-lg">{progress}%</p>
+            <p className="text-muted-foreground text-lg" key={progress}>{Math.round(progress)}%</p>
           </div>
         )}
         <div className="flex justify-center space-x-2 mt-6">

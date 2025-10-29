@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { LocationType } from '@/types/gameTypes';
 
 // Изображения для каждой локации
@@ -95,20 +95,24 @@ export const useLocationImagePreloader = () => {
     setIsLoading(true);
     setLoadingProgress(0);
 
-    let loadedCount = 0;
+    const loadedCountRef = { current: 0 };
     const totalImages = images.length;
 
     const loadImage = (src: string): Promise<void> => {
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
-          loadedCount++;
-          setLoadingProgress(Math.round((loadedCount / totalImages) * 100));
+          loadedCountRef.current++;
+          const progress = Math.round((loadedCountRef.current / totalImages) * 100);
+          console.log(`Loaded ${loadedCountRef.current}/${totalImages} images (${progress}%)`);
+          setLoadingProgress(progress);
           resolve();
         };
         img.onerror = () => {
-          loadedCount++;
-          setLoadingProgress(Math.round((loadedCount / totalImages) * 100));
+          loadedCountRef.current++;
+          const progress = Math.round((loadedCountRef.current / totalImages) * 100);
+          console.log(`Failed to load image ${src}, progress: ${loadedCountRef.current}/${totalImages} (${progress}%)`);
+          setLoadingProgress(progress);
           resolve();
         };
         img.src = src;

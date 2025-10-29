@@ -14,7 +14,12 @@ export const DarkForestMap = ({ mapWidth, mapHeight, enemies }: DarkForestMapPro
       style={{ 
         width: mapWidth, 
         height: mapHeight,
-        backgroundColor: '#000000'
+        backgroundImage: `
+          linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)),
+          url(/grass.png)
+        `,
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'auto, 64px 64px'
       }}
     >
       {/* Return portal to village */}

@@ -55,6 +55,7 @@ const RPGGame = () => {
   const [isNoClipCheatEnabled, setIsNoClipCheatEnabled] = useState(false);
   const [isTreasureChestOpened, setIsTreasureChestOpened] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [battleCooldown, setBattleCooldown] = useState(false);
 
   // Initial load of village images
   useEffect(() => {
@@ -496,8 +497,8 @@ const RPGGame = () => {
 
   // Battle system
   const handleBattleStart = useCallback((enemy: Enemy) => {
-    // Don't start battle if already in battle or not in a location with enemies
-    if (battleState || gameScreen === 'battle' || (currentLocation !== 'abandoned-mines' && currentLocation !== 'darkforest')) return;
+    // Don't start battle if already in battle, not in a location with enemies, or in cooldown
+    if (battleState || gameScreen === 'battle' || battleCooldown || (currentLocation !== 'abandoned-mines' && currentLocation !== 'darkforest')) return;
     
     console.log('Starting battle with', enemy.name, 'health:', enemy.health);
     
@@ -512,7 +513,7 @@ const RPGGame = () => {
     setGameScreen('battle');
     setBattleLog([`Бой с ${enemy.name} начинается!`]);
     setDamageTexts([]);
-  }, [player, currentLocation, battleState, gameScreen]);
+  }, [player, currentLocation, battleState, gameScreen, battleCooldown]);
 
   // Loot generation function
   const generateLoot = useCallback((enemyType: 'rat' | 'bat' | 'wolf' | 'spirit' | 'spider') => {
@@ -883,6 +884,12 @@ const RPGGame = () => {
     setGameScreen('game');
     setBattleLog([]);
     setDamageTexts([]);
+    
+    // Set battle cooldown to prevent immediate re-engagement
+    setBattleCooldown(true);
+    setTimeout(() => {
+      setBattleCooldown(false);
+    }, 2000); // 2 second cooldown after battle
   }, []);
 
   const addDamageText = useCallback((amount: number, target: 'player' | 'enemy', type: 'damage' | 'heal' | 'defend' | 'skill' = 'damage') => {
@@ -1392,19 +1399,19 @@ const RPGGame = () => {
   const { enemies: mineEnemies, attackEnemy: attackMineEnemy, removeEnemy: removeMineEnemy } = useEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'abandoned-mines' ? handlePlayerTakeDamage : () => {},
-    onBattleStart: handleBattleStart,
+    onBattleStart: currentLocation === 'abandoned-mines' ? handleBattleStart : () => {},
     isInBattle: gameScreen === 'battle' || battleState !== null
   });
 
   const { enemies: forestEnemies, attackEnemy: attackForestEnemy, removeEnemy: removeForestEnemy } = useDarkForestEnemySystem({
     player,
     onPlayerTakeDamage: currentLocation === 'darkforest' ? handlePlayerTakeDamage : () => {},
-    onBattleStart: handleBattleStart,
+    onBattleStart: currentLocation === 'darkforest' ? handleBattleStart : () => {},
     isInBattle: gameScreen === 'battle' || battleState !== null
   });
 
   // Get current enemies and handlers based on location
-  const enemies = currentLocation === 'darkforest' ? forestEnemies : mineEnemies;
+  const enemies = currentLocation === 'darkforest' ? forestEnemies : (currentLocation === 'abandoned-mines' ? mineEnemies : []);
   const attackEnemy = currentLocation === 'darkforest' ? attackForestEnemy : attackMineEnemy;
   const removeEnemy = currentLocation === 'darkforest' ? removeForestEnemy : removeMineEnemy;
 

@@ -38,7 +38,7 @@ import { useLocationImagePreloader } from '@/hooks/useLocationImagePreloader';
 const RPGGame = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { preloadLocationImages, loadingProgress, isLoading: isPreloadingImages } = useLocationImagePreloader();
+  const { preloadLocationImages, loadingProgress, isLoading: isPreloadingImages, resetProgress } = useLocationImagePreloader();
   const [gameScreen, setGameScreen] = useState<GameScreen>('game');
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
@@ -2334,6 +2334,7 @@ const handleBuyItem = useCallback((item: Item) => {
   }, [isTreasureChestOpened, toast]);
 
   const handlePortalUse = useCallback(() => {
+    resetProgress();
     setIsLoadingLocation(true);
     
     const loadAndTransition = async () => {
@@ -2391,9 +2392,10 @@ const handleBuyItem = useCallback((item: Item) => {
     };
     
     loadAndTransition();
-  }, [currentLocation, preloadLocationImages]);
+  }, [currentLocation, preloadLocationImages, resetProgress]);
 
   const handleDarkForestPortalUse = useCallback(() => {
+    resetProgress();
     setIsLoadingLocation(true);
     
     const loadAndTransition = async () => {
@@ -2426,7 +2428,7 @@ const handleBuyItem = useCallback((item: Item) => {
     };
     
     loadAndTransition();
-  }, [currentLocation, preloadLocationImages]);
+  }, [currentLocation, preloadLocationImages, resetProgress]);
 
   const handleMineCoal = useCallback(() => {
     if (resourceNodes.coal.count <= 0) return;

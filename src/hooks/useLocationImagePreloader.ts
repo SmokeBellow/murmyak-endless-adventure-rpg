@@ -86,6 +86,10 @@ export const useLocationImagePreloader = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  const resetProgress = () => {
+    setLoadingProgress(0);
+  };
+
   const preloadLocationImages = async (location: LocationType): Promise<void> => {
     const images = locationImages[location];
     if (!images || images.length === 0) {
@@ -128,5 +132,5 @@ export const useLocationImagePreloader = () => {
     }
   };
 
-  return { preloadLocationImages, loadingProgress, isLoading };
+  return { preloadLocationImages, loadingProgress, isLoading, resetProgress };
 };

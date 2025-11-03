@@ -65,6 +65,46 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// Utility function to validate CSS color values and prevent injection attacks
+const isValidCSSColor = (color: string): boolean => {
+  if (!color || typeof color !== 'string') return false;
+  
+  // Validate hex colors (#RGB, #RRGGBB, #RGBA, #RRGGBBAA)
+  const hexPattern = /^#[0-9A-Fa-f]{3,8}$/;
+  if (hexPattern.test(color)) return true;
+  
+  // Validate CSS color functions (rgb, rgba, hsl, hsla) - strict format
+  const colorFunctionPattern = /^(rgb|rgba|hsl|hsla)\(\s*[\d\s.,%-]+\s*\)$/;
+  if (colorFunctionPattern.test(color)) return true;
+  
+  // Whitelist of safe named CSS colors
+  const namedColors = [
+    'transparent', 'currentColor', 'inherit',
+    'black', 'white', 'red', 'green', 'blue', 'yellow', 'orange', 'purple', 
+    'pink', 'brown', 'gray', 'grey', 'cyan', 'magenta', 'lime', 'navy', 
+    'teal', 'olive', 'maroon', 'aqua', 'silver', 'fuchsia'
+  ];
+  if (namedColors.includes(color.toLowerCase())) return true;
+  
+  return false;
+};
+
+// Sanitize color value to prevent CSS injection
+const sanitizeColor = (color: string | undefined): string | null => {
+  if (!color) return null;
+  
+  // Trim and remove any dangerous characters
+  const trimmed = color.trim();
+  
+  // Validate the color
+  if (!isValidCSSColor(trimmed)) {
+    console.warn(`Invalid CSS color value rejected: ${color}`);
+    return null;
+  }
+  
+  return trimmed;
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color
@@ -83,11 +123,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color =
+    const rawColor =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
+    const color = sanitizeColor(rawColor);
     return color ? `  --color-${key}: ${color};` : null
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `
